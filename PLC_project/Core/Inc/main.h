@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BTN_Pin GPIO_PIN_13
+#define BTN_GPIO_Port GPIOC
+#define LED_Pin GPIO_PIN_6
+#define LED_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
