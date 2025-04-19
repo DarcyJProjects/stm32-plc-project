@@ -20,6 +20,7 @@
 #include "main.h"
 #include "usb_device.h"
 #include "usb_serial.h"
+#include "io.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -76,6 +77,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  io_add_channel(GPIOC, GPIO_PIN_13, IO_INPUT); // On-board button input
+  io_add_channel(GPIOC, GPIO_PIN_6, IO_OUTPUT); // On-board LED output
 
   /* USER CODE END Init */
 
@@ -91,8 +94,8 @@ int main(void)
   MX_USB_Device_Init();
   /* USER CODE BEGIN 2 */
 
-  // Initialise PC6 to LOW (LED)
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+  // Initialise channel 1 to RESET (LED)
+  io_write(1, GPIO_PIN_RESET);
 
   // Store previous button state
   GPIO_PinState prevButtonState = GPIO_PIN_RESET;
@@ -103,23 +106,27 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  GPIO_PinState buttonState = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+	  // Read the button
+	  GPIO_PinState buttonState = io_read(0); // Channel 0 is PC13 = on-board button
 
-	  if (buttonState == GPIO_PIN_SET) {
+	  // Turn on LED conditioned on button input, output over serial
+	  if (buttonState) {
 		  // Button down, turn on LED
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+		  io_write(1, GPIO_PIN_SET); // Turn on
 		  if (prevButtonState != buttonState) {
 			  usb_serial_print("LED ON\r\n");
 		  }
 	  } else {
 		  // Button up, turn off ELD
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+		  io_write(1, GPIO_PIN_RESET);
 		  if (prevButtonState != buttonState) {
 			  usb_serial_print("LED OFF\r\n");
 		  }
 	  }
 
 	  prevButtonState = buttonState;
+
+	  HAL_Delay(10); // Reduce button bounce
 
     /* USER CODE END WHILE */
 
