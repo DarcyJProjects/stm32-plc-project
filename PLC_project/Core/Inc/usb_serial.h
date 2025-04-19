@@ -8,4 +8,6 @@
 
 void usb_serial_print(const char *msg);
 
+void usb_serial_println(const char *msg);
+
 #endif // Closes the include guard that started with #ifndef

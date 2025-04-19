@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef IO_DIGITAL_H
+#define IO_DIGITAL_H
 
 #include "stm32g4xx_hal.h"
 #include <stdbool.h> // Lets us use boolean logic
@@ -22,20 +22,19 @@ typedef struct {
 	GPIO_TypeDef* port;
 	uint16_t pin;
 	IO_Direction direction;
-} IO_Channel;
+} IO_Digital_Channel;
 
 
 
-#define MAX_IO_CHANNELS 16 // Max 16 digital IOs
-extern IO_Channel io_channel[MAX_IO_CHANNELS]; // defined in source, but declared here to be used
+#define MAX_IO_DIGITAL 16 // Max 16 digital IOs
 
 // Adds a new channel (either input or output) to the list
-void io_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Direction dir);
+void io_digital_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Direction dir);
 
 // Reads an IO channel (if it is an input)
-GPIO_PinState io_read(int index);
+GPIO_PinState io_digital_read(int index);
 
 // Writes to an IO channel (if it is an output).
-void io_write(int index, GPIO_PinState state);
+void io_digital_write(int index, GPIO_PinState state);
 
 #endif

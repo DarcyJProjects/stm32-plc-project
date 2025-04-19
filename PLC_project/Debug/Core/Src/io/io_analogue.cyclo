@@ -1,0 +1,3 @@
+../Core/Src/io/io_analogue.c:15:6:io_analogue_add_channel	2
+../Core/Src/io/io_analogue.c:33:10:io_analogue_read	5
+../Core/Src/io/io_analogue.c:54:6:io_analogue_write	4

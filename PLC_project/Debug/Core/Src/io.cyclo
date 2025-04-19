@@ -1,3 +1,0 @@
-../Core/Src/io.c:8:6:io_add_channel	2
-../Core/Src/io.c:17:15:io_read	4
-../Core/Src/io.c:24:6:io_write	4
