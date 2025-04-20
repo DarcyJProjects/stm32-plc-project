@@ -92,6 +92,8 @@ void DHT11_Setup(GPIO_TypeDef* port, uint16_t pin) {
  * This function initiates communication with the DHT11 sensor and reads the temperature and humidity values.
  * It requires a successful setup of the DHT11 sensor through DHT11_Setup() before calling this function.
  *
+ * Note max polling rate for the DHT11 is 1Hz.
+ *
  * @pre DHT11_Setup(port, pin) must be called before using this function.
  *
  * @param temperature_int: Pointer to store the integer part of the temperature (°C).
