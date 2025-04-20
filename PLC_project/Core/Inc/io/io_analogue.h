@@ -2,8 +2,16 @@
 #define IO_ANALOGUE_H
 
 #include "stm32g4xx_hal.h"
-#include "stm32g4xx_hal_dac.h"
+
+// Only include if enabled in the project config
+#ifdef HAL_ADC_MODULE_ENABLED
 #include "stm32g4xx_hal_adc.h"
+#endif
+
+#ifdef HAL_DAC_MODULE_ENABLED
+#include "stm32g4xx_hal_dac.h"
+#endif
+
 #include "stm32g4xx_hal_gpio.h"
 #include <stdbool.h> // Lets us use boolean logic
 
@@ -18,8 +26,7 @@ typedef enum {
 
 // Define a struct to represent an analogue I/O channel
 typedef struct {
-	ADC_HandleTypeDef* hadc; // ADC handle for conversion (only for inputs)
-	DAC_HandleTypeDef* hdac; // DAC handle for output (only for outputs)
+	void* handle; // ADC/DAC handle
 	uint32_t channel; // ADC/DAC channel number
 	IO_Analogue_Direction direction; // Input/Output direction
 } IO_Analogue_Channel;
@@ -29,7 +36,7 @@ typedef struct {
 #define MAX_IO_ANALOGUE 8 // Max 8 analogue IOs
 
 // Adds a new channel (either input or output) to the list
-void io_analogue_add_channel(ADC_HandleTypeDef* hadc, DAC_HandleTypeDef* hdac, uint32_t channel, IO_Analogue_Direction dir);
+void io_analogue_add_channel(void* handle, uint32_t channel, IO_Analogue_Direction dir);
 
 // Reads from an ADC
 uint32_t io_analogue_read(int index);

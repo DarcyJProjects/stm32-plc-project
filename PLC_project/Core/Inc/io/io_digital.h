@@ -5,11 +5,11 @@
 #include <stdbool.h> // Lets us use boolean logic
 
 // Creates an enum named IO_Direction with two possible values
-// 0 : IO_INPUT
-// 1 : IO_OUTPUT
+// 0 : IO_DIGITAL_INPUT
+// 1 : IO_DIGITAL_OUTPUT
 typedef enum {
-	IO_INPUT,
-	IO_OUTPUT
+	IO_DIGITAL_INPUT,
+	IO_DIGITAL_OUTPUT
 } IO_Direction;
 
 
