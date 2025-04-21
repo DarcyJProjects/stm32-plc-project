@@ -28,6 +28,7 @@
 SPI_HandleTypeDef hspi1;
 
 UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
 /* USER CODE END PV */
@@ -35,6 +36,7 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
@@ -61,7 +63,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   DHT11_Setup(GPIOB, GPIO_PIN_0); // setup DHT11 on pin B0
-  RS485_Setup(GPIOA, GPIO_PIN_1);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -72,22 +73,23 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USB_Device_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  RS485_Setup(GPIOA, GPIO_PIN_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   //uint8_t temp_int = 0, temp_dec = 0, hum_int = 0, hum_dec = 0;
 
-  HAL_Delay(8000);
 
   while(1) {
-	  uint8_t msg[] = "Hello from STM32 over RS485!\r\n";
-	  RS485_Transmit(msg, sizeof(msg) - 1);
-	  HAL_Delay(2000);
+	  //uint8_t msg[] = "Hello from STM32 over RS485!\r\n";
+	  //RS485_Transmit(msg, sizeof(msg) - 1);
+	  HAL_Delay(10000);
 	  /*char msg[64];
 
 	  DHT11_Response response = DHT11_Read(&temp_int, &temp_dec, &hum_int, &hum_dec);
@@ -241,6 +243,23 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMAMUX1_CLK_ENABLE();
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 
 }
 
