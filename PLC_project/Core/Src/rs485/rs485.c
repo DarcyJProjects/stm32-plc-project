@@ -12,6 +12,10 @@ extern DMA_HandleTypeDef hdma_usart2_rx;
 static GPIO_TypeDef* RS485_DIR_PORT;
 static uint16_t RS485_DIR_PIN;
 
+static uint8_t* RS485_TXBuffer = NULL;
+static uint16_t RS485_TXBufferLen = 0;
+static volatile bool RS485_TXBusy = false;
+
 #define RS485_DMA_BUFFER_SIZE 64
 
 static uint8_t RS485_DMA_BUFFER[RS485_DMA_BUFFER_SIZE] = {0};
@@ -35,24 +39,22 @@ void RS485_Setup(GPIO_TypeDef* dir_port, uint16_t dir_pin) {
 	RS485_SetReceiveMode();
 
 	// Start DMA
-	//HAL_UART_Receive_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
-
-	// Enable IDLE interrupt
-	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
 }
 
 void RS485_Transmit(uint8_t *data, uint16_t len) {
+	if (RS485_TXBusy) return; // return to prevent overlapping TX
+	// Note may need to implement a queue of transmits?
+
+	RS485_TXBusy = true;
+	RS485_TXBuffer = data;
+	RS485_TXBufferLen = len;
+
 	// Set to transmit mode
 	RS485_SetTransmitMode();
 
-	// Transmit data
-	HAL_Delay(1); // short delay
-	HAL_UART_Transmit(&huart2, data, len, HAL_MAX_DELAY);
-	HAL_Delay(1); // short delay
-
-	// Revert mode ready to receive
-	RS485_SetReceiveMode();
+	// Start interrupt based transmit
+	HAL_UART_Transmit_IT(&huart2, RS485_TXBuffer, RS485_TXBufferLen);
 }
 
 void RS485_Receive(uint8_t* buffer, uint16_t len) {
@@ -64,14 +66,24 @@ void RS485_Receive(uint8_t* buffer, uint16_t len) {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
-	RS485_ReceivedLength = size;
+	if (huart->Instance == USART2) {
+		RS485_ReceivedLength = size;
 
-	// DEBUG PRINT TO USB OVER SERIAL
-	if (RS485_ReceivedLength < RS485_DMA_BUFFER_SIZE) {
-		RS485_DMA_BUFFER[RS485_ReceivedLength] = '\0';
+		// DEBUG PRINT TO USB OVER SERIAL
+		if (RS485_ReceivedLength < RS485_DMA_BUFFER_SIZE) {
+			RS485_DMA_BUFFER[RS485_ReceivedLength] = '\0';
+		}
+		usb_serial_println((char*)RS485_DMA_BUFFER);
+
+		// Ready for next reception
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
 	}
-	usb_serial_println((char*)RS485_DMA_BUFFER);
+}
 
-	// Ready for next reception
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+	if (huart->Instance == USART2) {
+		// Transmission complete, revert to receive mode
+		RS485_SetReceiveMode();
+		RS485_TXBusy = false;
+	}
 }

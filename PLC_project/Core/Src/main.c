@@ -7,7 +7,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usb_serial.h"
-#include "sensors/dht11.h"
 #include "rs485/rs485.h"
 #include <string.h>
 /* USER CODE END Includes */
@@ -62,7 +61,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  DHT11_Setup(GPIOB, GPIO_PIN_0); // setup DHT11 on pin B0
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -83,28 +81,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  //uint8_t temp_int = 0, temp_dec = 0, hum_int = 0, hum_dec = 0;
-
 
   while(1) {
-	  //uint8_t msg[] = "Hello from STM32 over RS485!\r\n";
-	  //RS485_Transmit(msg, sizeof(msg) - 1);
-	  HAL_Delay(10000);
-	  /*char msg[64];
-
-	  DHT11_Response response = DHT11_Read(&temp_int, &temp_dec, &hum_int, &hum_dec);
-	  if (response == DHT11_OK) {
-		  sprintf(msg, "Temp: %d.%dC, Humidity: %d.%d%", temp_int, temp_dec, hum_int, hum_dec);
-	  } else if (response == DHT11_ERROR_TIMEOUT) {
-		  sprintf(msg, "DHT11_ERROR_TIMEOUT");
-	  } else if (response == DHT11_ERROR_CHECKSUM) {
-		  sprintf(msg, "DHT11_ERROR_CHECKSUM");
-	  } else if (response == DHT11_ERROR_NO_RESPONSE) {
-		  sprintf(msg, "DHT11_ERROR_NO_RESPONSE");
-	  }
-	  usb_serial_println(msg);
-
-	  HAL_Delay(2000);*/
+	  uint8_t msg[] = "Hello from STM32!\r\n";
+	  RS485_Transmit(msg, sizeof(msg) - 1);
+	  HAL_Delay(2000); // only send every 2 seconds
   }
     /* USER CODE END WHILE */
 
