@@ -1,0 +1,4 @@
+../Core/Src/rs485/rs485.c:10:6:RS485_Setup	16	static
+../Core/Src/rs485/rs485.c:15:6:RS485_SetTransmitMode	8	static
+../Core/Src/rs485/rs485.c:20:6:RS485_SetReceiveMode	8	static
+../Core/Src/rs485/rs485.c:25:6:RS485_Transmit	16	static

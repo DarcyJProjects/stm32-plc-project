@@ -31,7 +31,7 @@ void io_digital_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Direction dir) 
  * @retval The GPIO_PinState of the digital input, or 0 if the channel is invalid or not an input channel.
  */
 GPIO_PinState io_digital_read(int index) {
-	if (index >= 0 && index < io_digital_channel_count && io_digital_channels[index].direction == IO_INPUT) {
+	if (index >= 0 && index < io_digital_channel_count && io_digital_channels[index].direction == IO_DIGITAL_INPUT) {
 		return HAL_GPIO_ReadPin(io_digital_channels[index].port, io_digital_channels[index].pin);
 	}
 	return GPIO_PIN_RESET;
@@ -46,7 +46,7 @@ GPIO_PinState io_digital_read(int index) {
  * @param value: The GPIO_PinState to write to the output channel (GPIO_PIN_RESET, or GPIO_PIN_SET).
  */
 void io_digital_write(int index, GPIO_PinState value) {
-	if (index >= 0 && index < io_digital_channel_count && io_digital_channels[index].direction == IO_OUTPUT) {
+	if (index >= 0 && index < io_digital_channel_count && io_digital_channels[index].direction == IO_DIGITAL_OUTPUT) {
 		HAL_GPIO_WritePin(io_digital_channels[index].port, io_digital_channels[index].pin, value);
 	}
 }
