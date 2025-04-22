@@ -1,6 +1,6 @@
 ../Core/Src/rs485/rs485.c:23:6:RS485_SetTransmitMode	8	static
 ../Core/Src/rs485/rs485.c:28:6:RS485_SetReceiveMode	8	static
 ../Core/Src/rs485/rs485.c:33:6:RS485_Setup	16	static
-../Core/Src/rs485/rs485.c:45:6:RS485_Transmit	16	static
-../Core/Src/rs485/rs485.c:60:6:HAL_UARTEx_RxEventCallback	16	static
-../Core/Src/rs485/rs485.c:78:6:HAL_UART_TxCpltCallback	16	static
+../Core/Src/rs485/rs485.c:45:6:RS485_Transmit	24	static
+../Core/Src/rs485/rs485.c:75:6:HAL_UARTEx_RxEventCallback	16	static
+../Core/Src/rs485/rs485.c:93:6:HAL_UART_TxCpltCallback	16	static

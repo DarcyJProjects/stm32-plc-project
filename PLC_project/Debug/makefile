@@ -73,8 +73,8 @@ all: main-build
 main-build: PLC_project.elf secondary-outputs
 
 # Tool invocations
-PLC_project.elf PLC_project.map: $(OBJS) $(USER_OBJS) C:\Users\darcy\OneDrive\Documents\GitHub\stm32-plc-project-6b6eb5c64746e3753077f7815b1195db6795be61\PLC_project\STM32G474CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "PLC_project.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\darcy\OneDrive\Documents\GitHub\stm32-plc-project-6b6eb5c64746e3753077f7815b1195db6795be61\PLC_project\STM32G474CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PLC_project.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+PLC_project.elf PLC_project.map: $(OBJS) $(USER_OBJS) C:\Users\darcy\OneDrive\Documents\GitHub\stm32-plc-project\PLC_project\STM32G474CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "PLC_project.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\darcy\OneDrive\Documents\GitHub\stm32-plc-project\PLC_project\STM32G474CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PLC_project.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -60,7 +60,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  io_digital_add_channel(GPIOA, GPIO_PIN_4, IO_DIGITAL_OUTPUT);
+  io_digital_add_channel(GPIOC, GPIO_PIN_6, IO_DIGITAL_OUTPUT);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -94,6 +94,8 @@ int main(void)
 
 		uint8_t msg[] = "Hello from STM32!\r\n";
 		RS485_Transmit(msg, sizeof(msg) - 1);
+
+		HAL_Delay(10);
 
 		// Flash on-board LED to signify non-stuck while loop (was crashing in previous tests trying to implement DMA RS485)
 		io_digital_write(0, GPIO_PIN_SET);
@@ -170,7 +172,7 @@ static void MX_USART2_UART_Init(void)
   huart2.Instance = USART2;
   huart2.Init.BaudRate = 9600;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.StopBits = UART_STOPBITS_2;
   huart2.Init.Parity = UART_PARITY_NONE;
   huart2.Init.Mode = UART_MODE_TX_RX;
   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;

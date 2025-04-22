@@ -45,15 +45,30 @@ void RS485_Setup(GPIO_TypeDef* dir_port, uint16_t dir_pin) {
 void RS485_Transmit(uint8_t *data, uint16_t len) {
     if (RS485_TxInProgress) {
     	// TODO: Implement queue of transmits
-
     	return;
     }
 
-
-	RS485_SetTransmitMode();
+    if (huart2.gState != HAL_UART_STATE_READY || huart2.ErrorCode != HAL_UART_ERROR_NONE) {
+    	// Reset UART
+		HAL_UART_Abort(&huart2);
+		HAL_UART_Init(&huart2);
+	}
 
     RS485_TxInProgress = true;
-    HAL_UART_Transmit_DMA(&huart2, data, len);
+	RS485_SetTransmitMode();
+
+	// Enable TC interrupt
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_TC);
+
+	// Transmit and store the status of it
+	HAL_StatusTypeDef transmitStatus = HAL_UART_Transmit_DMA(&huart2, data, len);
+	if (transmitStatus != HAL_OK) {
+		// UART TX DMA Error - switch back to receiving
+		RS485_SetReceiveMode();
+		RS485_TxInProgress = false;
+		__HAL_UART_DISABLE_IT(&huart2, UART_IT_TC);
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
+	}
 }
 
 
@@ -77,13 +92,19 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART2) {
-    	RS485_TxInProgress = false;
+    	// Check if this is a TC interrupt (not DMA completion)
+    	if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC)) {
+    		// Clear TC interrupt
+    		__HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_TC);
+    		__HAL_UART_DISABLE_IT(&huart2, UART_IT_TC);
 
-        // NOTE: DO NOT PUT HAL_DELAYS IN THIS OR IT WILL LEAD TO ALL SORTS OF ISSUES!
+    		// Transmission fully complete, switch to receive mode
+    		RS485_SetReceiveMode();
+    		RS485_TxInProgress = false;
 
-        RS485_SetReceiveMode();
-
-        // Restart DMA receive if needed
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
+    		// Restart DMA receive
+    		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
+    	}
+    	// DMA Completion (data transferred to UART TDR) does nothing here
     }
 }
