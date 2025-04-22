@@ -2,6 +2,7 @@
 #define RS485_H
 
 #include "stm32g4xx_hal.h"
+#include <stdbool.h>
 
 void RS485_Setup(GPIO_TypeDef* dir_port, uint16_t dir_pin);
 
