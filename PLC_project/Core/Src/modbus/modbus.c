@@ -1,3 +1,7 @@
+// Sources:
+// https://controllerstech.com/stm32-reads-holding-and-input-registers/
+// https://stackoverflow.com/questions/19347685/calculating-modbus-rtu-crc-16
+
 #include "modbus/modbus.h"
 
 #define MODBUS_MAX_FRAME_SIZE 256
@@ -7,6 +11,7 @@ static uint16_t modbus_holding_registers[MODBUS_REGISTER_COUNT] = {0};
 // !!! STILL NEED TO IMPLEMENT CRC CHECK !!!
 
 // FUNCTIONS
+static uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
 static void send_response(uint8_t* frame, uint16_t len);
 static void send_exception(uint8_t address, uint8_t function, uint8_t exception);
 
@@ -24,7 +29,16 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 	uint8_t function = frame[1];
 
-	if (address != MODBUS_SLAVE_ADDRESS) return; // Only respond to requests for us
+	// Check if the frame is for us
+	if (address != MODBUS_SLAVE_ADDRESS) return;
+
+	// Check if the CRC is valid
+	uint16_t received_crc = (frame[7] << 8) | frame[6]; // MODBUS sends LSB first (unlike address, function)
+	uint16_t calculated_crc = modbus_crc16(frame, len);
+	if (received_crc != calculated_crc) {
+		// Invalid CRC, No exception for a CRC failure
+		return;
+	}
 
 	switch (function) {
 		case MODBUS_FUNC_READ_HOLDING_REGISTERS: {
@@ -75,6 +89,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 
 			send_response(responseData, responseLen);
+			break;
 		}
 
 		case MODBUS_FUNC_WRITE_SINGLE_REGISTER: {
@@ -88,6 +103,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			modbus_holding_registers[regAddress] = writeValue; // write the value to the register
 			send_response(frame, 6); // Echo back the original request (to say it was successful)
+			break;
 		}
 
 		default:
@@ -106,6 +122,27 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 // Returns a pointer to the holding register array
 uint16_t* modbus_get_holding_registers(void) {
 	return modbus_holding_registers;
+}
+
+// Calculate CRC16
+// Source: https://stackoverflow.com/questions/19347685/calculating-modbus-rtu-crc-16
+static uint16_t modbus_crc16(uint8_t* frame, uint16_t len) {
+	uint16_t crc = 0xFFFF;
+
+	for (uint16_t pos = 0; pos < len; pos++) {
+		crc ^= frame[pos]; // XOR byte into LSB of CRC
+
+		for (uint8_t b = 0; b < 8; b++) { // Iterate over each bit
+			if ((crc & 0x0001) != 0) { // If LSB is set
+				crc >>= 1; // Shift right
+				crc ^= 0xA001; // XOR 0xA001
+			} else { // Else (LSB is not set)
+				crc >>= 1; // Shift right
+			}
+		}
+	}
+
+	return crc;
 }
 
 // Send the response over RS485
