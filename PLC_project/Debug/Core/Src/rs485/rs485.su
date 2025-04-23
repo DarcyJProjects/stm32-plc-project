@@ -4,3 +4,4 @@
 ../Core/Src/rs485/rs485.c:45:6:RS485_Transmit	24	static
 ../Core/Src/rs485/rs485.c:75:6:HAL_UARTEx_RxEventCallback	48	dynamic
 ../Core/Src/rs485/rs485.c:98:6:HAL_UART_TxCpltCallback	16	static
+../Core/Src/rs485/rs485.c:119:6:RS485_TCCallback	8	static

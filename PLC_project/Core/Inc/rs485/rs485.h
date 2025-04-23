@@ -13,6 +13,6 @@ void RS485_SetReceiveMode(void);
 
 void RS485_Transmit(uint8_t* data, uint16_t len);
 
-void RS485_Receive(uint8_t* buffer, uint16_t len);
+void RS485_TCCallback(void);
 
 #endif

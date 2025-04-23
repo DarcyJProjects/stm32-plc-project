@@ -96,9 +96,11 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-    if (huart->Instance == USART2) {
+    // Retaining, just in case the RS485_TCCallback fix broke rs485
+
+	//if (huart->Instance == USART2) {
     	// Check if this is a TC interrupt (not DMA completion)
-    	if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC)) {
+    	/*if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC)) {
     		// Clear TC interrupt
     		__HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_TC);
     		__HAL_UART_DISABLE_IT(&huart2, UART_IT_TC);
@@ -109,7 +111,34 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 
     		// Restart DMA receive
     		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
-    	}
+    	}*/
     	// DMA Completion (data transferred to UART TDR) does nothing here
-    }
+    //}
 }
+
+void RS485_TCCallback(void)
+{
+	// Transmission fully complete, switch to receive mode
+	RS485_SetReceiveMode();
+	RS485_TxInProgress = false;
+
+	// Restart DMA receive
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
+
+	/* NEED TO ADD THE FOLLOWING CODE IN stm32g4xx_it.c IN USART2_IRQHandler TO CALL THIS FUNCTION:
+    // Check if TC interrupt is triggered
+    if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC)) {
+        // Clear the TC interrupt flag
+        __HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_TC);
+
+        // Disable TC interrupt (optional, if no longer needed)
+        __HAL_UART_DISABLE_IT(&huart2, UART_IT_TC);
+
+        // Call the post-transmission function from RS485.c
+        RS485_TCCallback();
+    }
+
+    // REMEMBER TO INCLUDE RS485.h: #include "rs485/rs485.h"
+    */
+}
+

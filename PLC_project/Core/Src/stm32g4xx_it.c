@@ -22,6 +22,7 @@
 #include "stm32g4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "rs485/rs485.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -253,6 +254,18 @@ void USART2_IRQHandler(void)
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
+
+  // Check if TC interrupt is triggered
+  if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC)) {
+	  // Clear the TC interrupt flag
+	  __HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_TC);
+
+	  // Disable TC interrupt (optional, if no longer needed)
+	  __HAL_UART_DISABLE_IT(&huart2, UART_IT_TC);
+
+	  // Call the post-transmission function from RS485.c
+	  RS485_TCCallback();
+  }
 
   /* USER CODE END USART2_IRQn 1 */
 }
