@@ -7,6 +7,7 @@
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32g4xx.o"
 "./Core/Src/usb_serial.o"
+"./Core/Src/modbus/modbus.o"
 "./Core/Src/rs485/rs485.o"
 "./Core/Src/sensors/dht11.o"
 "./Core/Startup/startup_stm32g474ceux.o"

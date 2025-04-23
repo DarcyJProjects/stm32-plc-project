@@ -1,0 +1,4 @@
+../Core/Src/modbus/modbus.c:15:6:modbus_handle_frame	10
+../Core/Src/modbus/modbus.c:107:11:modbus_get_holding_registers	1
+../Core/Src/modbus/modbus.c:112:13:send_response	1
+../Core/Src/modbus/modbus.c:118:13:send_exception	1

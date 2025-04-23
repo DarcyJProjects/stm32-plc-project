@@ -10,6 +10,7 @@
 #include "rs485/rs485.h"
 #include <string.h>
 #include "io/io_digital.h"
+#include "modbus/modbus.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -79,7 +80,8 @@ int main(void)
   io_digital_write(0, GPIO_PIN_RESET);
   HAL_Delay(5000);
 
-
+  uint8_t modbus_frame[] = {0x01, 0x03, 0x00, 0x10, 0x00, 0x02, 0xC4, 0x0B};
+  uint16_t frame_len = sizeof(modbus_frame) / sizeof(modbus_frame[0]);
 
   /* USER CODE END 2 */
 
@@ -87,15 +89,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
 	while(1) {
-		char sent_msg[] = "Sent";
-		usb_serial_println(sent_msg);
+		//uint8_t msg[] = "Hello from STM32!\r\n";
+		//RS485_Transmit(msg, sizeof(msg) - 1);
 
-		HAL_Delay(10);
-
-		uint8_t msg[] = "Hello from STM32!\r\n";
-		RS485_Transmit(msg, sizeof(msg) - 1);
-
-		HAL_Delay(10);
+		// Simualate receiving modbus frame
+		modbus_handle_frame(modbus_frame, frame_len);
 
 		// Flash on-board LED to signify non-stuck while loop (was crashing in previous tests trying to implement DMA RS485)
 		io_digital_write(0, GPIO_PIN_SET);

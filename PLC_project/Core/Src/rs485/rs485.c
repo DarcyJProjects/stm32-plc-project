@@ -76,13 +76,18 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 	if (huart->Instance == USART2) {
 		RS485_ReceivedLength = size;
 
-		// TODO: pass data to MODBUS stack for processing
-
 		// DEBUG PRINT TO USB OVER SERIAL (remove in production)
-		if (RS485_ReceivedLength < RS485_DMA_BUFFER_SIZE) {
+		/*if (RS485_ReceivedLength < RS485_DMA_BUFFER_SIZE) {
 			RS485_DMA_BUFFER[RS485_ReceivedLength] = '\0';
 			usb_serial_println((char*)RS485_DMA_BUFFER);
-		}
+		}*/
+
+		// Copy the received data into a new buffer for safe processing
+		uint8_t frame[size];
+		memcpy(frame, RS485_DMA_BUFFER, size);
+
+		// Handle the frame with modbus
+		modbus_handle_frame(frame, size);
 
 		// Ready for next reception
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);

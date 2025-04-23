@@ -26,6 +26,7 @@ OBJCOPY_BIN :=
 SUBDIRS := \
 Core/Src/io \
 Core/Src \
+Core/Src/modbus \
 Core/Src/rs485 \
 Core/Src/sensors \
 Core/Startup \

@@ -3,6 +3,7 @@
 
 #include "stm32g4xx_hal.h"
 #include <stdbool.h>
+#include "modbus/modbus.h" // for relaying received frames to modbus
 
 void RS485_Setup(GPIO_TypeDef* dir_port, uint16_t dir_pin);
 
