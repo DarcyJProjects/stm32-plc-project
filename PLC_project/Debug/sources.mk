@@ -28,11 +28,16 @@ Core/Src/io \
 Core/Src \
 Core/Src/modbus \
 Core/Src/rs485 \
+Core/Src/sd \
 Core/Src/sensors \
 Core/Startup \
 Drivers/STM32G4xx_HAL_Driver/Src \
+FATFS/App \
+FATFS/Target \
 Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src \
+Middlewares/Third_Party/FatFs/src \
+Middlewares/Third_Party/FatFs/src/option \
 USB_Device/App \
 USB_Device/Target \
 

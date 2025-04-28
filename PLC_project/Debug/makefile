@@ -11,11 +11,16 @@ RM := rm -rf
 -include sources.mk
 -include USB_Device/Target/subdir.mk
 -include USB_Device/App/subdir.mk
+-include Middlewares/Third_Party/FatFs/src/option/subdir.mk
+-include Middlewares/Third_Party/FatFs/src/subdir.mk
 -include Middlewares/ST/STM32_USB_Device_Library/Core/Src/subdir.mk
 -include Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/subdir.mk
+-include FATFS/Target/subdir.mk
+-include FATFS/App/subdir.mk
 -include Drivers/STM32G4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/sensors/subdir.mk
+-include Core/Src/sd/subdir.mk
 -include Core/Src/rs485/subdir.mk
 -include Core/Src/modbus/subdir.mk
 -include Core/Src/io/subdir.mk
