@@ -59,7 +59,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t endAddress = startAddress + coilCount - 1; // get the ending coil
 
 			// Check if endAddress is outside the stored registers
-			if (endAddress >= MAX_IO_COILS) {
+			if (endAddress >= io_coil_channel_count) { // io_coil_channel count external from io_coils
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
@@ -81,12 +81,6 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Iterate over each coil and add the its value
 			for (int i = 0; i < coilCount; i++) {
-				// Ensure that the coil is an input
-				if (io_coil_get_direction(startAddress) != IO_COIL_INPUT) {
-					send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
-					return;
-				}
-
 				GPIO_PinState coilValue = io_coil_read(startAddress);
 
 				if (coilValue == GPIO_PIN_SET) {
@@ -161,14 +155,8 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t coilAddress = (frame[2] << 8) | frame[3];
 			uint16_t writeValue = (frame[4] << 8) | frame[5];
 
-			if (coilAddress >= MAX_IO_COILS) {
+			if (coilAddress >= io_coil_channel_count) { // io_coil_channel count external from io_coils
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
-				return;
-			}
-
-			// Ensure that the coil is an output
-			if (io_coil_get_direction(coilAddress) != IO_COIL_OUTPUT) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
 				return;
 			}
 
@@ -201,7 +189,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint8_t byteCount = frame[6];
 			uint16_t expectedBytes = (coilCount + 7) / 8;
 
-			if (startAddress + coilCount > MAX_IO_COILS) {
+			if (startAddress + coilCount > io_coil_channel_count) { // io_coil_channel count external from io_coils
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
@@ -222,12 +210,6 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				uint16_t bit_index = i % 8;
 
 				uint8_t writeValue = (frame[frameIndex + byte_index] >> bit_index) & 0x01;
-
-				// Ensure that the coil is an output
-				if (io_coil_get_direction(coilAddress) != IO_COIL_OUTPUT) {
-					send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
-					return;
-				}
 
 				GPIO_PinState writeState = (writeValue) ? GPIO_PIN_SET : GPIO_PIN_RESET; // 1 = GPIO_PIN_SET, 0 = GPIO_PIN_RESET
 
@@ -318,9 +300,9 @@ static void send_response(uint8_t* frame, uint16_t len) {
 	frame[len++] = (crc >> 8) & 0xFF;  // MSB second
 
 	//debug
-	static char debug_msg_response[256];
-	snprintf(debug_msg_response, sizeof(debug_msg_response), "DEBUG: Transmit len = %u, first four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
-	CDC_Transmit_FS((uint8_t*)debug_msg_response, strlen(debug_msg_response));
+	//static char debug_msg_response[256];
+	//snprintf(debug_msg_response, sizeof(debug_msg_response), "DEBUG: Transmit len = %u, first four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
+	//CDC_Transmit_FS((uint8_t*)debug_msg_response, strlen(debug_msg_response));
 
 	// Transmit over RS485
 	RS485_Transmit(frame, len);

@@ -2,7 +2,7 @@
 
 // Allocates storage for all the IO channels.
 IO_Coil_Channel io_coil_channels[MAX_IO_COILS]; // Array of type IO_Channel (struct created in header)
-int io_coil_channel_count = 0;
+uint16_t io_coil_channel_count = 0;
 
 /**
  * @Brief Adds a coil input or output channel to the system
@@ -14,12 +14,12 @@ int io_coil_channel_count = 0;
  * @param pin: Pin number of the GPIO port where the coil pin is connected.
  * @param dir: Direction of the channel (IO_COIL_INPUT or IO_COIL_OUTPUT)
  */
-void io_coil_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Coil_Direction dir) {
+void io_coil_add_channel(GPIO_TypeDef* port, uint16_t pin) {
 	if (io_coil_channel_count >= MAX_IO_COILS) return; // Cannot add another channel if all channels taken
 
 	io_coil_channels[io_coil_channel_count].port = port;
 	io_coil_channels[io_coil_channel_count].pin = pin;
-	io_coil_channels[io_coil_channel_count].direction = dir;
+	io_coil_channels[io_coil_channel_count].storedState = GPIO_PIN_RESET; // default to OFF = RESET
 	io_coil_channel_count++;
 }
 
@@ -31,8 +31,8 @@ void io_coil_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Coil_Direction dir
  * @retval The GPIO_PinState of the coil input, or 0 if the channel is invalid or not an input channel.
  */
 GPIO_PinState io_coil_read(uint16_t index) {
-	if (index >= 0 && index < io_coil_channel_count && io_coil_channels[index].direction == IO_COIL_INPUT) {
-		return HAL_GPIO_ReadPin(io_coil_channels[index].port, io_coil_channels[index].pin);
+	if (index >= 0 && index < io_coil_channel_count) {
+		return io_coil_channels[index].storedState;
 	}
 	return GPIO_PIN_RESET;
 }
@@ -46,21 +46,8 @@ GPIO_PinState io_coil_read(uint16_t index) {
  * @param value: The GPIO_PinState to write to the output channel (GPIO_PIN_RESET, or GPIO_PIN_SET).
  */
 void io_coil_write(uint16_t index, GPIO_PinState value) {
-	if (index >= 0 && index < io_coil_channel_count && io_coil_channels[index].direction == IO_COIL_OUTPUT) {
-		HAL_GPIO_WritePin(io_coil_channels[index].port, io_coil_channels[index].pin, value);
-	}
-}
-
-/**
- * @Brief Returns the direction of a registered coil of a provided index.
- *
- * This function gets the direction of a coil.
- *
- * @param index: The index of the channel to check (assigned in order of registration with io_coil_add_channel).
- */
-IO_Coil_Direction io_coil_get_direction(uint16_t index) {
 	if (index >= 0 && index < io_coil_channel_count) {
-		return io_coil_channels[index].direction;
+		HAL_GPIO_WritePin(io_coil_channels[index].port, io_coil_channels[index].pin, value);
+		io_coil_channels[index].storedState = value;
 	}
-	return IO_COIL_INVALID;
 }

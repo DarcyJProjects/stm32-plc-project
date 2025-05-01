@@ -67,9 +67,15 @@ int main(void)
   /* USER CODE BEGIN Init */
   //io_digital_add_channel(GPIOC, GPIO_PIN_6, IO_DIGITAL_OUTPUT);
 
-  // Add Coils
-  io_coil_add_channel(GPIOC, GPIO_PIN_6, IO_COIL_OUTPUT);
-  io_coil_add_channel(GPIOC, GPIO_PIN_13, IO_COIL_INPUT);
+  // Add Channels
+  // COILS: Digital R/W: for this controller, all digital outputs
+  // DISCRETE INPUTS: Digital R: for this controller, all digital inputs
+  // HOLDING REGISTERS: Analogue R/W: for this controller, all analogue outputs
+  // INPUT REGISTERS: Analogue R: for this controller, all analogue inputs
+  io_coil_add_channel(GPIOC, GPIO_PIN_6);
+  //TODO: io_discrete_in_add_channel(GPIOC, GPIO_PIN_13, IO_COIL_INPUT);
+  //TODO: io_holding_reg_add_channel //
+  //TODO: io_input_reg_add_channel
 
   /* USER CODE END Init */
 
