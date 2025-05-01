@@ -19,9 +19,9 @@ static void send_exception(uint8_t address, uint8_t function, uint8_t exception)
 // Handle a full received modbus frame
 void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 	//debug
-	static char debug_msg[256];
-	snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, First four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
-	CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
+	//static char debug_msg[256];
+	//snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, First four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
+	//CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
 
 	if (len < 6) return;
 
@@ -34,7 +34,11 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 	// Check if the CRC is valid
 	uint16_t received_crc = (frame[7] << 8) | frame[6]; // MODBUS sends LSB first (unlike address, function)
-	uint16_t calculated_crc = modbus_crc16(frame, len);
+	uint16_t calculated_crc = modbus_crc16(frame, len - 2); // Exclude received CRC from CRC calculation
+	//static char debug_crc[256];
+	//snprintf(debug_crc, sizeof(debug_crc), "DEBUG: Received CRC = 0x%02X, Calculated CRC = 0x%02X\r\n", received_crc, calculated_crc);
+	//CDC_Transmit_FS((uint8_t*)debug_crc, strlen(debug_crc));
+
 	if (received_crc != calculated_crc) {
 		// Invalid CRC, No exception for a CRC failure
 		return;
@@ -68,7 +72,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			responseData[0] = MODBUS_SLAVE_ADDRESS; // the address of us
 			responseData[1] = function;
-			responseData[2] = regCount;
+			responseData[2] = regCount * 2; // 16 bit register * 2 = number of bytes (16 bit = 2 bytes)
 
 			uint16_t responseLen = 3; // 3 bytes currently stored
 
@@ -82,11 +86,9 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				startAddress++;
 			}
 
-			//debug
-			static char debug_msg_response[256];
-			snprintf(debug_msg_response, sizeof(debug_msg_response), "DEBUG: Response len = %u, first four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", responseLen, responseData[0], responseData[1], responseData[2], responseData[3]);
-			CDC_Transmit_FS((uint8_t*)debug_msg_response, strlen(debug_msg_response));
-
+			static char debug_msg[256];
+			snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, First four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
+			CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
 
 			send_response(responseData, responseLen);
 			break;
@@ -147,6 +149,16 @@ static uint16_t modbus_crc16(uint8_t* frame, uint16_t len) {
 
 // Send the response over RS485
 static void send_response(uint8_t* frame, uint16_t len) {
+	// Add CRC
+	uint16_t crc = modbus_crc16(frame, len);
+	frame[len++] = crc & 0xFF;         // LSB first
+	frame[len++] = (crc >> 8) & 0xFF;  // MSB second
+
+	//debug
+	static char debug_msg_response[256];
+	snprintf(debug_msg_response, sizeof(debug_msg_response), "DEBUG: Transmit len = %u, first four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
+	CDC_Transmit_FS((uint8_t*)debug_msg_response, strlen(debug_msg_response));
+
 	// Transmit over RS485
 	RS485_Transmit(frame, len);
 }

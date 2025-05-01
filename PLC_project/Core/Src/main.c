@@ -88,6 +88,7 @@ int main(void)
 	io_digital_write(0, GPIO_PIN_RESET);
 	HAL_Delay(5000);
 
+	/* SD
 	// Setup FATFS
 	FATFS FatFs; // Fatfs handle
 	FIL fil; // File handle
@@ -111,6 +112,7 @@ int main(void)
 
 	f_close(&fil); // close the file
 	f_mount(NULL, "", 0); // un-mount the drive
+	*/
 
 	uint8_t modbus_frame[] = {0x01, 0x03, 0x00, 0x10, 0x00, 0x02, 0xC4, 0x0B};
 	uint16_t frame_len = sizeof(modbus_frame) / sizeof(modbus_frame[0]);
@@ -125,13 +127,13 @@ int main(void)
 		//RS485_Transmit(msg, sizeof(msg) - 1);
 
 		// Simualate receiving modbus frame
-		modbus_handle_frame(modbus_frame, frame_len);
+		//modbus_handle_frame(modbus_frame, frame_len);
 
 		// Flash on-board LED to signify non-stuck while loop (was crashing in previous tests trying to implement DMA RS485)
-		io_digital_write(0, GPIO_PIN_SET);
-		HAL_Delay(1000);
-		io_digital_write(0, GPIO_PIN_RESET);
-		HAL_Delay(1000);
+		//io_digital_write(0, GPIO_PIN_SET);
+		//HAL_Delay(1000);
+		//io_digital_write(0, GPIO_PIN_RESET);
+		//HAL_Delay(1000);
 	}
     /* USER CODE END WHILE */
 
