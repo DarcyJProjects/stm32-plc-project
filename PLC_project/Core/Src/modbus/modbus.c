@@ -33,7 +33,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 	if (address != MODBUS_SLAVE_ADDRESS) return;
 
 	// Check if the CRC is valid
-	uint16_t received_crc = (frame[7] << 8) | frame[6]; // MODBUS sends LSB first (unlike address, function)
+	uint16_t received_crc = (frame[len - 1] << 8) | frame[len - 2]; // MODBUS sends LSB first (unlike address, function)
 	uint16_t calculated_crc = modbus_crc16(frame, len - 2); // Exclude received CRC from CRC calculation
 	//static char debug_crc[256];
 	//snprintf(debug_crc, sizeof(debug_crc), "DEBUG: Received CRC = 0x%02X, Calculated CRC = 0x%02X\r\n", received_crc, calculated_crc);
@@ -54,7 +54,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t regCount = (frame[4] << 8) | frame[5]; // combines frame[4] and frame[5] to get 16 bit number of registers
 
 			// Check if regCount value is legal for modbus specs
-			if (regCount == 0 || regCount > 125) {
+			if (regCount == 0 || regCount > MODBUS_REGISTER_COUNT) {
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
@@ -62,7 +62,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t endAddress = startAddress + regCount - 1; // get the ending register
 
 			// Check if endAddress is outside the stored registers
-			if (endAddress > MODBUS_REGISTER_COUNT) {
+			if (endAddress >= MODBUS_REGISTER_COUNT) {
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
@@ -101,7 +101,39 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			}
 
 			modbus_holding_registers[regAddress] = writeValue; // write the value to the register
-			send_response(frame, 6); // Echo back the original request (to say it was successful)
+			send_response(frame, 6); // Echo back 6 bytes (as per spec)of the original request (to say it was successful)
+			break;
+		}
+
+		case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS: {
+			uint16_t startAddress = (frame[2] << 8) | frame[3];
+			uint16_t regCount = (frame[4] << 8) | frame[5];
+			uint8_t byteCount = frame[6];
+
+			if (startAddress + regCount > MODBUS_REGISTER_COUNT) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				return;
+			}
+
+			if (byteCount != regCount * 2) { // not enough values provided to write to all the registers
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Index where register values start in the frame
+			uint16_t frameIndex = 7;
+
+			// Iterate over each register and add the register value
+			for (int i = 0; i < regCount; i++) {
+				uint16_t regAddress = startAddress + i; // start at the startAddress and continue
+				uint16_t writeValue = (frame[frameIndex] << 8) | frame[frameIndex + 1]; // MSB received first, so put MSB last, LSB first now.
+
+				modbus_holding_registers[regAddress] = writeValue; // write the value to the register
+
+				frameIndex += 2; // Move to the next register value in frame (2 bytes per register so +=2)
+			}
+
+			send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
 			break;
 		}
 
@@ -163,11 +195,16 @@ static void send_response(uint8_t* frame, uint16_t len) {
 // Send the exception over RS485
 static void send_exception(uint8_t address, uint8_t function, uint8_t exception) {
 	// Craft exceptionFrame
-	uint8_t exceptionFrame[3]; // length is only 3 bytes (address|function|exception)
+	uint8_t exceptionFrame[5];
 	exceptionFrame[0] = address;
-	exceptionFrame[1] = function;
+	exceptionFrame[1] = function | 0x80; // Must OR function with 0x80 to indicate an exception
 	exceptionFrame[2] = exception;
 
+	// Add CRC
+	uint16_t crc = modbus_crc16(exceptionFrame, 3);
+	exceptionFrame[3] = crc & 0xFF;         // LSB first
+	exceptionFrame[4] = (crc >> 8) & 0xFF;  // MSB second
+
 	// Transmit over RS485
-	RS485_Transmit(exceptionFrame, 3);
+	RS485_Transmit(exceptionFrame, 5);
 }
