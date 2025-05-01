@@ -78,11 +78,8 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Iterate over each register and add the register value
 			for (int i = 0; i < regCount; i++) {
-				responseLen++;
-				responseData[responseLen] = (modbus_holding_registers[startAddress] >> 8) & 0xFF; // Extract the higher byte
-				responseLen++;
-				responseData[responseLen] = (modbus_holding_registers[startAddress]) & 0xFF; // Extract the lower byte
-
+				responseData[responseLen++] = (modbus_holding_registers[startAddress] >> 8) & 0xFF; // Extract the higher byte
+				responseData[responseLen++] = (modbus_holding_registers[startAddress]) & 0xFF; // Extract the lower byte
 				startAddress++;
 			}
 
