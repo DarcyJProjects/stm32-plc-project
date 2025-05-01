@@ -14,7 +14,7 @@ int io_digital_channel_count = 0;
  * @param pin: Pin number of the GPIO port where the digital pin is connected.
  * @param dir: Direction of the channel (IO_DIGITAL_INPUT or IO_DIGITAL_OUTPUT)
  */
-void io_digital_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Direction dir) {
+void io_digital_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Digital_Direction dir) {
 	if (io_digital_channel_count >= MAX_IO_DIGITAL) return; // Cannot add another channel if all channels taken
 
 	io_digital_channels[io_digital_channel_count].port = port;

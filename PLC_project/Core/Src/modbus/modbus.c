@@ -1,14 +1,15 @@
 // Sources:
 // https://controllerstech.com/stm32-reads-holding-and-input-registers/
 // https://stackoverflow.com/questions/19347685/calculating-modbus-rtu-crc-16
+// https://www.modbustools.com/modbus.html#Function01
+// https://dev.to/madhav_baby_giraffe/bit-packing-the-secret-to-optimizing-data-storage-and-transmission-m70
 
 #include "modbus/modbus.h"
 
 #define MODBUS_MAX_FRAME_SIZE 256
 
-static uint16_t modbus_holding_registers[MODBUS_REGISTER_COUNT] = {0};
+static uint16_t modbus_holding_registers[MODBUS_REGISTER_COUNT] = {0}; // will be moved to io_registers once implemented
 
-// !!! STILL NEED TO IMPLEMENT CRC CHECK !!!
 
 // FUNCTIONS
 static uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
@@ -45,6 +46,70 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 	}
 
 	switch (function) {
+		case MODBUS_FUNC_READ_COILS: {
+			uint16_t startAddress = (frame[2] << 8) | frame[3];
+			uint16_t coilCount = (frame[4] << 8) | frame[5];
+
+			// Check if coilCount value is legal for modbus specs
+			if (coilCount == 0 || coilCount > MAX_IO_COILS) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			uint16_t endAddress = startAddress + coilCount - 1; // get the ending coil
+
+			// Check if endAddress is outside the stored registers
+			if (endAddress >= MAX_IO_COILS) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = MODBUS_SLAVE_ADDRESS; // the address of us
+			responseData[1] = function;
+			responseData[2] = (coilCount + 7) / 8; // round up
+
+			uint16_t responseLen = 3; // 3 bytes currently stored
+
+			// Coil states are to be packed into bytes, one bit per coil, starting with LSB first
+			// E.g., if coil states are 1, 0, 0, 1, 0 for these 5 example coils,
+			//		 we store the states as: 00001001 (1 byte) - not 1 byte per bit as thats not efficient (note coil 0 is LSB, then filled towards MSB)
+			uint8_t currentByte = 0;
+			uint8_t bitIndex = 0;
+
+			// Iterate over each coil and add the its value
+			for (int i = 0; i < coilCount; i++) {
+				// Ensure that the coil is an input
+				if (io_coil_get_direction(startAddress) != IO_COIL_INPUT) {
+					send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
+					return;
+				}
+
+				GPIO_PinState coilValue = io_coil_read(startAddress);
+
+				if (coilValue == GPIO_PIN_SET) {
+					// If coil is SET, set the bit at the bitIndex in the currentByte
+					currentByte |= (1 << bitIndex);
+				}
+
+				bitIndex++; // Move to next bit
+
+				if (bitIndex == 8 || i == coilCount - 1) {
+					// Once filled 8 bits (1 byte), or at last coil, store the currentByte and reset variables
+					responseData[responseLen++] = currentByte;
+					currentByte = 0;
+					bitIndex = 0;
+				}
+
+				startAddress++;
+			}
+
+			send_response(responseData, responseLen);
+			break;
+		}
+
 		case MODBUS_FUNC_READ_HOLDING_REGISTERS: {
 			// Combine two bytes to get the 16 byte address
 			// Example: frame[2] = 00010110, frame[3] = 10110100 (arbitrary)
@@ -83,11 +148,36 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				startAddress++;
 			}
 
-			static char debug_msg[256];
-			snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, First four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
-			CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
+			// DEBUG
+			//static char debug_msg[256];
+			//snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, First four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
+			//CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
 
 			send_response(responseData, responseLen);
+			break;
+		}
+
+		case MODBUS_FUNC_WRITE_SINGLE_COIL: {
+			uint16_t coilAddress = (frame[2] << 8) | frame[3];
+			uint16_t writeValue = (frame[4] << 8) | frame[5];
+
+			if (coilAddress >= MAX_IO_COILS) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				return;
+			}
+
+			// Ensure that the coil is an output
+			if (io_coil_get_direction(coilAddress) != IO_COIL_OUTPUT) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
+				return;
+			}
+
+			GPIO_PinState writeState = (writeValue == 0xFF00) ? GPIO_PIN_SET : GPIO_PIN_RESET; // 0xFF00 = GPIO_PIN_SET, 0x0000 = GPIO_PIN_RESET
+
+			// Write the GPIO state to the corresponding coil channel in io_coils
+			io_coil_write(coilAddress, writeState);
+
+			send_response(frame, 6); // Echo back 6 byes (as per spec) of the original request (to say it was successful)
 			break;
 		}
 
@@ -101,7 +191,51 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			}
 
 			modbus_holding_registers[regAddress] = writeValue; // write the value to the register
-			send_response(frame, 6); // Echo back 6 bytes (as per spec)of the original request (to say it was successful)
+			send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
+			break;
+		}
+
+		case MODBUS_FUNC_WRITE_MULTIPLE_COILS: {
+			uint16_t startAddress = (frame[2] << 8) | frame[3];
+			uint16_t coilCount = (frame[4] << 8) | frame[5];
+			uint8_t byteCount = frame[6];
+			uint16_t expectedBytes = (coilCount + 7) / 8;
+
+			if (startAddress + coilCount > MAX_IO_COILS) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				return;
+			}
+
+			if (expectedBytes != byteCount) { // not enough values provided to write to all the coils
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Index where coil values start in the frame
+			uint16_t frameIndex = 7;
+
+			// Iterate over each coil and set the coil value
+			for (uint16_t i = 0; i < coilCount; i++) {
+				uint16_t coilAddress = startAddress + i; // start at the startAddress and continue
+
+				uint16_t byte_index = i / 8;
+				uint16_t bit_index = i % 8;
+
+				uint8_t writeValue = (frame[frameIndex + byte_index] >> bit_index) & 0x01;
+
+				// Ensure that the coil is an output
+				if (io_coil_get_direction(coilAddress) != IO_COIL_OUTPUT) {
+					send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
+					return;
+				}
+
+				GPIO_PinState writeState = (writeValue) ? GPIO_PIN_SET : GPIO_PIN_RESET; // 1 = GPIO_PIN_SET, 0 = GPIO_PIN_RESET
+
+				// Write the GPIO state to the corresponding coil channel in io_coils
+				io_coil_write(coilAddress, writeState);
+			}
+
+			send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
 			break;
 		}
 

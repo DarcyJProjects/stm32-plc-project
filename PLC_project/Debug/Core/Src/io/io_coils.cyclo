@@ -1,0 +1,4 @@
+../Core/Src/io/io_coils.c:17:6:io_coil_add_channel	2
+../Core/Src/io/io_coils.c:33:15:io_coil_read	3
+../Core/Src/io/io_coils.c:48:6:io_coil_write	3
+../Core/Src/io/io_coils.c:61:19:io_coil_get_direction	2

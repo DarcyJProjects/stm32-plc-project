@@ -6,14 +6,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Core/Src/io/io_analogue.c \
+../Core/Src/io/io_coils.c \
 ../Core/Src/io/io_digital.c 
 
 OBJS += \
 ./Core/Src/io/io_analogue.o \
+./Core/Src/io/io_coils.o \
 ./Core/Src/io/io_digital.o 
 
 C_DEPS += \
 ./Core/Src/io/io_analogue.d \
+./Core/Src/io/io_coils.d \
 ./Core/Src/io/io_digital.d 
 
 
@@ -24,7 +27,7 @@ Core/Src/io/%.o Core/Src/io/%.su Core/Src/io/%.cyclo: ../Core/Src/io/%.c Core/Sr
 clean: clean-Core-2f-Src-2f-io
 
 clean-Core-2f-Src-2f-io:
-	-$(RM) ./Core/Src/io/io_analogue.cyclo ./Core/Src/io/io_analogue.d ./Core/Src/io/io_analogue.o ./Core/Src/io/io_analogue.su ./Core/Src/io/io_digital.cyclo ./Core/Src/io/io_digital.d ./Core/Src/io/io_digital.o ./Core/Src/io/io_digital.su
+	-$(RM) ./Core/Src/io/io_analogue.cyclo ./Core/Src/io/io_analogue.d ./Core/Src/io/io_analogue.o ./Core/Src/io/io_analogue.su ./Core/Src/io/io_coils.cyclo ./Core/Src/io/io_coils.d ./Core/Src/io/io_coils.o ./Core/Src/io/io_coils.su ./Core/Src/io/io_digital.cyclo ./Core/Src/io/io_digital.d ./Core/Src/io/io_digital.o ./Core/Src/io/io_digital.su
 
 .PHONY: clean-Core-2f-Src-2f-io
 

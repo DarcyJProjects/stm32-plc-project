@@ -10,18 +10,17 @@
 typedef enum {
 	IO_DIGITAL_INPUT,
 	IO_DIGITAL_OUTPUT
-} IO_Direction;
+} IO_Digital_Direction;
 
 
 // Define a struct to hold everything required to represent a single IO channel
 // port : which GPIO port e.g., GPIOA, GPIOB, GPIOC
 // pin : which pin number e.g., GPIO_PIN_13
-// direction : whether its an input or output (uses IO_Direction enum)
-// state : stores the latest input reading or output value
+// direction : whether its an input or output (uses IO_Digital_Direction enum)
 typedef struct {
 	GPIO_TypeDef* port;
 	uint16_t pin;
-	IO_Direction direction;
+	IO_Digital_Direction direction;
 } IO_Digital_Channel;
 
 
@@ -29,7 +28,7 @@ typedef struct {
 #define MAX_IO_DIGITAL 16 // Max 16 digital IOs
 
 // Adds a new channel (either input or output) to the list
-void io_digital_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Direction dir);
+void io_digital_add_channel(GPIO_TypeDef* port, uint16_t pin, IO_Digital_Direction dir);
 
 // Reads an IO channel (if it is an input)
 GPIO_PinState io_digital_read(int index);

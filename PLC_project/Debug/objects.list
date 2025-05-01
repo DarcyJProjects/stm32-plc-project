@@ -1,4 +1,5 @@
 "./Core/Src/io/io_analogue.o"
+"./Core/Src/io/io_coils.o"
 "./Core/Src/io/io_digital.o"
 "./Core/Src/main.o"
 "./Core/Src/stm32g4xx_hal_msp.o"

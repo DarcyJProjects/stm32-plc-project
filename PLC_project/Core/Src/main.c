@@ -65,7 +65,12 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  io_digital_add_channel(GPIOC, GPIO_PIN_6, IO_DIGITAL_OUTPUT);
+  //io_digital_add_channel(GPIOC, GPIO_PIN_6, IO_DIGITAL_OUTPUT);
+
+  // Add Coils
+  io_coil_add_channel(GPIOC, GPIO_PIN_6, IO_COIL_OUTPUT);
+  io_coil_add_channel(GPIOC, GPIO_PIN_13, IO_COIL_INPUT);
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -306,9 +311,9 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
@@ -316,6 +321,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, SD_CS_Pin|GPIO_PIN_6, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PA4 PA5 */
   GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5;
