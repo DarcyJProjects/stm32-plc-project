@@ -297,7 +297,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				uint16_t regAddress = startAddress + i; // start at the startAddress and continue
 				uint16_t writeValue = (frame[frameIndex] << 8) | frame[frameIndex + 1]; // MSB received first, so put MSB last, LSB first now.
 
-				//modbus_holding_registers[regAddress] = writeValue; // write the value to the register
+				io_holding_reg_write(regAddress, writeValue); // write the value to the register
 
 				frameIndex += 2; // Move to the next register value in frame (2 bytes per register so +=2)
 			}
