@@ -21,15 +21,15 @@ typedef struct {
 } IO_Coil_Channel;
 
 
-#define MAX_IO_COILS 8
+#define MAX_IO_COILS 4
 
 // Adds a new channel to the list
 void io_coil_add_channel(GPIO_TypeDef* port, uint16_t pin);
 
-// Reads an IO channel
+// Reads the coil
 GPIO_PinState io_coil_read(uint16_t index);
 
-// Writes to an IO channel (if it is an output).
+// Writes to the coil
 void io_coil_write(uint16_t index, GPIO_PinState state);
 
 #endif

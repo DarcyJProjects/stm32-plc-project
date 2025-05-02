@@ -8,9 +8,6 @@
 
 #define MODBUS_MAX_FRAME_SIZE 256
 
-static uint16_t modbus_holding_registers[MODBUS_REGISTER_COUNT] = {0}; // will be moved to io_registers once implemented
-
-
 // FUNCTIONS
 static uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
 static void send_response(uint8_t* frame, uint16_t len);
@@ -58,7 +55,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			uint16_t endAddress = startAddress + coilCount - 1; // get the ending coil
 
-			// Check if endAddress is outside the stored registers
+			// Check if endAddress is outside the stored coils
 			if (endAddress >= io_coil_channel_count) { // io_coil_channel count external from io_coils
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
@@ -104,6 +101,64 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			break;
 		}
 
+		case MODBUS_FUNC_READ_DISCRETE_INPUTS: {
+			uint16_t startAddress = (frame[2] << 8) | frame[3];
+			uint16_t discreteCount = (frame[4] << 8) | frame[5];
+
+			// Check if discreteCount value is legal for modbus specs
+			if (discreteCount == 0 || discreteCount > MAX_IO_DISCRETE_IN) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			uint16_t endAddress = startAddress + discreteCount - 1; // get the ending discrete input
+
+			// Check if endAddress is outside the stored discrete inputs
+			if (endAddress >= io_discrete_in_channel_count) { // io_coil_channel count external from io_coils
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = MODBUS_SLAVE_ADDRESS; // the address of us
+			responseData[1] = function;
+			responseData[2] = (discreteCount + 7) / 8; // round up
+
+			uint16_t responseLen = 3; // 3 bytes currently stored
+
+			// Discrete input states are to be packed into bytes, one bit per input, starting with LSB first
+			// E.g., if discrete input states are 1, 0, 0, 1, 0 for these 5 example coils,
+			//		 we store the states as: 00001001 (1 byte) - not 1 byte per bit as thats not efficient (note input 0 is LSB, then filled towards MSB)
+			uint8_t currentByte = 0;
+			uint8_t bitIndex = 0;
+
+			// Iterate over each input and add the its value
+			for (int i = 0; i < discreteCount; i++) {
+				GPIO_PinState discreteValue = io_discrete_in_read(startAddress);
+
+				if (discreteValue == GPIO_PIN_SET) {
+					// If input is SET, set the bit at the bitIndex in the currentByte
+					currentByte |= (1 << bitIndex);
+				}
+
+				bitIndex++; // Move to next bit
+
+				if (bitIndex == 8 || i == discreteCount - 1) {
+					// Once filled 8 bits (1 byte), or at last input, store the currentByte and reset variables
+					responseData[responseLen++] = currentByte;
+					currentByte = 0;
+					bitIndex = 0;
+				}
+
+				startAddress++;
+			}
+
+			send_response(responseData, responseLen);
+			break;
+		}
+
 		case MODBUS_FUNC_READ_HOLDING_REGISTERS: {
 			// Combine two bytes to get the 16 byte address
 			// Example: frame[2] = 00010110, frame[3] = 10110100 (arbitrary)
@@ -113,7 +168,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t regCount = (frame[4] << 8) | frame[5]; // combines frame[4] and frame[5] to get 16 bit number of registers
 
 			// Check if regCount value is legal for modbus specs
-			if (regCount == 0 || regCount > MODBUS_REGISTER_COUNT) {
+			if (regCount == 0 || regCount > io_holding_reg_channel_count) {
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
@@ -121,7 +176,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t endAddress = startAddress + regCount - 1; // get the ending register
 
 			// Check if endAddress is outside the stored registers
-			if (endAddress >= MODBUS_REGISTER_COUNT) {
+			if (endAddress >= io_holding_reg_channel_count) {
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
@@ -137,15 +192,13 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Iterate over each register and add the register value
 			for (int i = 0; i < regCount; i++) {
-				responseData[responseLen++] = (modbus_holding_registers[startAddress] >> 8) & 0xFF; // Extract the higher byte
-				responseData[responseLen++] = (modbus_holding_registers[startAddress]) & 0xFF; // Extract the lower byte
+				uint16_t regValue = io_holding_reg_read(startAddress);
+
+				responseData[responseLen++] = (regValue >> 8) & 0xFF; // Extract the higher byte
+				responseData[responseLen++] = (regValue) & 0xFF; // Extract the lower byte
+
 				startAddress++;
 			}
-
-			// DEBUG
-			//static char debug_msg[256];
-			//snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, First four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
-			//CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
 
 			send_response(responseData, responseLen);
 			break;
@@ -173,12 +226,12 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t regAddress = (frame[2] << 8) | frame[3];
 			uint16_t writeValue = (frame[4] << 8) | frame[5];
 
-			if (regAddress >= MODBUS_REGISTER_COUNT) {
+			if (regAddress >= io_holding_reg_channel_count) {
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
-			modbus_holding_registers[regAddress] = writeValue; // write the value to the register
+			io_holding_reg_write(regAddress, writeValue); // write the value to the register
 			send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
 			break;
 		}
@@ -226,7 +279,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t regCount = (frame[4] << 8) | frame[5];
 			uint8_t byteCount = frame[6];
 
-			if (startAddress + regCount > MODBUS_REGISTER_COUNT) {
+			if (startAddress + regCount > io_holding_reg_channel_count) {
 				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
@@ -244,7 +297,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				uint16_t regAddress = startAddress + i; // start at the startAddress and continue
 				uint16_t writeValue = (frame[frameIndex] << 8) | frame[frameIndex + 1]; // MSB received first, so put MSB last, LSB first now.
 
-				modbus_holding_registers[regAddress] = writeValue; // write the value to the register
+				//modbus_holding_registers[regAddress] = writeValue; // write the value to the register
 
 				frameIndex += 2; // Move to the next register value in frame (2 bytes per register so +=2)
 			}
@@ -266,10 +319,6 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
     //HAL_Delay(10);
 }*/
 
-// Returns a pointer to the holding register array
-uint16_t* modbus_get_holding_registers(void) {
-	return modbus_holding_registers;
-}
 
 // Calculate CRC16
 // Source: https://stackoverflow.com/questions/19347685/calculating-modbus-rtu-crc-16

@@ -1,5 +1,4 @@
-../Core/Src/modbus/modbus.c:21:6:modbus_handle_frame	360	static
-../Core/Src/modbus/modbus.c:270:11:modbus_get_holding_registers	4	static
-../Core/Src/modbus/modbus.c:276:17:modbus_crc16	24	static
-../Core/Src/modbus/modbus.c:296:13:send_response	24	static
-../Core/Src/modbus/modbus.c:312:13:send_exception	24	static
+../Core/Src/modbus/modbus.c:18:6:modbus_handle_frame	376	static
+../Core/Src/modbus/modbus.c:325:17:modbus_crc16	24	static
+../Core/Src/modbus/modbus.c:345:13:send_response	24	static
+../Core/Src/modbus/modbus.c:361:13:send_exception	24	static

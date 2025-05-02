@@ -1,0 +1,2 @@
+../Core/Src/io/io_discrete_in.c:16:6:io_discrete_in_add_channel	2
+../Core/Src/io/io_discrete_in.c:31:15:io_discrete_in_read	2

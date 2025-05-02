@@ -62,9 +62,9 @@ void io_analogue_write(int index, uint32_t value) {
 		DAC_HandleTypeDef* hdac = (DAC_HandleTypeDef*)io_analogue_channels[index].handle; // cast generic handle to DAC_HandleTypeDef
 
 		// Start DAC conversion (DAC peripheral, DAC channel, data alignment, value)
-		HAL_DAC_SetValue(io_analogue_channels[index].hdac, io_analogue_channels[index].channel, DAC_ALIGN_12B_R, value);
+		HAL_DAC_SetValue(hdac, io_analogue_channels[index].channel, DAC_ALIGN_12B_R, value);
 		// Enable the DAC channel and apply the value to the pin
-		HAL_DAC_Start(io_analogue_channels[index].hdac, io_analogue_channels[index].channel);
+		HAL_DAC_Start(hdac, io_analogue_channels[index].channel);
 #endif
 	}
 }

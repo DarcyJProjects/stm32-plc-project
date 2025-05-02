@@ -5,9 +5,9 @@ IO_Coil_Channel io_coil_channels[MAX_IO_COILS]; // Array of type IO_Channel (str
 uint16_t io_coil_channel_count = 0;
 
 /**
- * @Brief Adds a coil input or output channel to the system
+ * @Brief Adds a coil output channel to the system
  *
- * This function adds a coil input or output to the system creating a channel which can
+ * This function adds a coil output to the system creating a channel which can
  * be used to read from or write to. The channel number is incremented with each channel added.
  *
  * @param port: Pointer to the port where the coil pin is connected (e.g., GPIOA, GPIOB, GPIOC).
@@ -28,7 +28,7 @@ void io_coil_add_channel(GPIO_TypeDef* port, uint16_t pin) {
  *
  * @param index: The index of the channel to read (assigned in order of registration with io_coil_add_channel)
  *
- * @retval The GPIO_PinState of the coil input, or 0 if the channel is invalid or not an input channel.
+ * @retval The GPIO_PinState of the coil input, or 0 if the channel index is invalid.
  */
 GPIO_PinState io_coil_read(uint16_t index) {
 	if (index >= 0 && index < io_coil_channel_count) {
