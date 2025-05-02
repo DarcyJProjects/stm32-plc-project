@@ -9,21 +9,24 @@ C_SRCS += \
 ../Core/Src/io/io_coils.c \
 ../Core/Src/io/io_digital.c \
 ../Core/Src/io/io_discrete_in.c \
-../Core/Src/io/io_holding_reg.c 
+../Core/Src/io/io_holding_reg.c \
+../Core/Src/io/io_input_reg.c 
 
 OBJS += \
 ./Core/Src/io/io_analogue.o \
 ./Core/Src/io/io_coils.o \
 ./Core/Src/io/io_digital.o \
 ./Core/Src/io/io_discrete_in.o \
-./Core/Src/io/io_holding_reg.o 
+./Core/Src/io/io_holding_reg.o \
+./Core/Src/io/io_input_reg.o 
 
 C_DEPS += \
 ./Core/Src/io/io_analogue.d \
 ./Core/Src/io/io_coils.d \
 ./Core/Src/io/io_digital.d \
 ./Core/Src/io/io_discrete_in.d \
-./Core/Src/io/io_holding_reg.d 
+./Core/Src/io/io_holding_reg.d \
+./Core/Src/io/io_input_reg.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -33,7 +36,7 @@ Core/Src/io/%.o Core/Src/io/%.su Core/Src/io/%.cyclo: ../Core/Src/io/%.c Core/Sr
 clean: clean-Core-2f-Src-2f-io
 
 clean-Core-2f-Src-2f-io:
-	-$(RM) ./Core/Src/io/io_analogue.cyclo ./Core/Src/io/io_analogue.d ./Core/Src/io/io_analogue.o ./Core/Src/io/io_analogue.su ./Core/Src/io/io_coils.cyclo ./Core/Src/io/io_coils.d ./Core/Src/io/io_coils.o ./Core/Src/io/io_coils.su ./Core/Src/io/io_digital.cyclo ./Core/Src/io/io_digital.d ./Core/Src/io/io_digital.o ./Core/Src/io/io_digital.su ./Core/Src/io/io_discrete_in.cyclo ./Core/Src/io/io_discrete_in.d ./Core/Src/io/io_discrete_in.o ./Core/Src/io/io_discrete_in.su ./Core/Src/io/io_holding_reg.cyclo ./Core/Src/io/io_holding_reg.d ./Core/Src/io/io_holding_reg.o ./Core/Src/io/io_holding_reg.su
+	-$(RM) ./Core/Src/io/io_analogue.cyclo ./Core/Src/io/io_analogue.d ./Core/Src/io/io_analogue.o ./Core/Src/io/io_analogue.su ./Core/Src/io/io_coils.cyclo ./Core/Src/io/io_coils.d ./Core/Src/io/io_coils.o ./Core/Src/io/io_coils.su ./Core/Src/io/io_digital.cyclo ./Core/Src/io/io_digital.d ./Core/Src/io/io_digital.o ./Core/Src/io/io_digital.su ./Core/Src/io/io_discrete_in.cyclo ./Core/Src/io/io_discrete_in.d ./Core/Src/io/io_discrete_in.o ./Core/Src/io/io_discrete_in.su ./Core/Src/io/io_holding_reg.cyclo ./Core/Src/io/io_holding_reg.d ./Core/Src/io/io_holding_reg.o ./Core/Src/io/io_holding_reg.su ./Core/Src/io/io_input_reg.cyclo ./Core/Src/io/io_input_reg.d ./Core/Src/io/io_input_reg.o ./Core/Src/io/io_input_reg.su
 
 .PHONY: clean-Core-2f-Src-2f-io
 

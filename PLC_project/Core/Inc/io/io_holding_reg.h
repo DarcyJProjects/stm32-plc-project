@@ -16,10 +16,10 @@ extern uint16_t io_holding_reg_channel_count; // extern so modbus.c can check th
 #include "stm32g4xx_hal_gpio.h"
 #include <stdbool.h> // Lets us use boolean logic
 
-// Define a struct to represent an analogue I/O channel
+// Define a struct to represent a holding register channel
 typedef struct {
-	void* handle; // ADC/DAC handle
-	uint32_t channel; // ADC/DAC channel number
+	void* handle; // DAC handle
+	uint32_t channel; // DAC channel number
 	uint16_t storedValue; // Last output value
 } IO_Holding_Reg_Channel;
 
@@ -28,9 +28,9 @@ typedef struct {
 #define MAX_IO_HOLDING_REG 2
 
 // Adds a new channel to the list
-void io_analogue_add_channel(void* handle, uint32_t channel);
+void io_holding_reg_add_channel(void* handle, uint32_t channel);
 
-// Reads from an ADC
+// Reads from last stored value
 uint16_t io_holding_reg_read(uint16_t index); // uint16_t as modbus uses 16 bit values
 
 // Writes to a DAC

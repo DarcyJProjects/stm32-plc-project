@@ -37,11 +37,11 @@ uint32_t io_analogue_read(int index) {
 #ifdef HAL_ADC_MODULE_ENABLED
 		ADC_HandleTypeDef* hadc = (ADC_HandleTypeDef*)io_analogue_channels[index].handle; // cast generic handle to ADC_HandleTypeDef
 		// Start ADC conversion
-		HAL_ADC_Start(io_analogue_channels[index].hadc);
-		// Wait until the AD conversion is done (or a timeout of 100 ms occurs)
-		if (HAL_ADC_PollForConversion(io_analogue_channels[index].hadc, 100) == HAL_OK) {
+		HAL_ADC_Start(hadc);
+		// Wait until the ADC conversion is done (or a timeout of 100 ms occurs)
+		if (HAL_ADC_PollForConversion(hadc, 100) == HAL_OK) {
 			// Return the ADC value
-			return HAL_ADC_GetValue(io_analogue_channels[index].hadc);
+			return HAL_ADC_GetValue(hadc);
 		}
 #endif
 	}

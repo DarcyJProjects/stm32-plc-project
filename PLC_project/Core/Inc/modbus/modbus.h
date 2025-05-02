@@ -7,7 +7,7 @@
 #include "io/io_coils.h" // required for controlling coils
 #include "io/io_discrete_in.h" // required for reading discrete inputs
 #include "io/io_holding_reg.h" // required for controlling holding registers
-//#include "io/io_input_reg.h" // required for reading input registers
+#include "io/io_input_reg.h" // required for reading input registers
 
 // MODBUS ADDRESS
 #define MODBUS_SLAVE_ADDRESS 0x01 // Our slave address
@@ -20,6 +20,7 @@
 #define MODBUS_FUNC_READ_COILS 0x01
 #define MODBUS_FUNC_READ_DISCRETE_INPUTS 0x02
 #define MODBUS_FUNC_READ_HOLDING_REGISTERS 0x03
+#define MODBUS_FUNC_READ_INPUT_REGISTERS 0x04
 #define MODBUS_FUNC_WRITE_SINGLE_COIL 0x05
 #define MODBUS_FUNC_WRITE_SINGLE_REGISTER 0x06
 #define MODBUS_FUNC_WRITE_MULTIPLE_COILS 0x0F

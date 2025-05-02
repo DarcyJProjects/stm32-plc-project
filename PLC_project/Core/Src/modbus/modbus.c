@@ -204,6 +204,47 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			break;
 		}
 
+		case MODBUS_FUNC_READ_INPUT_REGISTERS: {
+			uint16_t startAddress = (frame[2] << 8) | frame[3];
+			uint16_t regCount = (frame[4] << 8) | frame[5];
+
+			// Check if regCount value is legal for modbus specs
+			if (regCount == 0 || regCount > io_input_reg_channel_count) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			uint16_t endAddress = startAddress + regCount - 1; // get the ending register
+
+			// Check if endAddress is outside the stored registers
+			if (endAddress >= io_input_reg_channel_count) {
+				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = MODBUS_SLAVE_ADDRESS;
+			responseData[1] = function;
+			responseData[2] = regCount * 2;
+
+			uint16_t responseLen = 3; // 3 bytes currently stored
+
+			// Iterate over each register and add the register value
+			for (int i = 0; i < regCount; i++) {
+				uint16_t regValue = io_input_reg_read(startAddress);
+
+				responseData[responseLen++] = (regValue >> 8) & 0xFF; // Extract the higher byte
+				responseData[responseLen++] = (regValue) & 0xFF; // Extract the lower byte
+
+				startAddress++;
+			}
+
+			send_response(responseData, responseLen);
+			break;
+		}
+
 		case MODBUS_FUNC_WRITE_SINGLE_COIL: {
 			uint16_t coilAddress = (frame[2] << 8) | frame[3];
 			uint16_t writeValue = (frame[4] << 8) | frame[5];

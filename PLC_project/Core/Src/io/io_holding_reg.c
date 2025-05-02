@@ -10,8 +10,8 @@ uint16_t io_holding_reg_channel_count = 0;
  * This function adds a holding register to the system creating a channel which can
  * be used to read from or write to. The channel number is incremented with each channel added.
  *
- * @param handle: Pointer to generic ADC or DAC handle.
- * @param channel: ADC or DAC channel number (e.g., ADC_CHANNEL_4)
+ * @param handle: Pointer to generic DAC handle.
+ * @param channel: DAC channel number (e.g., DAC_CHANNEL_1)
  */
 void io_holding_reg_add_channel(void* handle, uint32_t channel) {
 	if (io_holding_reg_channel_count >= MAX_IO_HOLDING_REG) return; // Cannot add another channel if all channels taken
@@ -25,11 +25,11 @@ void io_holding_reg_add_channel(void* handle, uint32_t channel) {
 /**
  * @Brief Reads the last set value from a registered holding register channel of a provided index.
  *
- * This function returns the last set value of a holding register. It starts an ADC conversion and returns the digital value (0-4095)
+ * This function returns the last set value of a holding register.
  *
  * @param index: The index of the channel to read (assigned in order of registration with io_holding_reg_add_channel)
  *
- * @retval The ADC conversion result, or 0 if the channel is invalid.
+ * @retval The last written value for the holding register, or 0 if the channel is invalid.
  */
 uint16_t io_holding_reg_read(uint16_t index) {
 	if (index >= 0 && index < io_holding_reg_channel_count) {
@@ -58,6 +58,7 @@ void io_holding_reg_write(uint16_t index, uint16_t value) {
 		HAL_DAC_SetValue(hdac, io_holding_reg_channels[index].channel, DAC_ALIGN_12B_R, scaledValue);
 
 		// Enable the DAC channel and apply the value to the pin
+		// TODO: Move to init so its only ran once. doesnt need to be run each time
 		HAL_DAC_Start(hdac, io_holding_reg_channels[index].channel);
 
 		// Store the set value
