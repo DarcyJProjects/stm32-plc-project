@@ -1,0 +1,5 @@
+../Core/Src/rtc/rtc_ds3231.c:3:16:BCDToDecimal	1
+../Core/Src/rtc/rtc_ds3231.c:7:16:DecimalToBCD	1
+../Core/Src/rtc/rtc_ds3231.c:11:19:DS3231_ReadTime	3
+../Core/Src/rtc/rtc_ds3231.c:37:19:DS3231_SetTime	2
+../Core/Src/rtc/rtc_ds3231.c:56:10:DS3231_ReadTemp	4
