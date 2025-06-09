@@ -1,7 +1,8 @@
-../Core/Src/rs485/rs485.c:23:6:RS485_SetTransmitMode	1
-../Core/Src/rs485/rs485.c:28:6:RS485_SetReceiveMode	1
-../Core/Src/rs485/rs485.c:33:6:RS485_Setup	1
-../Core/Src/rs485/rs485.c:45:6:RS485_Transmit	5
-../Core/Src/rs485/rs485.c:75:6:HAL_UARTEx_RxEventCallback	2
-../Core/Src/rs485/rs485.c:98:6:HAL_UART_TxCpltCallback	1
-../Core/Src/rs485/rs485.c:119:6:RS485_TCCallback	1
+../Core/Src/rs485/rs485.c:40:6:RS485_SetTransmitMode	1
+../Core/Src/rs485/rs485.c:48:6:RS485_SetReceiveMode	1
+../Core/Src/rs485/rs485.c:56:6:RS485_Setup	1
+../Core/Src/rs485/rs485.c:71:6:RS485_Transmit	4
+../Core/Src/rs485/rs485.c:90:6:HAL_UARTEx_RxEventCallback	4
+../Core/Src/rs485/rs485.c:112:6:RS485_TCCallback	1
+../Core/Src/rs485/rs485.c:127:6:RS485_ProcessPendingFrames	2
+../Core/Src/rs485/rs485.c:138:6:RS485_TransmitPendingFrames	5

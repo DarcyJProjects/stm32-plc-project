@@ -22,6 +22,8 @@
 #include "stm32g4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "rs485/rs485.h"
+#include "usb_serial.h" // debug
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -249,22 +251,22 @@ void USB_LP_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-	// Check if TC interrupt is triggered
-	if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TC)) {
-		// Clear the TC interrupt flag
-		__HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_TC);
-
-		// Disable TC interrupt (optional, if no longer needed)
-		__HAL_UART_DISABLE_IT(&huart1, UART_IT_TC);
-
-		// Call the post-transmission function from RS485.c
-		RS485_TCCallback();
-	}
-
   /* USER CODE END USART1_IRQn 0 */
-  HAL_UART_IRQHandler(&huart1);
-  /* USER CODE BEGIN USART1_IRQn 1 */
 
+  HAL_UART_IRQHandler(&huart1);
+
+  /* USER CODE BEGIN USART1_IRQn 1 */
+  // Check if TC interrupt is triggered
+  	if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TC)) {
+  		// Clear the TC interrupt flag
+  		__HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_TC);
+
+  		// Disable TC interrupt (optional, if no longer needed)
+  		__HAL_UART_DISABLE_IT(&huart1, UART_IT_TC);
+
+  		// Call the post-transmission function from RS485.c
+  		RS485_TCCallback();
+  	}
   /* USER CODE END USART1_IRQn 1 */
 }
 

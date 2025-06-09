@@ -1,3 +1,5 @@
+// TODO: Migrate I2C abstraction module (i2c/i2c.h) over direct HAL
+
 #ifndef RTC_DS3231_H
 #define RTC_DS3231_H
 

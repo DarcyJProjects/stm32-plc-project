@@ -142,6 +142,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  /* RS485 Circular Frame Handling BEGIN*/
+	  RS485_ProcessPendingFrames();
+	  RS485_TransmitPendingFrames();
+	  /* RS485 Circular Frame Handling END*/
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

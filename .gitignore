@@ -24,3 +24,6 @@
 *.swp
 *.bak
 *.tmp
+
+# Python, ignore for now
+*.py
