@@ -421,3 +421,7 @@ static void send_exception(uint8_t address, uint8_t function, uint8_t exception)
 	// Transmit over RS485
 	RS485_Transmit(exceptionFrame, 5);
 }
+
+uint8_t modbusGetSlaveAddress(void) {
+	return slave_address;
+}

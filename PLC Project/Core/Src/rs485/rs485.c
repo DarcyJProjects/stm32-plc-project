@@ -5,7 +5,7 @@
 #include "rs485/rs485.h"
 #include "usb_serial.h" // debug only
 
-//#define LED_STATUS_ENABLE
+#define LED_STATUS_ENABLE
 
 extern UART_HandleTypeDef huart1;
 extern DMA_HandleTypeDef hdma_usart1_rx;

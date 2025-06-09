@@ -3,3 +3,4 @@
 ../Core/Src/modbus/modbus.c:373:17:modbus_crc16	4
 ../Core/Src/modbus/modbus.c:393:13:send_response	1
 ../Core/Src/modbus/modbus.c:409:13:send_exception	1
+../Core/Src/modbus/modbus.c:425:9:modbusGetSlaveAddress	1

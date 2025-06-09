@@ -1,0 +1,3 @@
+../Core/Src/i2c/display.c:10:6:display_Setup	1
+../Core/Src/i2c/display.c:19:6:display_Boot	1
+../Core/Src/i2c/display.c:28:6:display_StatusPage	1

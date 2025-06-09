@@ -24,12 +24,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "ssd1306/ssd1306.h"
-#include "ssd1306/ssd1306_tests.h"
-#include "ssd1306/ssd1306_fonts.h"
 #include "rtc/rtc_ds3231.h"
 #include "modbus/modbus.h"
 #include "rs485/rs485.h"
+#include "i2c/display.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,7 +103,7 @@ int main(void)
 // DISCRETE INPUTS: Digital R: for this controller, all digital inputs
 // HOLDING REGISTERS: Analogue R/W: for this controller, all analogue outputs
 // INPUT REGISTERS: Analogue R: for this controller, all analogue inputs
-  io_coil_add_channel(GPIOC, GPIO_PIN_6);
+  //io_coil_add_channel(GPIOC, GPIO_PIN_6);
   io_input_reg_add_channel(DS3231_ReadTemp, &hi2c1);
 
   /* USER CODE END Init */
@@ -131,11 +129,37 @@ int main(void)
   }
   /* USER CODE BEGIN 2 */
   // SETUP ---------------------------------------------------------------------------------------//
+    // Splash Screen
+	display_Setup(GPIOC, BTN1_Pin);
+	display_Boot();
+
+  	// Communication
     modbus_Setup(0x01); // Set modbus slave address
   	RS485_Setup(GPIOA, RS485_DIR_Pin); // changed from PA4 to PA8 to not interfere with DAC1
-  	//ssd1306_Init();
-  	//HAL_Delay(5000);
-  	// ---------------------------------------------------------------------------------------------//
+
+  	// Setup Coils
+  	io_coil_add_channel(GPIOC, DOUT1_Pin);
+  	io_coil_add_channel(GPIOB, DOUT2_Pin);
+  	io_coil_add_channel(GPIOB, DOUT3_Pin);
+  	io_coil_add_channel(GPIOB, DOUT4_Pin);
+
+
+
+  	// Flash on-board LED
+  	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_SET);
+  	HAL_Delay(60);
+  	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_RESET);
+  	HAL_Delay(60);
+  	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_SET);
+  	HAL_Delay(60);
+	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_RESET);
+
+	HAL_Delay(1000);
+
+	// TEMP: ->> needs to be in a timer to update every few seconds for eg TODO
+	display_StatusPage();
+
+  // ---------------------------------------------------------------------------------------------//
   /* USER CODE END 2 */
 
   /* Infinite loop */

@@ -1,3 +1,6 @@
+// SSD1306 library from https://github.com/afiskon/stm32-ssd1306
+// Does not use my I2C abstraction, but that is fine. In the I2C folder as it is still an I2C device
+
 /**
  * Private configuration file for the SSD1306 library.
  * This example is configured for STM32F0, I2C and including all fonts.

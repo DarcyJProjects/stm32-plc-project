@@ -14,7 +14,7 @@
 
 _BEGIN_STD_C
 
-#include "ssd1306/ssd1306_conf.h"
+#include "i2c/ssd1306/ssd1306_conf.h"
 #include "stm32g4xx_hal.h"
 
 

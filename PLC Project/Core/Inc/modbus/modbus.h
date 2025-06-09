@@ -33,4 +33,6 @@ void modbus_Setup(uint8_t slaveAddress);
 // Handle a full received modbus frame
 void modbus_handle_frame(uint8_t* frame, uint16_t len);
 
+uint8_t modbusGetSlaveAddress(void);
+
 #endif

@@ -22,8 +22,8 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-Core/Inc/ssd1306 \
 Core/Src/i2c \
+Core/Src/i2c/ssd1306 \
 Core/Src/io \
 Core/Src \
 Core/Src/modbus \

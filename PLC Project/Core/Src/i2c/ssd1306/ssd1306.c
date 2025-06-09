@@ -1,4 +1,4 @@
-#include "ssd1306/ssd1306.h"
+#include "i2c/ssd1306/ssd1306.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>  // For memcpy

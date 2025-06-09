@@ -25,9 +25,9 @@ RM := rm -rf
 -include Core/Src/rs485/subdir.mk
 -include Core/Src/modbus/subdir.mk
 -include Core/Src/io/subdir.mk
+-include Core/Src/i2c/ssd1306/subdir.mk
 -include Core/Src/i2c/subdir.mk
 -include Core/Src/subdir.mk
--include Core/Inc/ssd1306/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
