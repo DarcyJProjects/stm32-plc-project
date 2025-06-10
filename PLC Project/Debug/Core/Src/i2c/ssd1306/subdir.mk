@@ -7,16 +7,19 @@
 C_SRCS += \
 ../Core/Src/i2c/ssd1306/ssd1306.c \
 ../Core/Src/i2c/ssd1306/ssd1306_fonts.c \
+../Core/Src/i2c/ssd1306/ssd1306_icons.c \
 ../Core/Src/i2c/ssd1306/ssd1306_tests.c 
 
 OBJS += \
 ./Core/Src/i2c/ssd1306/ssd1306.o \
 ./Core/Src/i2c/ssd1306/ssd1306_fonts.o \
+./Core/Src/i2c/ssd1306/ssd1306_icons.o \
 ./Core/Src/i2c/ssd1306/ssd1306_tests.o 
 
 C_DEPS += \
 ./Core/Src/i2c/ssd1306/ssd1306.d \
 ./Core/Src/i2c/ssd1306/ssd1306_fonts.d \
+./Core/Src/i2c/ssd1306/ssd1306_icons.d \
 ./Core/Src/i2c/ssd1306/ssd1306_tests.d 
 
 
@@ -27,7 +30,7 @@ Core/Src/i2c/ssd1306/%.o Core/Src/i2c/ssd1306/%.su Core/Src/i2c/ssd1306/%.cyclo:
 clean: clean-Core-2f-Src-2f-i2c-2f-ssd1306
 
 clean-Core-2f-Src-2f-i2c-2f-ssd1306:
-	-$(RM) ./Core/Src/i2c/ssd1306/ssd1306.cyclo ./Core/Src/i2c/ssd1306/ssd1306.d ./Core/Src/i2c/ssd1306/ssd1306.o ./Core/Src/i2c/ssd1306/ssd1306.su ./Core/Src/i2c/ssd1306/ssd1306_fonts.cyclo ./Core/Src/i2c/ssd1306/ssd1306_fonts.d ./Core/Src/i2c/ssd1306/ssd1306_fonts.o ./Core/Src/i2c/ssd1306/ssd1306_fonts.su ./Core/Src/i2c/ssd1306/ssd1306_tests.cyclo ./Core/Src/i2c/ssd1306/ssd1306_tests.d ./Core/Src/i2c/ssd1306/ssd1306_tests.o ./Core/Src/i2c/ssd1306/ssd1306_tests.su
+	-$(RM) ./Core/Src/i2c/ssd1306/ssd1306.cyclo ./Core/Src/i2c/ssd1306/ssd1306.d ./Core/Src/i2c/ssd1306/ssd1306.o ./Core/Src/i2c/ssd1306/ssd1306.su ./Core/Src/i2c/ssd1306/ssd1306_fonts.cyclo ./Core/Src/i2c/ssd1306/ssd1306_fonts.d ./Core/Src/i2c/ssd1306/ssd1306_fonts.o ./Core/Src/i2c/ssd1306/ssd1306_fonts.su ./Core/Src/i2c/ssd1306/ssd1306_icons.cyclo ./Core/Src/i2c/ssd1306/ssd1306_icons.d ./Core/Src/i2c/ssd1306/ssd1306_icons.o ./Core/Src/i2c/ssd1306/ssd1306_icons.su ./Core/Src/i2c/ssd1306/ssd1306_tests.cyclo ./Core/Src/i2c/ssd1306/ssd1306_tests.d ./Core/Src/i2c/ssd1306/ssd1306_tests.o ./Core/Src/i2c/ssd1306/ssd1306_tests.su
 
 .PHONY: clean-Core-2f-Src-2f-i2c-2f-ssd1306
 

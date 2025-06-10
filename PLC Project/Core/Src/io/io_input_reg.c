@@ -4,6 +4,9 @@
 IO_Input_Reg_Channel io_input_reg_channels[256]; // Array of type channel (struct created in header)
 uint16_t io_input_reg_channel_count = 0;
 uint16_t io_input_adc_reg_channel_count = 0;
+uint8_t is_calibrated = 0;
+
+extern ADC_HandleTypeDef hadc1; // Declare external handle for ADC1
 
 /**
  * @Brief Adds an input register channel to the system
@@ -16,7 +19,7 @@ uint16_t io_input_adc_reg_channel_count = 0;
  */
 void io_input_reg_add_channel(uint16_t (*read_func)(void*), void* context) {
 	// Check is a physical ADC input channel is being added
-	if (read_func == adc_read_func) {
+	if (read_func == (void*)adc_read_func) {
 		// Enforce limit only for physical ADC inputs
 		if (io_input_adc_reg_channel_count >= MAX_IO_ADC_INPUT_REG) {
 			return;
@@ -48,17 +51,32 @@ uint16_t io_input_reg_read(uint16_t index) {
 
 
 // Read function for physical adc channels, i2c is device dependent
-uint16_t adc_read_func(void* context) {
+uint16_t adc_read_func(uint32_t channel) {
 #ifdef HAL_ADC_MODULE_ENABLED
-		ADC_HandleTypeDef* hadc = (ADC_HandleTypeDef*)context; // cast generic handle to ADC_HandleTypeDef
+		//ADC_HandleTypeDef* hadc = (ADC_HandleTypeDef*)context; // cast generic handle to ADC_HandleTypeDef
+		ADC_HandleTypeDef* hadc = &hadc1;
+
+		// Stop ADC before reconfiguration
+    	HAL_ADC_Stop(&hadc1);
+
+		// Configure the specified channel
+		ADC_ChannelConfTypeDef sConfig = {0};
+		sConfig.Channel = channel;
+		sConfig.Rank = ADC_REGULAR_RANK_1; /* !!! WILL NOT WORK WITHOUT !! */
+		sConfig.SamplingTime = ADC_SAMPLETIME_47CYCLES_5; // Better accuracy
+		sConfig.SingleDiff = ADC_SINGLE_ENDED; /* !!! WILL NOT WORK WITHOUT !!! */
+		HAL_ADC_ConfigChannel(hadc, &sConfig);
+
 		// Start ADC conversion
 		HAL_ADC_Start(hadc);
+
 		// Wait until the ADC conversion is done (or a timeout of 100 ms occurs)
 		if (HAL_ADC_PollForConversion(hadc, 100) == HAL_OK) {
+			//HAL_ADC_Stop(hadc);
 			// Return the ADC value
 			return (HAL_ADC_GetValue(hadc) * 65535) / 4095; // scale 12 bit value to 16 bit value as expected by modbus specifications
 		}
+		HAL_ADC_Stop(hadc);
 #endif
 	return 0;
 }
-

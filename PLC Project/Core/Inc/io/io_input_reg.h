@@ -34,6 +34,6 @@ void io_input_reg_add_channel(uint16_t (*read_func)(void*), void* context);
 uint16_t io_input_reg_read(uint16_t index);
 
 // Read function for physical adc channels, i2c is device dependent
-uint16_t adc_read_func(void* context);
+uint16_t adc_read_func(uint32_t channel);
 
 #endif

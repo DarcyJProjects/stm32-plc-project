@@ -25,15 +25,15 @@
 void INA226_Init(I2C_HandleTypeDef *hi2c);
 
 // Bus Voltage in Volts
-uint16_t INA226_ReadBusVoltageRaw(void);
+uint16_t INA226_ReadBusVoltageRaw(void* context);
 float INA226_ReadBusVoltage(void);
 
 // Current in Amps
-uint16_t INA226_ReadCurrentRaw(void);
+uint16_t INA226_ReadCurrentRaw(void* context);
 float INA226_ReadCurrent(void);
 
 // Power in Watts
-uint16_t INA226_ReadPowerRaw(void);
+uint16_t INA226_ReadPowerRaw(void* context);
 float INA226_ReadPower(void);
 
 #endif

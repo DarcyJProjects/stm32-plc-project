@@ -1,9 +1,9 @@
 ../Core/Src/i2c/ina226.c:7:13:INA226_WriteRegister	24	static
 ../Core/Src/i2c/ina226.c:16:17:INA226_ReadRegister	24	static
 ../Core/Src/i2c/ina226.c:26:6:INA226_Init	16	static
-../Core/Src/i2c/ina226.c:37:10:INA226_ReadBusVoltageRaw	8	static
+../Core/Src/i2c/ina226.c:37:10:INA226_ReadBusVoltageRaw	16	static
 ../Core/Src/i2c/ina226.c:41:7:INA226_ReadBusVoltage	8	static
-../Core/Src/i2c/ina226.c:45:10:INA226_ReadCurrentRaw	8	static
+../Core/Src/i2c/ina226.c:45:10:INA226_ReadCurrentRaw	16	static
 ../Core/Src/i2c/ina226.c:49:7:INA226_ReadCurrent	8	static
-../Core/Src/i2c/ina226.c:53:10:INA226_ReadPowerRaw	8	static
+../Core/Src/i2c/ina226.c:53:10:INA226_ReadPowerRaw	16	static
 ../Core/Src/i2c/ina226.c:57:7:INA226_ReadPower	8	static

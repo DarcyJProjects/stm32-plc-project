@@ -17,7 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <i2c/ina226.h>
 #include "main.h"
 #include "app_fatfs.h"
 #include "usb_device.h"
@@ -149,22 +148,33 @@ int main(void)
   	io_coil_add_channel(GPIOB, DOUT3_Pin);
   	io_coil_add_channel(GPIOB, DOUT4_Pin);
 
-  	// Setup Discrete Inputs [HARDWARE}
-  	gpio_config discrete_in_0 = {GPIOA, 2}; // PA2
-  	gpio_config discrete_in_1 = {GPIOA, 3}; // PA3
-  	gpio_config discrete_in_2 = {GPIOB, 13}; // PB13
-  	gpio_config discrete_in_3 = {GPIOB, 14}; // PB14
+  	// Setup Discrete Inputs [HARDWARE]
+  	gpio_config discrete_in_0 = {GPIOA, GPIO_PIN_2}; // PA2
+  	gpio_config discrete_in_1 = {GPIOA, GPIO_PIN_3}; // PA3
+  	gpio_config discrete_in_2 = {GPIOB, GPIO_PIN_13}; // PB13
+  	gpio_config discrete_in_3 = {GPIOB, GPIO_PIN_14}; // PB14
   	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_0);
   	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_1);
   	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_2);
   	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_3);
 
+  	// Setup Holding Registers [HARDWARE]
+  	io_holding_reg_add_channel(&hdac1, DAC_CHANNEL_1);
+  	io_holding_reg_add_channel(&hdac1, DAC_CHANNEL_2);
 
-  	// Setup Input register (DEBUG, TODO)
+
+  	// Setup Input register
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_1);
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_2);
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_11);
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_14);
+
+  	/*
+  	Test with I2C:
   	io_input_reg_add_channel(DS3231_ReadTemp, &hi2c1);
-  	//uint16_t ina226_address = 0x40;
-  	//io_input_reg_add_channel(INA226_ReadBusVoltage, &ina226_address);
-  	//io_input_reg_add_channel(INA226_ReadCurrent, &ina226_address);
+  	io_input_reg_add_channel(INA226_ReadBusVoltageRaw, &hi2c1);
+  	io_input_reg_add_channel(INA226_ReadCurrentRaw, &hi2c1);
+  	io_input_reg_add_channel(INA226_ReadPowerRaw, &hi2c1);*/
 
 
 
@@ -189,7 +199,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
 	uint16_t btn1status = 0;
-	uint16_t lastButtonPress = 0;
+	uint32_t lastButtonPress = 0;
 
 	uint32_t loopCounter = 0;
 	uint32_t lastTimeTick = HAL_GetTick();  // ms
@@ -229,10 +239,14 @@ int main(void)
 
 		  // Update display
 		  display_StatusPage();
+
+		  char buf[64];
+		  sprintf(buf, "PA3: %d", HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3));
+		  usb_serial_println(buf);
 	  }
 
 	  // Every 10 seconds since pressing display button, go to main page
-	  if (HAL_GetTick() - lastButtonPress >= 10000|| (HAL_GetTick() < lastButtonPress)) { // wraparound-safe comparison
+	  if ((HAL_GetTick() - lastButtonPress) >= 10000|| (HAL_GetTick() < lastButtonPress)) { // wraparound-safe comparison
 		  display_setPage(0);
 	  }
 

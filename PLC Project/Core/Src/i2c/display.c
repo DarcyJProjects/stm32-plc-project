@@ -2,12 +2,13 @@
 #include "i2c/display.h"
 #include "i2c/ssd1306/ssd1306.h"
 #include "i2c/ssd1306/ssd1306_fonts.h"
+#include "i2c/ssd1306/ssd1306_icons.h"
 #include "modbus/modbus.h"
 #include "io/io_coils.h"
 
 // Variables
 uint16_t currentPage = 0;
-uint16_t endPage = 1;
+uint16_t endPage = 4;
 
 void display_Setup() {
 	// Initialise SSD1306
@@ -37,12 +38,12 @@ void display_StatusPage(void) {
 
 			ssd1306_SetCursor(2, 40);
 			float voltage = INA226_ReadBusVoltage();
-			if (voltage > 10) sprintf(buf, "Supply Voltage: %.1fV", voltage); // only 1dp will fit
-			else sprintf(buf, "Supply Voltage: %.2fV", voltage); // 2dp will fit
+			if (voltage > 10) sprintf(buf, "Supply: %.1fV", voltage); // only 1dp will fit
+			else sprintf(buf, "Supply: %.2fV", voltage); // 2dp will fit
 			ssd1306_WriteString(buf, Font_6x8, White);
 
 			ssd1306_SetCursor(2, 55);
-			sprintf(buf, "Current Draw: %.0fmA", INA226_ReadCurrent() * 1000);
+			sprintf(buf, "Current: %.0fmA", INA226_ReadCurrent() * 1000);
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
 		case 1:
@@ -66,7 +67,74 @@ void display_StatusPage(void) {
 			sprintf(buf, "3: %s", io_coil_read(3) ? "ON" : "OFF");
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
+		case 2:
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(4, 0);
+			ssd1306_WriteString("Discrete In", Font_11x18, White);
+
+			ssd1306_SetCursor(2, 25);
+			sprintf(buf, "0: %s", io_discrete_in_read(0) ? "ON" : "OFF");
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			sprintf(buf, "1: %s", io_discrete_in_read(1) ? "ON" : "OFF");
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(60, 25);
+			sprintf(buf, "2: %s", io_discrete_in_read(2) ? "ON" : "OFF");
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(60, 40);
+			sprintf(buf, "3: %s", io_discrete_in_read(3) ? "ON" : "OFF");
+			ssd1306_WriteString(buf, Font_6x8, White);
+			break;
+		case 3:
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(2, 0);
+			ssd1306_WriteString("Holding Reg", Font_11x18, White);
+
+			ssd1306_SetCursor(2, 25);
+			sprintf(buf, "0: %d", io_holding_reg_read(0));
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			sprintf(buf, "1: %d", io_holding_reg_read(1));
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			/*ssd1306_SetCursor(60, 25);
+			sprintf(buf, "2: %d", io_holding_reg_read(2));
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(60, 40);
+			sprintf(buf, "3: %d", io_holding_reg_read(3));
+			ssd1306_WriteString(buf, Font_6x8, White);*/
+			break;
+		case 4:
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(12, 0);
+			ssd1306_WriteString("Input Reg", Font_11x18, White);
+
+			ssd1306_SetCursor(2, 25);
+			sprintf(buf, "0: %d", io_input_reg_read(0));
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			sprintf(buf, "1: %d", io_input_reg_read(1));
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(60, 25);
+			sprintf(buf, "2: %d", io_input_reg_read(2));
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(60, 40);
+			sprintf(buf, "3: %d", io_input_reg_read(3));
+			ssd1306_WriteString(buf, Font_6x8, White);
+			break;
 	}
+
+	ssd1306_SetCursor(110, 56);
+	sprintf(buf, "%d/%d", currentPage, endPage);
+	ssd1306_WriteString(buf, Font_6x8, White);
 
 	ssd1306_UpdateScreen();
 }

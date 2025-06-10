@@ -79,10 +79,10 @@ void Error_Handler(void);
 #define DOUT3_GPIO_Port GPIOB
 #define DOUT4_Pin GPIO_PIN_2
 #define DOUT4_GPIO_Port GPIOB
-#define AIN3_Pin GPIO_PIN_11
-#define AIN3_GPIO_Port GPIOB
-#define AIN4_Pin GPIO_PIN_12
+#define AIN4_Pin GPIO_PIN_11
 #define AIN4_GPIO_Port GPIOB
+#define AIN3_Pin GPIO_PIN_12
+#define AIN3_GPIO_Port GPIOB
 #define DIN3_Pin GPIO_PIN_13
 #define DIN3_GPIO_Port GPIOB
 #define DIN4_Pin GPIO_PIN_14
