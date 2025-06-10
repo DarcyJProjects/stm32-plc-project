@@ -32,7 +32,7 @@ void io_holding_reg_add_channel(void* handle, uint32_t channel) {
  * @retval The last written value for the holding register, or 0 if the channel is invalid.
  */
 uint16_t io_holding_reg_read(uint16_t index) {
-	if (index >= 0 && index < io_holding_reg_channel_count) {
+	if (index < io_holding_reg_channel_count) {
 		return io_holding_reg_channels[index].storedValue;
 	}
 	return 0;

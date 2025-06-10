@@ -28,6 +28,7 @@
 #include "modbus/modbus.h"
 #include "rs485/rs485.h"
 #include "i2c/display.h"
+#include "i2c/ina226.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -104,7 +105,7 @@ int main(void)
 // HOLDING REGISTERS: Analogue R/W: for this controller, all analogue outputs
 // INPUT REGISTERS: Analogue R: for this controller, all analogue inputs
   //io_coil_add_channel(GPIOC, GPIO_PIN_6);
-  io_input_reg_add_channel(DS3231_ReadTemp, &hi2c1);
+
 
   /* USER CODE END Init */
 
@@ -130,18 +131,35 @@ int main(void)
   /* USER CODE BEGIN 2 */
   // SETUP ---------------------------------------------------------------------------------------//
     // Splash Screen
-	display_Setup(GPIOC, BTN1_Pin);
+	display_Setup();
 	display_Boot();
 
   	// Communication
     modbus_Setup(0x01); // Set modbus slave address
   	RS485_Setup(GPIOA, RS485_DIR_Pin); // changed from PA4 to PA8 to not interfere with DAC1
 
-  	// Setup Coils
+  	// Setup Coils [HARDWARE]
   	io_coil_add_channel(GPIOC, DOUT1_Pin);
   	io_coil_add_channel(GPIOB, DOUT2_Pin);
   	io_coil_add_channel(GPIOB, DOUT3_Pin);
   	io_coil_add_channel(GPIOB, DOUT4_Pin);
+
+  	// Setup Discrete Inputs [HARDWARE}
+  	gpio_config discrete_in_0 = {GPIOA, 2}; // PA2
+  	gpio_config discrete_in_1 = {GPIOA, 3}; // PA3
+  	gpio_config discrete_in_2 = {GPIOB, 13}; // PB13
+  	gpio_config discrete_in_3 = {GPIOB, 14}; // PB14
+  	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_0);
+  	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_1);
+  	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_2);
+  	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_3);
+
+
+  	// Setup Input register (DEBUG, TODO)
+  	io_input_reg_add_channel(DS3231_ReadTemp, &hi2c1);
+  	//uint16_t ina226_address = 0x40;
+  	//io_input_reg_add_channel(INA226_ReadBusVoltage, &ina226_address);
+  	//io_input_reg_add_channel(INA226_ReadCurrent, &ina226_address);
 
 
 
@@ -164,12 +182,49 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+	uint16_t btn1status = 0;
+
+	uint32_t loopCounter = 0;
+	uint32_t lastTime = HAL_GetTick();  // ms
+
   while (1)
   {
+	  loopCounter++;
+
 	  /* RS485 Circular Frame Handling BEGIN*/
 	  RS485_ProcessPendingFrames();
 	  RS485_TransmitPendingFrames();
 	  /* RS485 Circular Frame Handling END*/
+
+
+	  /* CHECK INPUTS BEGIN*/
+	  // Check display button
+	  GPIO_PinState btn1 = HAL_GPIO_ReadPin(GPIOC, BTN1_Pin);
+	  if (btn1 == GPIO_PIN_SET) {
+		  if (btn1status == 0) {
+			  display_BtnPress();
+		  }
+
+		  btn1status = 1;
+	  } else if (btn1 == GPIO_PIN_RESET) {
+		  btn1status = 0;
+	  }
+	  /* CHECK INPUTS END*/
+
+
+	  /* SCHEDULE BEGIN*/
+
+	  // Every two seconds
+	  if (HAL_GetTick() - lastTime >= 2000) {
+		  lastTime = HAL_GetTick();
+		  loopCounter = 0;
+
+		  // Update display
+		  display_StatusPage();
+	  }
+
+	  /* SCHEDULE END*/
 
 
     /* USER CODE END WHILE */
@@ -562,7 +617,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : BTN1_Pin */
   GPIO_InitStruct.Pin = BTN1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(BTN1_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : DIN1_Pin DIN2_Pin BTN2_Pin */

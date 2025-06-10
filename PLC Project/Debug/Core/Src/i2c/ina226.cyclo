@@ -1,0 +1,3 @@
+../Core/Src/i2c/ina226.c:5:17:INA226_ReadRegister	1
+../Core/Src/i2c/ina226.c:11:10:INA226_ReadBusVoltage	1
+../Core/Src/i2c/ina226.c:16:10:INA226_ReadCurrent	1

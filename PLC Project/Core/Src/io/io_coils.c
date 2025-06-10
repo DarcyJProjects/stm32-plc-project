@@ -31,7 +31,7 @@ void io_coil_add_channel(GPIO_TypeDef* port, uint16_t pin) {
  * @retval The GPIO_PinState of the coil input, or 0 if the channel index is invalid.
  */
 GPIO_PinState io_coil_read(uint16_t index) {
-	if (index >= 0 && index < io_coil_channel_count) {
+	if (index < io_coil_channel_count) {
 		return io_coil_channels[index].storedState;
 	}
 	return GPIO_PIN_RESET;

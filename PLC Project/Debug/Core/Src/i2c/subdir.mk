@@ -7,17 +7,20 @@
 C_SRCS += \
 ../Core/Src/i2c/bmp280.c \
 ../Core/Src/i2c/display.c \
-../Core/Src/i2c/i2c.c 
+../Core/Src/i2c/i2c.c \
+../Core/Src/i2c/ina226.c 
 
 OBJS += \
 ./Core/Src/i2c/bmp280.o \
 ./Core/Src/i2c/display.o \
-./Core/Src/i2c/i2c.o 
+./Core/Src/i2c/i2c.o \
+./Core/Src/i2c/ina226.o 
 
 C_DEPS += \
 ./Core/Src/i2c/bmp280.d \
 ./Core/Src/i2c/display.d \
-./Core/Src/i2c/i2c.d 
+./Core/Src/i2c/i2c.d \
+./Core/Src/i2c/ina226.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -27,7 +30,7 @@ Core/Src/i2c/%.o Core/Src/i2c/%.su Core/Src/i2c/%.cyclo: ../Core/Src/i2c/%.c Cor
 clean: clean-Core-2f-Src-2f-i2c
 
 clean-Core-2f-Src-2f-i2c:
-	-$(RM) ./Core/Src/i2c/bmp280.cyclo ./Core/Src/i2c/bmp280.d ./Core/Src/i2c/bmp280.o ./Core/Src/i2c/bmp280.su ./Core/Src/i2c/display.cyclo ./Core/Src/i2c/display.d ./Core/Src/i2c/display.o ./Core/Src/i2c/display.su ./Core/Src/i2c/i2c.cyclo ./Core/Src/i2c/i2c.d ./Core/Src/i2c/i2c.o ./Core/Src/i2c/i2c.su
+	-$(RM) ./Core/Src/i2c/bmp280.cyclo ./Core/Src/i2c/bmp280.d ./Core/Src/i2c/bmp280.o ./Core/Src/i2c/bmp280.su ./Core/Src/i2c/display.cyclo ./Core/Src/i2c/display.d ./Core/Src/i2c/display.o ./Core/Src/i2c/display.su ./Core/Src/i2c/i2c.cyclo ./Core/Src/i2c/i2c.d ./Core/Src/i2c/i2c.o ./Core/Src/i2c/i2c.su ./Core/Src/i2c/ina226.cyclo ./Core/Src/i2c/ina226.d ./Core/Src/i2c/ina226.o ./Core/Src/i2c/ina226.su
 
 .PHONY: clean-Core-2f-Src-2f-i2c
 

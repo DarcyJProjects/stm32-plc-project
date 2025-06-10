@@ -40,7 +40,7 @@ void io_input_reg_add_channel(uint16_t (*read_func)(void*), void* context) {
  * @retval The ADC conversion result, or 0 if the channel is invalid.
  */
 uint16_t io_input_reg_read(uint16_t index) {
-	if (index >= 0 && index < io_input_reg_channel_count) {
+	if (index < io_input_reg_channel_count) {
 		return io_input_reg_channels[index].read_func(io_input_reg_channels[index].context);
 	}
 	return 0;

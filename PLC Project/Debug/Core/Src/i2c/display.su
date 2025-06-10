@@ -1,3 +1,4 @@
-../Core/Src/i2c/display.c:10:6:display_Setup	16	static
-../Core/Src/i2c/display.c:19:6:display_Boot	16	static
-../Core/Src/i2c/display.c:28:6:display_StatusPage	48	static
+../Core/Src/i2c/display.c:13:6:display_Setup	8	static
+../Core/Src/i2c/display.c:18:6:display_Boot	16	static
+../Core/Src/i2c/display.c:27:6:display_StatusPage	56	static
+../Core/Src/i2c/display.c:75:6:display_BtnPress	8	static
