@@ -1,3 +1,4 @@
+// TODO: I2C support
 // COILS ARE DIGITAL OUTPUTS
 // R/W as output can be set (W), but last state can be read (R)
 

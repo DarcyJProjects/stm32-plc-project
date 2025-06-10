@@ -1,9 +1,8 @@
+#include <i2c/ina226.h>
 #include "i2c/display.h"
 #include "i2c/ssd1306/ssd1306.h"
 #include "i2c/ssd1306/ssd1306_fonts.h"
 #include "modbus/modbus.h"
-#include "i2c/ina226.h"
-
 #include "io/io_coils.h"
 
 // Variables
@@ -33,17 +32,17 @@ void display_StatusPage(void) {
 			ssd1306_WriteString("Status", Font_11x18, White);
 
 			ssd1306_SetCursor(2, 25);
-			sprintf(buf, "Slave Add: 0x%02X", modbusGetSlaveAddress());
+			sprintf(buf, "Slave Addr: 0x%02X", modbusGetSlaveAddress());
 			ssd1306_WriteString(buf, Font_6x8, White);
 
-			uint16_t ina226_address = 0x40; // 7-bit I2C address
-
 			ssd1306_SetCursor(2, 40);
-			sprintf(buf, "Supply Voltage: %dV", INA226_ReadBusVoltage(&ina226_address));
+			float voltage = INA226_ReadBusVoltage();
+			if (voltage > 10) sprintf(buf, "Supply Voltage: %.1fV", voltage); // only 1dp will fit
+			else sprintf(buf, "Supply Voltage: %.2fV", voltage); // 2dp will fit
 			ssd1306_WriteString(buf, Font_6x8, White);
 
 			ssd1306_SetCursor(2, 55);
-			sprintf(buf, "Current Draw: %dmA", INA226_ReadCurrent(&ina226_address));
+			sprintf(buf, "Current Draw: %.0fmA", INA226_ReadCurrent() * 1000);
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
 		case 1:
@@ -81,4 +80,9 @@ void display_BtnPress() {
 	}
 
 	display_StatusPage();
+}
+
+void display_setPage(uint16_t page) {
+	if (page > endPage) return;
+	currentPage = page;
 }

@@ -12,4 +12,6 @@ void display_StatusPage(void);
 
 void display_BtnPress(void);
 
+void display_setPage(uint16_t page);
+
 #endif

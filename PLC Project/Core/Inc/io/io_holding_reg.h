@@ -1,3 +1,5 @@
+// TODO: I2C support
+
 // HOLDING REGISTERS ARE ANALOGUE OUTPUTS
 // R/W as output can be set (W), but last state can be read (R)
 

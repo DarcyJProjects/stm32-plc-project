@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <i2c/ina226.h>
 #include "main.h"
 #include "app_fatfs.h"
 #include "usb_device.h"
@@ -28,7 +29,7 @@
 #include "modbus/modbus.h"
 #include "rs485/rs485.h"
 #include "i2c/display.h"
-#include "i2c/ina226.h"
+#include "i2c/i2c.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -138,6 +139,10 @@ int main(void)
     modbus_Setup(0x01); // Set modbus slave address
   	RS485_Setup(GPIOA, RS485_DIR_Pin); // changed from PA4 to PA8 to not interfere with DAC1
 
+  	// Initialise Devices
+  	I2C_Setup(&hi2c1);
+  	INA226_Init(&hi2c1);
+
   	// Setup Coils [HARDWARE]
   	io_coil_add_channel(GPIOC, DOUT1_Pin);
   	io_coil_add_channel(GPIOB, DOUT2_Pin);
@@ -184,9 +189,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
 	uint16_t btn1status = 0;
+	uint16_t lastButtonPress = 0;
 
 	uint32_t loopCounter = 0;
-	uint32_t lastTime = HAL_GetTick();  // ms
+	uint32_t lastTimeTick = HAL_GetTick();  // ms
 
   while (1)
   {
@@ -204,6 +210,7 @@ int main(void)
 	  if (btn1 == GPIO_PIN_SET) {
 		  if (btn1status == 0) {
 			  display_BtnPress();
+			  lastButtonPress = HAL_GetTick();
 		  }
 
 		  btn1status = 1;
@@ -215,13 +222,18 @@ int main(void)
 
 	  /* SCHEDULE BEGIN*/
 
-	  // Every two seconds
-	  if (HAL_GetTick() - lastTime >= 2000) {
-		  lastTime = HAL_GetTick();
+	  // Every second
+	  if ((HAL_GetTick() - lastTimeTick) >= 1000 || (HAL_GetTick() < lastTimeTick)) { // wraparound-safe comparison
+		  lastTimeTick = HAL_GetTick();
 		  loopCounter = 0;
 
 		  // Update display
 		  display_StatusPage();
+	  }
+
+	  // Every 10 seconds since pressing display button, go to main page
+	  if (HAL_GetTick() - lastButtonPress >= 10000|| (HAL_GetTick() < lastButtonPress)) { // wraparound-safe comparison
+		  display_setPage(0);
 	  }
 
 	  /* SCHEDULE END*/
