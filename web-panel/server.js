@@ -62,23 +62,24 @@ app.get("/read", async (req, res) => {
     }
 });
 
-// Write (single)
+// Write (single and multiple)
 app.get("/write", async (req, res) => {
     if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
 
     const { type, address, value } = req.query;
 
     try {
+        const vals = value.split(',').map(v => parseInt(v)); // separate value(s) by comma, and convert to integers
+
         const addr = parseInt(address);
-        const val = parseInt(value);
 
         let resultAwait;
         switch (type) {
             case "coil":
-                resultAwait = client.writeCoil(addr, val);
+                resultAwait = client.writeCoils(addr, vals);
                 break;
             case "holding":
-                resultAwait = client.writeRegister(addr, val);
+                resultAwait = client.writeRegisters(addr, vals);
                 break;
             default:
                 return res.status(400).json({ error: "Invalid register type" });
@@ -87,7 +88,7 @@ app.get("/write", async (req, res) => {
         // timeout
         const result = await withTimeout(resultAwait, timeoutMs);
 
-        res.json({ status: "written", address: addr, value: val });
+        res.json({ status: "written", address: addr, value: vals });
     } catch (err) {
         console.error("Write error:", err.message);
         res.status(500).json({ error: err.message });
@@ -157,7 +158,6 @@ app.get("/disconnect", async (req, res) => {
         res.json({ success: false, error: err.message });
     }
 });
-
 
 
 app.listen(5000, () => {

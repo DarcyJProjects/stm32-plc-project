@@ -6,6 +6,8 @@
   <title>Control Panel - Embedded Controller</title>
   <!-- Bootstrap CSS CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-light py-4">
 
@@ -41,82 +43,7 @@
         &nbsp;&nbsp;<div id="connectionStatus" class="mt-2 text-muted d-inline-block"></div>
       </div>
     </div>
-    
-    <!-- Functions control panel -->
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Manual Control</h5>
-        <a class="btn btn-link" data-bs-toggle="collapse" href="#functionsBody">Toggle</a>
-      </div>
-      <div class="card-body">
-        <div id="functionsBody" class="collapse show">
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="coils-tab" data-bs-toggle="tab"
-                data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
-                aria-selected="true">Coils</button>
-            </li>
-            <!--<li class="nav-item" role="presentation">
-              <button class="nav-link" id="discrete-tab" data-bs-toggle="tab"
-                data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
-                aria-selected="true">Discrete Inputs</button>
-            </li>-->
-          </ul>
-          <div class="tab-content mt-3" id="myTabContent">
-            <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
-              <div class="card">
-                <div class="card-body">
-                  <h6>Read Coils (0x01)</h6>
-                  <div class="mb-3">
-                    <label for="coilAddressR" class="form-label">Coil Address</label>
-                    <input type="number" class="form-control" id="coilAddressR" placeholder="Enter coil address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="coilQuantityR" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="coilQuantityR" placeholder="Enter quantity of coils to read (e.g., 1)" min="1" />
-                  </div>
-
-                  <button id="coilSendR" class="btn btn-primary">Read</button>
-
-                  <div id="coilStatusR" class="mt-3"></div>
-
-                  <table id="coilResultTableR" class="table table-bordered">
-                    <tbody>
-                      <tr id="coilResultTableR_heading"></tr>
-                      <tr id="coilResultTableR_value"></tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="card-body">
-                  <h6>Write Single Coil (0x05)</h6>
-                  <div class="mb-3">
-                    <label for="coilAddressW" class="form-label">Coil Address</label>
-                    <input type="number" class="form-control" id="coilAddressW" placeholder="Enter coil address (e.g., 0)" min="0" />
-                  </div>
-
-                  <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="coilToggleW" disabled/>
-                    <label class="form-check-label" for="coilToggleW">Coil OFF/ON (0/1)</label>
-                  </div>
-
-                  <button id="coilSendW" class="btn btn-primary">Write</button>
-
-                  <div id="coilStatusW" class="mt-3"></div>
-                </div>
-              </div>
-            </div>
-            <!--<div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
-              <div class="card p-3">
-                <p>This is the Discrete tab content.</p>
-              </div>
-            </div>-->
-          </div>
-        </div>
-      </div>
-    </div>
-
-  <script>
+    <script>
     // Populate COM port dropdown
     const portSelect = document.getElementById("portSelect");
     const baudSelect = document.getElementById("baudSelect");
@@ -219,21 +146,111 @@
         }
       }
     });
+    </script>
+    
+    <!-- Functions control panel -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>Manual Control</h5>
+        <a class="btn btn-link" data-bs-toggle="collapse" href="#functionsBody">Toggle</a>
+      </div>
+      <div class="card-body">
+        <div id="functionsBody" class="collapse show">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="coils-tab" data-bs-toggle="tab"
+                data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
+                aria-selected="true">Coils</button>
+            </li>
+            <!--<li class="nav-item" role="presentation">
+              <button class="nav-link" id="discrete-tab" data-bs-toggle="tab"
+                data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
+                aria-selected="true">Discrete Inputs</button>
+            </li>-->
+          </ul>
+          <div class="tab-content mt-3" id="myTabContent">
+            <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
+              <div class="card">
+                <div class="card-body">
+                  <h6>Read Coils (0x01)</h6>
+                  <div class="mb-3">
+                    <label for="coilAddressR" class="form-label">Coil Address</label>
+                    <input type="number" class="form-control" id="coilAddressR" placeholder="Enter coil address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="coilQuantityR" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="coilQuantityR" placeholder="Enter quantity of coils to read (e.g., 1)" min="1" />
+                  </div>
 
-    window.onload = async function () {
-      await fetchPorts();
-      await getStatus();
-      if (isConnected) {
-        updateUI(true, currentPort, currentSlave);
-      }
-    };
-  </script>
+                  <button id="coilSendR" class="btn btn-primary">Read</button>
 
-  <script>
+                  <div id="coilStatusR" class="mt-3"></div>
+
+                  <table id="coilResultTableR" class="table table-bordered">
+                    <tbody>
+                      <tr id="coilResultTableR_heading"></tr>
+                      <tr id="coilResultTableR_value"></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="card-body">
+                  <h6>Write Single Coil (0x05)</h6>
+                  <div class="mb-3">
+                    <label for="coilAddressW" class="form-label">Coil Address</label>
+                    <input type="number" class="form-control" id="coilAddressW" placeholder="Enter coil address (e.g., 0)" min="0" />
+                  </div>
+
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="coilToggleW" disabled/>
+                    <label class="form-check-label" for="coilToggleW">Coil OFF/ON (0/1)</label>
+                  </div>
+
+                  <button id="coilSendW" class="btn btn-primary">Write</button>
+
+                  <div id="coilStatusW" class="mt-3"></div>
+                </div>
+
+                <div class="card-body">
+                  <h6>Write Multiple Coils (0x0f)</h6>
+                  <div class="mb-3">
+                    <label for="coilAddressWM" class="form-label">Coil Address</label>
+                    <input type="number" class="form-control" id="coilAddressWM" placeholder="Enter coil address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="coilQuantityWM" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="coilQuantityWM" placeholder="Enter quantity of coils to write to (e.g., 2)" min="1" />
+                  </div>
+                  <div id="coilWriteMultipleToggleDiv">
+                    <!--<div class="form-check form-switch mb-3">
+                      <input class="form-check-input" type="checkbox" id="coilToggleWM" disabled/>
+                      <label class="form-check-label" for="coilToggleWM">Coil OFF/ON (0/1)</label>
+                    </div>-->
+                  </div>
+                  <button id="coilSendWM" class="btn btn-primary">Write</button>
+
+                  <div id="coilStatusWM" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+            <!--<div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
+              <div class="card p-3">
+                <p>This is the Discrete tab content.</p>
+              </div>
+            </div>-->
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
     const coilToggleW = document.getElementById('coilToggleW');
     const coilAddressW = document.getElementById('coilAddressW');
     const coilSendW = document.getElementById('coilSendW');
     const coilStatusW = document.getElementById('coilStatusW');
+    
+    const coilQuantityWM = document.getElementById('coilQuantityWM');
+    const coilAddressWM = document.getElementById('coilAddressWM');
+    const coilSendWM = document.getElementById('coilSendWM');
 
     // Enable toggle only when coil address is valid
     coilAddressW.addEventListener('input', () => {
@@ -242,7 +259,7 @@
       coilStatusW.textContent = '';
     });
 
-    // Write
+    // Write Single
     async function writeCoil(address, value) {
       try {
         coilStatusW.textContent = 'Sending request...';
@@ -259,6 +276,26 @@
         }
       } catch (err) {
           coilStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    // Write multiple 
+    async function writeMultipleCoils(address, valueArray) {
+      try {
+        coilStatusWM.textContent = 'Sending request...';
+        
+        const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valueArray}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          coilStatusWM.innerHTML = `<div class="alert alert-success">Coils starting at address ${address} set to ${valueArray}.</div>`;
+        } else {
+          coilStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+        coilStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
       }
     }
 
@@ -299,6 +336,54 @@
       }
     }
 
+    // Update WM toggles
+    function updateWMToggles() {
+      const addr = parseInt(coilAddressWM.value);
+      const quan = parseInt(coilQuantityWM.value);
+      const workingDiv = document.getElementById("coilWriteMultipleToggleDiv");
+
+      workingDiv.innerHTML = "";
+      coilStatusWM.innerHTML = "";
+
+      if (Number(quan) > 256) {
+        coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
+        return;
+      }
+
+      if (isNaN(quan) || quan < 1 || quan > 256 || isNaN(addr) || addr < 0) {
+        return;
+      }
+
+      /*<div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" id="coilToggleWM" disabled/>
+        <label class="form-check-label" for="coilToggleWM">Coil OFF/ON (0/1)</label>
+      </div>*/
+
+      workingDiv.innerHTML = "<h6>Coil OFF/ON (0/1)</h6>";
+
+      for (var i = addr; i < addr + quan; i++) {
+        const id = `coilToggleWM-${i}`;
+        
+        const formDiv = document.createElement("div");
+        formDiv.className = "form-check form-switch mb-3";
+        
+        const input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "checkbox";
+        input.id = id;
+        
+        const label = document.createElement("label");
+        label.className = "form-check-label";
+        label.setAttribute("for", id);
+        label.textContent = `Coil ${i}`;
+
+        formDiv.appendChild(input);
+        formDiv.appendChild(label);
+
+        workingDiv.appendChild(formDiv);
+      }
+    }
+
     coilSendW.addEventListener('click', () => {
       const addr = coilAddressW.value;
       if (addr === '' || Number(addr) < 0) {
@@ -307,6 +392,29 @@
       }
       const val = coilToggleW.checked;
       writeCoil(addr, val);
+    });
+
+    coilSendWM.addEventListener('click', () => {
+      const address = parseInt(coilAddressWM.value);
+      const quantity = parseInt(coilQuantityWM.value);
+
+      if (isNaN(address) || address < 0) {
+        coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+        return;
+      }
+      if (isNaN(quantity) || quantity < 1) {
+        coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
+        return;
+      }
+
+      const valueArray = [];
+      for (var i = address; i < address + quantity; i++) {
+        const toggleElement = document.getElementById(`coilToggleWM-${i}`);
+        const toggleValue = toggleElement.checked ? 1 : 0;
+        valueArray.push(toggleValue);
+      }
+
+      writeMultipleCoils(address, valueArray); // handles value gathering in here
     });
 
     coilSendR.addEventListener('click', () => {
@@ -328,7 +436,141 @@
       }
       readCoil(addr, quan);
     });
-  </script>
+
+    coilQuantityWM.addEventListener('input', () => {
+      updateWMToggles();
+    });
+
+    coilAddressWM.addEventListener('input', () => {
+      updateWMToggles();
+    });
+    </script>
+
+    <!-- Registers over time -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>Graphing [Minimal Implementation]</h5>
+        <a class="btn btn-link" data-bs-toggle="collapse" href="#graphingBody">Toggle</a>
+      </div>
+      <div class="card-body">
+        <div id="graphingBody" class="collapse show">
+          <div>
+            <!-- Register select, graph address, graph quantity not active yet -->
+            <div class="mb-3">
+              <label for="registerSelect" class="form-label">Select Register Type:</label>
+              <select id="registerSelect" class="form-select">
+                <option>Coil</option>
+                <!--
+                <option>Discrete Input</option>
+                <option>Holding Register</option>
+                <option>Input Register</option>
+                -->
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="graphAddress" class="form-label">Address:</label>
+              <input type="number" class="form-control" id="graphAddress" placeholder="Enter register address (e.g., 0)" min="0" />
+            </div>
+            <div class="mb-3">
+              <label for="graphQuantity" class="form-label">Quantity:</label>
+              <input type="number" class="form-control" id="graphQuantity" placeholder="Enter quantity of registers to read (e.g., 1)" min="1" />
+            </div>
+            <div class="mb-3">
+              Polling Interval: 
+              <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s
+            </div>
+
+            <div id="graphStatus" class="mt-3"></div>
+
+
+            <div class="card-body">
+              <canvas id="registerChart" height="100"></canvas>
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
+    <script>
+      const context = document.getElementById("registerChart").getContext("2d");
+      const dataPoints = [];
+      const labels = [];
+
+      const chart = new Chart(context, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Coil Value',
+            data: dataPoints,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            tension: 0.2,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: true,
+          scales: {
+            x: { title: { display: true, text: 'Time' }},
+            y: { title: { display: true, text: 'Value' }}
+          }
+        }
+      });
+
+      let timer;
+      let addressToRead = 0; // SET ADDRESS
+      let quantity = 1;
+
+      async function fetchRegisterAndUpdateChart() {
+        try {
+          const res = await fetch(`/read?type=coil&address=${addressToRead}&quantity=${quantity}`);
+          const json = await res.json();
+          const now = new Date().toLocaleTimeString();
+
+          if (res.ok && json.data?.[0] !== undefined) {
+            if (dataPoints.length > 50) {
+              dataPoints.shift();
+              labels.shift();
+            }
+
+            dataPoints.push(json.data[0]);
+            labels.push(now);
+            chart.update();
+          }
+        } catch (err) {
+          console.error("Chart update error:", err);
+        }
+      }
+
+      function startPolling() {
+        clearInterval(timer);
+        const intervalSec = parseInt(document.getElementById('intervalInput').value || 5);
+        if (intervalSec < 1) {
+          graphStatus.innerHTML = `<div class="alert alert-warning">Please enter a interval greater than or equal to 1 second.</div>`;
+          return;
+        }
+        graphStatus.innerHTML = "";
+        timer = setInterval(fetchRegisterAndUpdateChart, intervalSec * 1000);
+      }
+    </script>
+
+<!-- WINDOW ON LOAD -->
+<script>
+  window.onload = async function () {
+    await fetchPorts();
+    await getStatus();
+    if (isConnected) {
+      updateUI(true, currentPort, currentSlave);
+    }
+
+    // Graphing
+    startPolling();
+    document.getElementById('intervalInput').addEventListener('change', startPolling);
+  };
+</script>
+  
+
+  
 
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
