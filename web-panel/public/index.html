@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Control Panel - Embedded Controller</title>
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light py-4">
+
+  <div class="container">
+    <h1 class="mb-4">Embedded Controller Control Panel</h1>
+
+    <!-- Serial connection panel -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>Serial Connection</h5>
+        <a class="btn btn-link" data-bs-toggle="collapse" href="#serialConnectionBody">Toggle</a>
+      </div>
+      <div class="card-body">
+        <div id="serialConnectionBody" class="collapse show">
+          <div class="mb-3">
+            <label for="portSelect" class="form-label">Select COM Port</label>
+            <select id="portSelect" class="form-select">
+              <option>Loading...</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="baudSelect" class="form-label">Select Baud Rate</label>
+            <select id="baudSelect" class="form-select">
+              <option>9600</option> <!-- hardcoded only option for now -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="slaveAddress" class="form-label">Slave Address</label>
+            <input type="number" class="form-control" id="slaveAddress" placeholder="Enter slave address (e.g., 1)" min="0" />
+          </div>
+        </div>
+        <button id="connectBtn" class="btn btn-success">Connect</button>
+        &nbsp;&nbsp;<div id="connectionStatus" class="mt-2 text-muted d-inline-block"></div>
+      </div>
+    </div>
+    
+    <!-- Functions control panel -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>Manual Control</h5>
+        <a class="btn btn-link" data-bs-toggle="collapse" href="#functionsBody">Toggle</a>
+      </div>
+      <div class="card-body">
+        <div id="functionsBody" class="collapse show">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="coils-tab" data-bs-toggle="tab"
+                data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
+                aria-selected="true">Coils</button>
+            </li>
+            <!--<li class="nav-item" role="presentation">
+              <button class="nav-link" id="discrete-tab" data-bs-toggle="tab"
+                data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
+                aria-selected="true">Discrete Inputs</button>
+            </li>-->
+          </ul>
+          <div class="tab-content mt-3" id="myTabContent">
+            <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
+              <div class="card">
+                <div class="card-body">
+                  <h6>Read Coils (0x01)</h6>
+                  <div class="mb-3">
+                    <label for="coilAddressR" class="form-label">Coil Address</label>
+                    <input type="number" class="form-control" id="coilAddressR" placeholder="Enter coil address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="coilQuantityR" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="coilQuantityR" placeholder="Enter quantity of coils to read (e.g., 1)" min="1" />
+                  </div>
+
+                  <button id="coilSendR" class="btn btn-primary">Read</button>
+
+                  <div id="coilStatusR" class="mt-3"></div>
+
+                  <table id="coilResultTableR" class="table table-bordered">
+                    <tbody>
+                      <tr id="coilResultTableR_heading"></tr>
+                      <tr id="coilResultTableR_value"></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="card-body">
+                  <h6>Write Single Coil (0x05)</h6>
+                  <div class="mb-3">
+                    <label for="coilAddressW" class="form-label">Coil Address</label>
+                    <input type="number" class="form-control" id="coilAddressW" placeholder="Enter coil address (e.g., 0)" min="0" />
+                  </div>
+
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="coilToggleW" disabled/>
+                    <label class="form-check-label" for="coilToggleW">Coil OFF/ON (0/1)</label>
+                  </div>
+
+                  <button id="coilSendW" class="btn btn-primary">Write</button>
+
+                  <div id="coilStatusW" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+            <!--<div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
+              <div class="card p-3">
+                <p>This is the Discrete tab content.</p>
+              </div>
+            </div>-->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <script>
+    // Populate COM port dropdown
+    const portSelect = document.getElementById("portSelect");
+    const baudSelect = document.getElementById("baudSelect");
+    const slaveSelect = document.getElementById("slaveAddress");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const connectBtn = document.getElementById("connectBtn");
+
+    const connectionStatusDefaultText = 'Select a port and click connect.';
+
+    let isConnected;
+    let currentPort; // only required for window.onload
+    let currentSlave; // only required for window.onload
+
+    async function getStatus() {
+      try {
+        const res = await fetch('/status');
+        const connected = await res.json();
+        isConnected = connected.status;
+        currentPort = connected.port;
+        currentSlave = connected.slave;
+      } catch (exception) {
+        isConnected = false; // assume
+      }
+    }
+
+    async function fetchPorts() {
+      try {
+        const res = await fetch('/ports');
+        const ports = await res.json();
+        portSelect.innerHTML = '';
+        ports.forEach(port => {
+          const option = document.createElement('option');
+          option.value = port;
+          option.textContent = port;
+          portSelect.appendChild(option);
+        });
+
+        connectionStatus.textContent = connectionStatusDefaultText;
+      } catch (exception) {
+        portSelect.innerHTML = '<option>Error loading ports</option>';
+        connectionStatus.textContent = 'Failed to fetch ports.';
+      }
+    }
+
+    function updateUI(connected, port, slave) {
+      connectionStatus.classList.remove("text-muted", "text-danger", "text-success");
+      if (connected) {
+        connectionStatus.textContent = `Connected to ${port}`;
+        connectionStatus.classList.add("text-success");
+        connectBtn.classList.remove("btn-success");
+        connectBtn.classList.add("btn-danger");
+        connectBtn.innerText = "Disconnect";
+      } else {
+        connectionStatus.textContent = `Disconnected from ${port}`;
+        connectionStatus.classList.add("text-muted");
+        connectBtn.classList.remove("btn-danger");
+        connectBtn.classList.add("btn-success");
+        connectBtn.innerText = "Connect";
+      }
+
+      if (slave !== undefined) {
+        slaveSelect.value = slave;
+      } 
+    }
+
+    connectBtn.addEventListener('click', async () => {
+      await getStatus();
+      const selectedPort = portSelect.value;
+      const selectedBaud = baudSelect.value;
+      const selectedSlave = slaveSelect.value;  
+
+      if (!isConnected) {
+        // Connect
+        const res = await fetch(`/connect?port=${encodeURIComponent(selectedPort)}&baud=${encodeURIComponent(selectedBaud)}&slave=${encodeURIComponent(selectedSlave)}`);
+        const data = await res.json();
+
+        
+        if (data.success) {
+          updateUI(true, selectedPort);
+        } else {
+          connectionStatus.textContent = `Failed: ${data.error}`;
+          connectionStatus.classList.remove("text-muted", "text-danger");
+          connectionStatus.classList.add("text-danger");
+          
+          connectBtn.classList.remove("btn-danger");
+          connectBtn.classList.add("btn-success");
+          connectBtn.innerText = "Connect";
+        }        
+      } else {
+        // Disconnect
+        const res = await fetch(`/disconnect`);
+        const data = await res.json();
+
+        if (data.success) {
+          updateUI(false, selectedPort);
+        } else {
+          connectionStatus.textContent = `Failed to disconnect: ${data.error}`;
+          connectionStatus.classList.remove("text-success");
+          connectionStatus.classList.add("text-danger");
+        }
+      }
+    });
+
+    window.onload = async function () {
+      await fetchPorts();
+      await getStatus();
+      if (isConnected) {
+        updateUI(true, currentPort, currentSlave);
+      }
+    };
+  </script>
+
+  <script>
+    const coilToggleW = document.getElementById('coilToggleW');
+    const coilAddressW = document.getElementById('coilAddressW');
+    const coilSendW = document.getElementById('coilSendW');
+    const coilStatusW = document.getElementById('coilStatusW');
+
+    // Enable toggle only when coil address is valid
+    coilAddressW.addEventListener('input', () => {
+      const val = coilAddressW.value;
+      coilToggleW.disabled = !(val !== '' && Number(val) >= 0);
+      coilStatusW.textContent = '';
+    });
+
+    // Write
+    async function writeCoil(address, value) {
+      try {
+        coilStatusW.textContent = 'Sending request...';
+        const valInt = value ? 1 : 0;
+        const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valInt}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          coilStatusW.innerHTML = `<div class="alert alert-success">Coil at address ${address} set to ${valInt}.</div>`;
+        } else {
+          coilStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+          coilStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    // Read
+    async function readCoil(address, quantity) {
+      try {
+        coilStatusR.textContent = 'Sending request...';
+        const url = `/read?type=coil&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+        console.log(url);
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          coilStatusR.innerHTML = "";
+          const coilValues = data.data;
+
+          const headingRow = document.getElementById("coilResultTableR_heading");
+          const valueRow = document.getElementById("coilResultTableR_value");
+
+          var index = address;
+
+          for (let i = address; i < address + quantity; i++) {
+            // Heading Cell
+            const cell = document.createElement('td'); // create a table cell
+            cell.textContent = i; // set cell content
+            headingRow.appendChild(cell); // add cell to row
+
+            // Value cell
+            const cell2 = document.createElement('td');
+            cell2.textContent = coilValues[i];
+            valueRow.appendChild(cell2);
+          }
+        } else {
+          coilStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+          coilStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    coilSendW.addEventListener('click', () => {
+      const addr = coilAddressW.value;
+      if (addr === '' || Number(addr) < 0) {
+        coilStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+        return;
+      }
+      const val = coilToggleW.checked;
+      writeCoil(addr, val);
+    });
+
+    coilSendR.addEventListener('click', () => {
+      const addr = coilAddressR.value;
+      const quan = coilQuantityR.value;
+
+      const headingRow = document.getElementById("coilResultTableR_heading");
+      const valueRow = document.getElementById("coilResultTableR_value");
+      headingRow.innerHTML = "";
+      valueRow.innerHTML = "";
+
+      if (addr === '' || Number(addr) < 0) {
+        coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+        return;
+      }
+      if (quan === '' || Number(quan) < 1) {
+        coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+        return;
+      }
+      readCoil(addr, quan);
+    });
+  </script>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+</body>
+</html>
