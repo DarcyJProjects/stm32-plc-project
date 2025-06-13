@@ -162,11 +162,21 @@
                 data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
                 aria-selected="true">Coils</button>
             </li>
-            <!--<li class="nav-item" role="presentation">
+            <li class="nav-item" role="presentation">
               <button class="nav-link" id="discrete-tab" data-bs-toggle="tab"
                 data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
                 aria-selected="true">Discrete Inputs</button>
-            </li>-->
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="holding-tab" data-bs-toggle="tab"
+                data-bs-target="#holding" type="button" role="tab" aria-controls="holding"
+                aria-selected="true">Holding Registers</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="input-tab" data-bs-toggle="tab"
+                data-bs-target="#input" type="button" role="tab" aria-controls="input"
+                aria-selected="true">Input Registers</button>
+            </li>
           </ul>
           <div class="tab-content mt-3" id="myTabContent">
             <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
@@ -187,8 +197,10 @@
                   <div id="coilStatusR" class="mt-3"></div>
 
                   <table id="coilResultTableR" class="table table-bordered">
-                    <tbody>
+                    <thead class="table-light">
                       <tr id="coilResultTableR_heading"></tr>
+                    </thead>
+                    <tbody>
                       <tr id="coilResultTableR_value"></tr>
                     </tbody>
                   </table>
@@ -233,16 +245,135 @@
                 </div>
               </div>
             </div>
-            <!--<div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
-              <div class="card p-3">
-                <p>This is the Discrete tab content.</p>
+            <div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
+              <div class="card">
+                <div class="card-body">
+                  <h6>Read Discrete Inputs (0x02)</h6>
+                  <div class="mb-3">
+                    <label for="discreteAddressR" class="form-label">Input Address</label>
+                    <input type="number" class="form-control" id="discreteAddressR" placeholder="Enter discrete input address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="discreteQuantityR" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="discreteQuantityR" placeholder="Enter quantity of discrete inputs to read (e.g., 1)" min="1" />
+                  </div>
+
+                  <button id="discreteSendR" class="btn btn-primary">Read</button>
+
+                  <div id="discreteStatusR" class="mt-3"></div>
+
+                  <table id="discreteResultTableR" class="table table-bordered">
+                    <thead class="table-light">
+                      <tr id="discreteResultTableR_heading"></tr>
+                    </thead>
+                    <tbody>
+                      <tr id="discreteResultTableR_value"></tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>-->
+            </div>
+            <div class="tab-pane fade show" id="holding" role="tabpanel" aria-labelledby="holding-tab">
+              <div class="card">
+                <div class="card-body">
+                  <h6>Read Holding Registers (0x03)</h6>
+                  <div class="mb-3">
+                    <label for="holdingAddressR" class="form-label">Register Address</label>
+                    <input type="number" class="form-control" id="holdingAddressR" placeholder="Enter holding register address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="holdingQuantityR" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="holdingQuantityR" placeholder="Enter quantity of holding registers to read (e.g., 1)" min="1" />
+                  </div>
+
+                  <button id="holdingSendR" class="btn btn-primary">Read</button>
+
+                  <div id="holdingStatusR" class="mt-3"></div>
+
+                  <table id="holdingResultTableR" class="table table-bordered">
+                    <thead class="table-light">
+                      <tr id="holdingResultTableR_heading"></tr>
+                    </thead>
+                    <tbody>
+                      <tr id="holdingResultTableR_value"></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="card-body">
+                  <h6>Write Single Register (0x06)</h6>
+                  <div class="mb-3">
+                    <label for="holdingAddressW" class="form-label">Register Address</label>
+                    <input type="number" class="form-control" id="holdingAddressW" placeholder="Enter holding register address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="holdingValueW" class="form-label">Value</label>
+                    <input type="number" class="form-control" id="holdingValueW" placeholder="Enter value to write (0-65535)" min="0" />
+                  </div>
+
+                  <button id="holdingSendW" class="btn btn-primary">Write</button>
+
+                  <div id="holdingStatusW" class="mt-3"></div>
+                </div>
+
+                <div class="card-body">
+                  <h6>Write Multiple Registers (0x10)</h6>
+                  <div class="mb-3">
+                    <label for="holdingAddressWM" class="form-label">Register Address</label>
+                    <input type="number" class="form-control" id="holdingAddressWM" placeholder="Enter holding register address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="holdingQuantityWM" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="holdingQuantityWM" placeholder="Enter quantity of holding registers to write to (e.g., 2)" min="1" />
+                  </div>
+                  <div id="holdingWriteMultipleToggleDiv">
+                  </div>
+                  <button id="holdingSendWM" class="btn btn-primary">Write</button>
+
+                  <div id="holdingStatusWM" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade show" id="input" role="tabpanel" aria-labelledby="input-tab">
+              <div class="card">
+                <div class="card-body">
+                  <h6>Read Input Registers (0x04)</h6>
+                  <div class="mb-3">
+                    <label for="inputAddressR" class="form-label">Input Address</label>
+                    <input type="number" class="form-control" id="inputAddressR" placeholder="Enter input register address (e.g., 0)" min="0" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputQuantityR" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="inputQuantityR" placeholder="Enter quantity of inputs registers to read (e.g., 1)" min="1" />
+                  </div>
+
+                  <button id="inputSendR" class="btn btn-primary">Read</button>
+
+                  <div id="inputStatusR" class="mt-3"></div>
+
+                  <table id="inputResultTableR" class="table table-bordered">
+                    <thead class="table-light">
+                      <tr id="inputResultTableR_heading"></tr>
+                    </thead>
+                    <tbody>
+                      <tr id="inputResultTableR_value"></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Coil Functions -->
     <script>
+    const coilAddressR = document.getElementById('coilAddressR');
+    const coilQuantityR = document.getElementById('coilQuantityR');
+    const coilSendR = document.getElementById('coilSendR');
+    const coilStatusR = document.getElementById('coilStatusR');
+
     const coilToggleW = document.getElementById('coilToggleW');
     const coilAddressW = document.getElementById('coilAddressW');
     const coilSendW = document.getElementById('coilSendW');
@@ -302,6 +433,9 @@
     // Read
     async function readCoil(address, quantity) {
       try {
+        const addr = parseInt(address);
+        const quan = parseInt(quantity);
+
         coilStatusR.textContent = 'Sending request...';
         const url = `/read?type=coil&address=${encodeURIComponent(address)}&quantity=${quantity}`;
         console.log(url);
@@ -315,9 +449,7 @@
           const headingRow = document.getElementById("coilResultTableR_heading");
           const valueRow = document.getElementById("coilResultTableR_value");
 
-          var index = address;
-
-          for (let i = address; i < address + quantity; i++) {
+          for (let i = addr; i < addr + quan; i++) {
             // Heading Cell
             const cell = document.createElement('td'); // create a table cell
             cell.textContent = i; // set cell content
@@ -325,7 +457,7 @@
 
             // Value cell
             const cell2 = document.createElement('td');
-            cell2.textContent = coilValues[i];
+            cell2.textContent = coilValues[i] ? "ON" : "OFF";
             valueRow.appendChild(cell2);
           }
         } else {
@@ -443,6 +575,341 @@
 
     coilAddressWM.addEventListener('input', () => {
       updateWMToggles();
+    });
+    </script>
+
+    <!-- Discrete Functions -->
+    <script>
+    const discreteAddressR = document.getElementById('discreteAddressR');
+    const discreteSendR = document.getElementById('discreteSendR');
+    const discreteStatusR = document.getElementById('discreteStatusR');
+    
+    // Read
+    async function readDiscrete(address, quantity) {
+      try {
+        const addr = parseInt(address);
+        const quan = parseInt(quantity);
+
+        discreteStatusR.textContent = 'Sending request...';
+        const url = `/read?type=discrete&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+        console.log(url);
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          discreteStatusR.innerHTML = "";
+          const discreteValues = data.data;
+
+          const headingRow = document.getElementById("discreteResultTableR_heading");
+          const valueRow = document.getElementById("discreteResultTableR_value");
+
+          for (let i = addr; i < addr + quan; i++) {
+            // Heading Cell
+            const cell = document.createElement('td'); // create a table cell
+            cell.textContent = i; // set cell content
+            headingRow.appendChild(cell); // add cell to row
+
+            // Value cell
+            const cell2 = document.createElement('td');
+            cell2.textContent = discreteValues[i] ? "ON" : "OFF";
+            valueRow.appendChild(cell2);
+          }
+        } else {
+          discreteStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+          discreteStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    discreteSendR.addEventListener('click', () => {
+      const addr = discreteAddressR.value;
+      const quan = discreteQuantityR.value;
+
+      const headingRow = document.getElementById("discreteResultTableR_heading");
+      const valueRow = document.getElementById("discreteResultTableR_value");
+      headingRow.innerHTML = "";
+      valueRow.innerHTML = "";
+
+      if (addr === '' || Number(addr) < 0) {
+        discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid discrete input address (0 or higher).</div>`;
+        return;
+      }
+      if (quan === '' || Number(quan) < 1) {
+        discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+        return;
+      }
+      readDiscrete(addr, quan);
+    });
+    </script>
+
+    <!-- Holding Functions -->
+    <script>
+    const holdingAddressR = document.getElementById('holdingAddressR');
+    const holdingQuantityR = document.getElementById('holdingQuantityR');
+    const holdingSendR = document.getElementById('holdingSendR');
+    const holdingStatusR = document.getElementById('holdingStatusR');
+
+    const holdingValueW = document.getElementById('holdingValueW');
+    const holdingAddressW = document.getElementById('holdingAddressW');
+    const holdingSendW = document.getElementById('holdingSendW');
+    const holdingStatusW = document.getElementById('holdingStatusW');
+
+    const holdingAddressWM = document.getElementById('holdingAddressWM');
+    const holdignSendWM = document.getElementById('holdingSendWM');
+    const holdingStatusWM = document.getElementById('holdingStatusWM');
+
+    // Write Single
+    async function writeHolding(address, value) {
+      try {
+        holdingStatusW.textContent = 'Sending request...';
+        const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${encodeURIComponent(value)}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          holdingStatusW.innerHTML = `<div class="alert alert-success">Holding register at address ${address} set to ${value}.</div>`;
+        } else {
+          holdingStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+          holdingStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    // Write multiple 
+    async function writeMultipleHolding(address, valueArray) {
+      try {
+        holdingStatusWM.textContent = 'Sending request...';
+        
+        const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${valueArray}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          holdingStatusWM.innerHTML = `<div class="alert alert-success">Holding registers starting at address ${address} set to ${valueArray}.</div>`;
+        } else {
+          holdingStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+        holdingStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    // Read
+    async function readHolding(address, quantity) {
+      try {
+        const addr = parseInt(address);
+        const quan = parseInt(quantity);
+
+        holdingStatusR.textContent = 'Sending request...';
+        const url = `/read?type=holding&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+        console.log(url);
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          holdingStatusR.innerHTML = "";
+          const holdingValues = data.data;
+
+          const headingRow = document.getElementById("holdingResultTableR_heading");
+          const valueRow = document.getElementById("holdingResultTableR_value");
+
+          for (let i = addr; i < addr + quan; i++) {
+            // Heading Cell
+            const cell = document.createElement('td'); // create a table cell
+            cell.textContent = i; // set cell content
+            headingRow.appendChild(cell); // add cell to row
+
+            // Value cell
+            const cell2 = document.createElement('td');
+            cell2.textContent = holdingValues[i];
+            valueRow.appendChild(cell2);
+          }
+        } else {
+          holdingStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+          holdingStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    // Update WM inputs
+    function updateWMInputs() {
+      const addr = parseInt(holdingAddressWM.value);
+      const quan = parseInt(holdingQuantityWM.value);
+      const workingDiv = document.getElementById("holdingWriteMultipleToggleDiv");
+
+      workingDiv.innerHTML = "";
+      holdingStatusWM.innerHTML = "";
+
+      if (Number(quan) > 256) {
+        holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
+        return;
+      }
+
+      if (isNaN(quan) || quan < 1 || quan > 256 || isNaN(addr) || addr < 0) {
+        return;
+      }
+
+      /*<div class="mb-3">
+        <label for="holdingValueW" class="form-label">Value</label>
+        <input type="number" class="form-control" id="holdingValueW" placeholder="Enter value to write (0-65535)" min="0" />
+      </div>*/
+
+      workingDiv.innerHTML = "<h6>Holding Register (Value 0-65535)</h6>";
+
+      for (var i = addr; i < addr + quan; i++) {
+        const id = `holdingInput-${i}`;
+        
+        const formDiv = document.createElement("div");
+        formDiv.className = "mb-3 d-flex align-items-center";
+
+        const label = document.createElement("label");
+        label.className = "me-2"; // right margin
+        label.setAttribute("for", id);
+        label.textContent = `Register ${i}`;
+        
+        const input = document.createElement("input");
+        input.className = "form-control";
+        input.style.width = "120px";
+        input.type = "number";
+        input.id = id;
+        input.min = "0";
+
+        formDiv.appendChild(label);
+        formDiv.appendChild(input);
+
+        workingDiv.appendChild(formDiv);
+      }
+    }
+
+    holdingSendW.addEventListener('click', () => {
+      const addr = holdingAddressW.value;
+      if (addr === '' || Number(addr) < 0) {
+        holdingStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+        return;
+      }
+      const val = holdingValueW.value;
+      writeHolding(addr, val);
+    });
+
+    holdingSendWM.addEventListener('click', () => {
+      const address = parseInt(holdingAddressWM.value);
+      const quantity = parseInt(holdingQuantityWM.value);
+
+      if (isNaN(address) || address < 0) {
+        holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+        return;
+      }
+      if (isNaN(quantity) || quantity < 1) {
+        holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
+        return;
+      }
+
+      const valueArray = [];
+      for (var i = address; i < address + quantity; i++) {
+        const inputElement = document.getElementById(`holdingInput-${i}`);
+        const inputValue = inputElement.value;
+        valueArray.push(inputValue);
+      }
+
+      writeMultipleHolding(address, valueArray); // handles value gathering in here
+    });
+
+    holdingSendR.addEventListener('click', () => {
+      const addr = holdingAddressR.value;
+      const quan = holdingQuantityR.value;
+
+      const headingRow = document.getElementById("holdingResultTableR_heading");
+      const valueRow = document.getElementById("holdingResultTableR_value");
+      headingRow.innerHTML = "";
+      valueRow.innerHTML = "";
+
+      if (addr === '' || Number(addr) < 0) {
+        holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+        return;
+      }
+      if (quan === '' || Number(quan) < 1) {
+        holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+        return;
+      }
+      readHolding(addr, quan);
+    });
+
+    holdingQuantityWM.addEventListener('input', () => {
+      updateWMInputs();
+    });
+
+    holdingAddressWM.addEventListener('input', () => {
+      updateWMInputs();
+    });
+    </script>
+
+    <!-- Input Functions -->
+    <script>
+    const inputAddressR = document.getElementById('inputAddressR');
+    const inputSendR = document.getElementById('inputSendR');
+    const inputStatusR = document.getElementById('inputStatusR');
+    
+    // Read
+    async function readInput(address, quantity) {
+      try {
+        const addr = parseInt(address);
+        const quan = parseInt(quantity);
+
+        inputStatusR.textContent = 'Sending request...';
+        const url = `/read?type=input&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+        console.log(url);
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          inputStatusR.innerHTML = "";
+          const inputValues = data.data;
+
+          const headingRow = document.getElementById("inputResultTableR_heading");
+          const valueRow = document.getElementById("inputResultTableR_value");
+
+          for (let i = addr; i < addr + quan; i++) {
+            // Heading Cell
+            const cell = document.createElement('td'); // create a table cell
+            cell.textContent = i; // set cell content
+            headingRow.appendChild(cell); // add cell to row
+
+            // Value cell
+            const cell2 = document.createElement('td');
+            cell2.textContent = inputValues[i];
+            valueRow.appendChild(cell2);
+          }
+        } else {
+          inputStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+          inputStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    }
+
+    inputSendR.addEventListener('click', () => {
+      const addr = inputAddressR.value;
+      const quan = inputQuantityR.value;
+
+      const headingRow = document.getElementById("inputResultTableR_heading");
+      const valueRow = document.getElementById("inputResultTableR_value");
+      headingRow.innerHTML = "";
+      valueRow.innerHTML = "";
+
+      if (addr === '' || Number(addr) < 0) {
+        inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid input register address (0 or higher).</div>`;
+        return;
+      }
+      if (quan === '' || Number(quan) < 1) {
+        inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+        return;
+      }
+      readInput(addr, quan);
     });
     </script>
 
