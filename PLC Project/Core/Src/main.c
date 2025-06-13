@@ -135,6 +135,9 @@ int main(void)
 	display_Setup();
 	display_Boot();
 
+	// Config
+	#define DEBOUNCE_DELAY 50 // milliseconds
+
   	// Communication
     modbus_Setup(0x01); // Set modbus slave address
   	RS485_Setup(GPIOA, RS485_DIR_Pin); // changed from PA4 to PA8 to not interfere with DAC1
@@ -195,7 +198,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-	uint16_t btn1status = 0;
+	uint8_t btn1status = 0;
 	uint32_t lastButtonPress = 0;
 
 	uint32_t loopCounter = 0;
@@ -215,12 +218,11 @@ int main(void)
 	  // Check display button
 	  GPIO_PinState btn1 = HAL_GPIO_ReadPin(GPIOC, BTN1_Pin);
 	  if (btn1 == GPIO_PIN_SET) {
-		  if (btn1status == 0) {
+		  if (btn1status == 0 && (HAL_GetTick() - lastButtonPress) > DEBOUNCE_DELAY) {
 			  display_BtnPress();
 			  lastButtonPress = HAL_GetTick();
+			  btn1status = 1;
 		  }
-
-		  btn1status = 1;
 	  } else if (btn1 == GPIO_PIN_RESET) {
 		  btn1status = 0;
 	  }
