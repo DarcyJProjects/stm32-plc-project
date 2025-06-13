@@ -29,6 +29,7 @@
 #include "rs485/rs485.h"
 #include "i2c/display.h"
 #include "i2c/i2c.h"
+#include "i2c/ina226.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -169,13 +170,9 @@ int main(void)
   	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_11);
   	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_14);
 
-  	/*
-  	Test with I2C:
-  	io_input_reg_add_channel(DS3231_ReadTemp, &hi2c1);
+  	// Hardcoded Status input registers (do not remove)
   	io_input_reg_add_channel(INA226_ReadBusVoltageRaw, &hi2c1);
   	io_input_reg_add_channel(INA226_ReadCurrentRaw, &hi2c1);
-  	io_input_reg_add_channel(INA226_ReadPowerRaw, &hi2c1);*/
-
 
 
   	// Flash on-board LED
