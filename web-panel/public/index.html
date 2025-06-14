@@ -8,6 +8,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 </head>
 <body class="bg-light py-4">
 
@@ -987,7 +990,7 @@
     <!-- Registers over time -->
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Graphing [Minimal Implementation]</h5>
+        <h5>Graphing</h5>
         <a class="btn btn-link" data-bs-toggle="collapse" href="#graphingBody">Toggle</a>
       </div>
       <div class="card-body">
@@ -998,59 +1001,139 @@
               <label for="registerSelect" class="form-label">Select Register Type:</label>
               <select id="registerSelect" class="form-select">
                 <option>Coil</option>
-                <!--
                 <option>Discrete Input</option>
                 <option>Holding Register</option>
                 <option>Input Register</option>
-                -->
               </select>
             </div>
             <div class="mb-3">
               <label for="graphAddress" class="form-label">Address:</label>
               <input type="number" class="form-control" id="graphAddress" placeholder="Enter register address (e.g., 0)" min="0" />
             </div>
-            <div class="mb-3">
+            <!--<div class="mb-3">
               <label for="graphQuantity" class="form-label">Quantity:</label>
               <input type="number" class="form-control" id="graphQuantity" placeholder="Enter quantity of registers to read (e.g., 1)" min="1" />
-            </div>
-            <div class="mb-3">
-              Polling Interval: 
-              <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s
-            </div>
+            </div>-->
 
+            <button id="addGraphingItem" class="btn btn-primary">Add</button>&nbsp;&nbsp;
+            <button id="removeGraphingItem" class="btn btn-danger">Remove</button>
+            <div id="addGraphingItemStatus" class="mt-3"></div>
+            <div id="removeGraphingItemStatus" class="mt-3"></div>
+
+            <br>
             <div id="graphStatus" class="mt-3"></div>
 
 
             <div class="card-body">
               <canvas id="registerChart" height="100"></canvas>
             </div>
+
+            <div class="mb-3">
+              Polling Interval: 
+              <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s
+              &nbsp;&nbsp;
+              <button id="chartResetZoom" class="btn btn-secondary">Reset Zoom</button>&nbsp;&nbsp;
+              <button id="chartExport" class="btn btn-secondary">Export to CSV</button>
+            </div>
+            
           </div> 
         </div>
       </div>
     </div>
     <script>
+      const addGraphingItem = document.getElementById('addGraphingItem');
+      const removeGraphingItem = document.getElementById('removeGraphingItem');
+      const addGraphingItemStatus = document.getElementById('addGraphingItemStatus');
+      const removeGraphingItemStatus = document.getElementById('removeGraphingItemStatus');
+
+      const chartResetZoom = document.getElementById('chartResetZoom');
+      const chartExport = document.getElementById('chartExport');
+
+      const addType = document.getElementById('registerSelect');
+      const addAddress = document.getElementById('graphAddress');
+
       const context = document.getElementById("registerChart").getContext("2d");
-      const dataPoints = [];
-      const labels = [];
 
       const chart = new Chart(context, {
         type: 'line',
         data: {
-          labels,
-          datasets: [{
-            label: 'Coil Value',
-            data: dataPoints,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            tension: 0.2,
-            fill: false
-          }]
+          datasets: []
         },
         options: {
           responsive: true,
           animation: true,
+          parsing: false,
           scales: {
-            x: { title: { display: true, text: 'Time' }},
-            y: { title: { display: true, text: 'Value' }}
+            //x: { title: { display: true, text: 'Time' }},
+            //y: { title: { display: true, text: 'Value' }}
+            x: {
+              type: 'time',
+              time: {
+                unit: 'second',
+                tooltipFormat: 'HH:mm:ss'
+              },
+              title: { display: true, text: 'Time' },
+              ticks: {
+                autoSkip: false,
+                source: 'auto'
+              },
+              adapters: {
+                date: luxon.DateTime
+              },
+              min: Date.now() - 60000, // show past 60 seconds
+              max: Date.now()
+            },
+            /*y: {
+              title: { display: true, text: 'Value' }
+            }*/
+            yDigital: {
+              type: 'linear',
+              position: 'left',
+              min: 0,
+              max: 1,
+              title: {
+                display: true,
+                text: 'Digital'
+              },
+              grid: {
+                drawOnChartArea: false, // avoid grid overlap
+                drawTicks: false,
+                drawBorder: false,
+              },
+            },
+            yAnalogue: {
+              type: 'linear',
+              position: 'right',
+              min: 0,
+              max: 65535,
+              title: {
+                display: true,
+                text: 'Analogue'
+              },
+              grid: {
+                drawTicks: true,
+                drawBorder: true,
+                drawOnChartArea: true,
+              },
+            }
+          },
+          plugins: {
+            zoom: {
+              pan: {
+                enabled: true,
+                mode: 'x',
+                modifierKey: 'ctrl'  // Optional
+              },
+              zoom: {
+                wheel: {
+                  enabled: true
+                },
+                pinch: {
+                  enabled: true
+                },
+                mode: 'x'
+              }
+            }
           }
         }
       });
@@ -1060,22 +1143,31 @@
       let quantity = 1;
 
       async function fetchRegisterAndUpdateChart() {
+        addGraphingItemStatus.innerHTML = ""; 
+
         try {
-          const res = await fetch(`/read?type=coil&address=${addressToRead}&quantity=${quantity}`);
-          const json = await res.json();
-          const now = new Date().toLocaleTimeString();
+          for (const dataset of chart.data.datasets) {
+            const address = dataset.address;
+            const type = dataset.regType;
 
-          if (res.ok && json.data?.[0] !== undefined) {
-            if (dataPoints.length > 50) {
-              dataPoints.shift();
-              labels.shift();
+            const res = await fetch(`/read?type=${type}&address=${encodeURIComponent(address)}`);
+            const data = await res.json();
+
+            if (res.ok && data.data?.[0] !== undefined) {
+              dataset.data.push({
+                x: new Date(),
+                y: data.data[0]
+              });
+            } else {
+              addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              return;
             }
-
-            dataPoints.push(json.data[0]);
-            labels.push(now);
-            chart.update();
           }
+          chart.options.scales.x.min = Date.now() - 60000;
+          chart.options.scales.x.max = Date.now();
+          chart.update();
         } catch (err) {
+          addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
           console.error("Chart update error:", err);
         }
       }
@@ -1090,7 +1182,172 @@
         graphStatus.innerHTML = "";
         timer = setInterval(fetchRegisterAndUpdateChart, intervalSec * 1000);
       }
+
+      function endPolling() {
+        clearInterval(timer);
+        timer = null;
+      }
+
+      function getRandomColour() {
+        const r = Math.floor(Math.random() * 200);
+        const g = Math.floor(Math.random() * 200);
+        const b = Math.floor(Math.random() * 200);
+        return `rgba(${r}, ${g}, ${b}, 1)`;
+      }
+
+      addGraphingItem.addEventListener('click', async () => {
+        addGraphingItemStatus.innerHTML = "";
+        removeGraphingItemStatus.innerHTML = "";
+
+        let type;
+        switch (addType.value) {
+          case "Coil":
+            type = "coil";
+            break;
+          case "Discrete Input":
+            type = "discrete";
+            break;
+          case "Holding Register":
+            type = "holding";
+            break;
+          case "Input Register":
+            type = "input";
+            break;
+          default:
+            addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
+            return;
+        }
+
+        const address = addAddress.value;
+
+        // Check and test validity
+        if (address === '' || Number(address) < 0) {
+          addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
+          return;
+        }
+
+        try {
+          const url = `/read?type=${type}&address=${encodeURIComponent(address)}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          if (!res.ok) {
+            addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            return;
+          }
+        } catch (err) {
+          addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          return;
+        }
+
+        const yAxisID = (type === 'coil' || type === 'discrete') ? 'yDigital' : 'yAnalogue';
+
+        // Create new dataset
+        const newDataset = {
+          label: `${addType.value} ${address}`,
+          regType: type,
+          address: parseInt(address), 
+          data: [],
+          borderColor: getRandomColour(),
+          tension: 0.2,
+          fill: false,
+          yAxisID: yAxisID
+        };
+
+        // Push to chart
+        chart.data.datasets.push(newDataset);
+        chart.update();
+
+        // Reset state
+        addAddress.value = "";
+
+        // Start polling
+        startPolling();
+      });
+
+      removeGraphingItem.addEventListener('click', () => {
+          removeGraphingItemStatus.innerHTML = "";
+
+          let type;
+          switch (addType.value) {
+            case "Coil":
+              type = "coil";
+              break;
+            case "Discrete Input":
+              type = "discrete";
+              break;
+            case "Holding Register":
+              type = "holding";
+              break;
+            case "Input Register":
+              type = "input";
+              break;
+            default:
+              removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
+              return;
+          }
+
+          const address = parseInt(addAddress.value);
+
+          if (isNaN(address) || address < 0) {
+            removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
+            return;
+          }
+
+          // Label for comparsion (to find one to delete)
+          const labelToRemove = `${addType.value} ${address}`;
+
+          // Find dataset index
+          const index = chart.data.datasets.findIndex(ds => ds.label === labelToRemove);
+
+          if (index !== -1) {
+            chart.data.datasets.splice(index, 1); // Remove the dataset
+
+            if (chart.data.datasets.length === 0) {
+              endPolling();
+            }
+
+            chart.update();
+          } else {
+            removeGraphingItemStatus.innerHTML = `<div class="alert alert-info">Dataset not found.</div>`;
+          }
+
+          addAddress.value = "";
+      });
+
+      document.getElementById('intervalInput').addEventListener('change', () => {
+        if (chart.data.datasets.length > 0) {
+          startPolling();          
+        } else {
+          endPolling();
+        }
+      });
+
+      chartResetZoom.addEventListener('click', () => {
+        chart.resetZoom();
+      });
+
+      chartExport.addEventListener('click', () => {
+        let csvContent = "data:text/csv;charset=utf-8,";
+
+        chart.data.datasets.forEach(dataset => {
+          csvContent += `\nDataset: ${dataset.label}\nTime,Value\n`;
+          dataset.data.forEach(point => {
+            const timestamp = new Date(point.x).toISOString();
+            csvContent += `${timestamp},${point.y}\n`;
+          });
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'export.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
     </script>
+
+
 
 <!-- WINDOW ON LOAD -->
 <script>
@@ -1101,10 +1358,6 @@
       updateUI(true, currentPort, currentSlave);
       statusPolling(true);
     }
-
-    // Graphing
-    startPolling();
-    document.getElementById('intervalInput').addEventListener('change', startPolling);
   };
 </script>
   

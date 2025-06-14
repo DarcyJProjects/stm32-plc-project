@@ -9,7 +9,8 @@ app.use(express.json());
 app.use(express.static('public'));
 
 const client = new ModbusRTU;
-const timeoutMs = 3000; // timeout for all functions sent over modbus in milliseconds
+const timeoutMs = 1000; // timeout for all functions sent over modbus in milliseconds
+const timeoutRetry = 3; // number of times to try when querying over modbus
 
 
 let isConnected = false;
@@ -17,7 +18,23 @@ let currentPort;
 let currentSlave;
 
 // Timeout function
-function withTimeout(awaiting, ms) {
+async function withTimeout(awaiting, ms) {
+    for (let attempt = 1; attempt <= timeoutRetry; attempt++) {
+        try {
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout')), ms)
+            );
+
+            const result = await Promise.race([awaiting, timeout]);
+            return result;
+        } catch (err) {
+            if (attempt === timeoutRetry || err.message !== 'Timeout') {
+                throw err;
+            }
+            console.warn(`Attempt ${attempt} timed out, retrying...`);
+        }
+    }
+
     const timeout = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Timeout')), ms)
     );
