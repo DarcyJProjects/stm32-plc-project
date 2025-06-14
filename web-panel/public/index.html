@@ -1030,8 +1030,8 @@
 
             <div class="mb-3">
               Polling Interval: 
-              <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s
-              &nbsp;&nbsp;
+              <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s&nbsp;&nbsp;
+              <button id="chartStartStop" class="btn btn-success">Start</button>&nbsp;&nbsp;
               <button id="chartResetZoom" class="btn btn-secondary">Reset Zoom</button>&nbsp;&nbsp;
               <button id="chartExport" class="btn btn-secondary">Export to CSV</button>
             </div>
@@ -1046,6 +1046,7 @@
       const addGraphingItemStatus = document.getElementById('addGraphingItemStatus');
       const removeGraphingItemStatus = document.getElementById('removeGraphingItemStatus');
 
+      const chartStartStop = document.getElementById('chartStartStop');
       const chartResetZoom = document.getElementById('chartResetZoom');
       const chartExport = document.getElementById('chartExport');
 
@@ -1134,6 +1135,18 @@
                 mode: 'x'
               }
             }
+          },
+          tooltip: {
+            enabled: true,
+            mode: 'nearest',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                const yValue = context.parsed.y;
+                return `${label}: ${yValue}`;
+              }
+            }
           }
         }
       });
@@ -1155,7 +1168,7 @@
 
             if (res.ok && data.data?.[0] !== undefined) {
               dataset.data.push({
-                x: new Date(),
+                x: Date.now(),
                 y: data.data[0]
               });
             } else {
@@ -1179,13 +1192,29 @@
           graphStatus.innerHTML = `<div class="alert alert-warning">Please enter a interval greater than or equal to 1 second.</div>`;
           return;
         }
+
+        if (chart.data.datasets.length === 0) {
+          graphStatus.innerHTML = `<div class="alert alert-warning">Please add a dataset to the graph.</div>`;
+          return;
+        }
+
         graphStatus.innerHTML = "";
         timer = setInterval(fetchRegisterAndUpdateChart, intervalSec * 1000);
+
+        // Change start to stop button
+        chartStartStop.innerText = "Stop";
+        chartStartStop.classList.remove("btn-success");
+        chartStartStop.classList.add("btn-danger");
       }
 
       function endPolling() {
         clearInterval(timer);
         timer = null;
+
+        // Change stop to start button
+        chartStartStop.innerText = "Start";
+        chartStartStop.classList.remove("btn-danger");
+        chartStartStop.classList.add("btn-success");
       }
 
       function getRandomColour() {
@@ -1315,8 +1344,16 @@
       });
 
       document.getElementById('intervalInput').addEventListener('change', () => {
-        if (chart.data.datasets.length > 0) {
+        if (chart.data.datasets.length > 0 && (timer)) { 
           startPolling();          
+        } else {
+          endPolling();
+        }
+      });
+
+      chartStartStop.addEventListener('click', () => {
+        if (chartStartStop.innerText == 'Start') {
+          startPolling();
         } else {
           endPolling();
         }
