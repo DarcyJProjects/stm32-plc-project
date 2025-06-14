@@ -17,17 +17,32 @@ typedef enum {
 } RegisterType;
 
 typedef enum {
-	CMP_EQ,
-	CMP_NEQ,
-	CMP_GT,
-	CMP_LT
+	CMP_EQ, 	// ==
+	CMP_NEQ,	// !=
+	CMP_GT,		// >
+	CMP_LT,		// <
+	CMP_GTET,	// >=
+	CMP_LTET	// <=
 } ComparisonOp;
 
+typedef enum {
+	LOGIC_NONE,
+	LOGIC_AND,
+	LOGIC_OR
+} LogicJoin;
+
 typedef struct {
-	RegisterType input_type;
-	uint16_t input_reg;
-	ComparisonOp op;
-	uint16_t compare_value;
+	RegisterType input_type1;
+	uint16_t input_reg1;
+	ComparisonOp op1;
+	uint16_t compare_value1;
+
+	RegisterType input_type2;
+	uint16_t input_reg2;
+	ComparisonOp op2;
+	uint16_t compare_value2;
+
+	LogicJoin join;
 
 	RegisterType output_type;
 	uint16_t output_reg;
