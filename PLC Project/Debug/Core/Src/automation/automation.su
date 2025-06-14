@@ -1,0 +1,6 @@
+../Core/Src/automation/automation.c:8:17:read_register_value	16	static
+../Core/Src/automation/automation.c:27:13:write_register_value	16	static
+../Core/Src/automation/automation.c:38:13:evaluate_rule	24	static
+../Core/Src/automation/automation.c:50:13:apply_rule	16	static
+../Core/Src/automation/automation.c:56:6:automation_Init	24	static
+../Core/Src/automation/automation.c:62:6:automation_Tick	16	static

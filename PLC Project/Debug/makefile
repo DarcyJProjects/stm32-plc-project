@@ -27,6 +27,7 @@ RM := rm -rf
 -include Core/Src/io/subdir.mk
 -include Core/Src/i2c/ssd1306/subdir.mk
 -include Core/Src/i2c/subdir.mk
+-include Core/Src/automation/subdir.mk
 -include Core/Src/subdir.mk
 -include objects.mk
 

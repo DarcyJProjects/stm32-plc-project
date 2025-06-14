@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "rtc/rtc_ds3231.h"
+#include "automation/automation.h"
 #include "modbus/modbus.h"
 #include "rs485/rs485.h"
 #include "i2c/display.h"
@@ -145,6 +146,7 @@ int main(void)
   	// Initialise Devices
   	I2C_Setup(&hi2c1);
   	INA226_Init(&hi2c1);
+  	automation_Init();
 
   	// Setup Coils [HARDWARE]
   	io_coil_add_channel(GPIOC, DOUT1_Pin);
@@ -212,6 +214,10 @@ int main(void)
 	  RS485_ProcessPendingFrames();
 	  RS485_TransmitPendingFrames();
 	  /* RS485 Circular Frame Handling END*/
+
+	  /* AUTOMATION BEGIN*/
+	  automation_Tick();
+	  /* AUTOMATION END*/
 
 
 	  /* CHECK INPUTS BEGIN*/
