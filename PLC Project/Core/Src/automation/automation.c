@@ -23,6 +23,8 @@ static void write_register_value(RegisterType type, uint16_t addr, uint16_t writ
 		case REG_HOLDING:
 			io_holding_reg_write(addr, write_value);
 			break;
+		default:
+			break;
 	}
 }
 
@@ -69,7 +71,7 @@ static void apply_rule(const LogicRule* rule) {
 void automation_Init(void) {
 	// Hard coded test rules TODO: THIS IS ONLY FOR TESTING
 
-	rules[0] = (LogicRule){
+	/*rules[0] = (LogicRule){
 		REG_INPUT, 0, CMP_GT, 30000, // If Input Register 0 > 30000
 		REG_HOLDING, 0, CMP_EQ, 4096, // If Holding Register 0 == 4096
 		LOGIC_AND, // Condition 1 AND Condition 2
@@ -78,17 +80,27 @@ void automation_Init(void) {
 
 	// Inverse of rules[0] to reset the coil state:
 	rules[1] = (LogicRule){
-			REG_INPUT, 0, CMP_LT, 30001, // If Input Register 0 !> 30000
-			REG_HOLDING, 0, CMP_NEQ, 4096, // If Holding Register 0 != 4096
-			LOGIC_OR, // Condition 1 OR Condition 2
-			REG_COIL, 0, 0 // Then, set Coil 0 to 0.
-		};
+		REG_INPUT, 0, CMP_LT, 30001, // If Input Register 0 !> 30000
+		REG_HOLDING, 0, CMP_NEQ, 4096, // If Holding Register 0 != 4096
+		LOGIC_OR, // Condition 1 OR Condition 2
+		REG_COIL, 0, 0 // Then, set Coil 0 to 0.
+	};
 
-	rule_count = 2;
+	rule_count = 2;*/
 }
 
 void automation_Tick(void) {
 	for (uint16_t i = 0; i < rule_count; i++) {
 		apply_rule(&rules[i]);
+	}
+}
+
+bool automation_add_rule(LogicRule newRule) {
+	if (rule_count < MAX_RULES) {
+		rules[rule_count] = newRule;
+		rule_count++;
+		return true;
+	} else {
+		return false;
 	}
 }

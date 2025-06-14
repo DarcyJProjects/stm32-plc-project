@@ -21,6 +21,7 @@
 "./Core/Src/system_stm32g4xx.o"
 "./Core/Src/usb_serial.o"
 "./Core/Src/modbus/modbus.o"
+"./Core/Src/modbus/modbus_vendor.o"
 "./Core/Src/rs485/rs485.o"
 "./Core/Src/rtc/rtc_ds3231.o"
 "./Core/Src/sd/user_diskio_spi.o"

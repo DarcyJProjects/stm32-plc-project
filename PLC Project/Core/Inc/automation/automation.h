@@ -16,6 +16,8 @@ typedef enum {
 	REG_INPUT
 } RegisterType;
 
+#define AUTOMATION_TYPE_COUNT 4 // required for modbus frame validation
+
 typedef enum {
 	CMP_EQ, 	// ==
 	CMP_NEQ,	// !=
@@ -25,11 +27,15 @@ typedef enum {
 	CMP_LTET	// <=
 } ComparisonOp;
 
+#define AUTOMATION_OPERATION_COUNT 6 // required for modbus frame validation
+
 typedef enum {
 	LOGIC_NONE,
 	LOGIC_AND,
 	LOGIC_OR
 } LogicJoin;
+
+#define AUTOMATION_JOIN_COUNT 3 // required for modbus frame validation
 
 typedef struct {
 	RegisterType input_type1;
@@ -52,6 +58,6 @@ typedef struct {
 void automation_Init(void);
 void automation_Tick(void);
 
-bool parse_rule(const char* rule_str, LogicRule* rule_out);
+bool automation_add_rule(LogicRule newRule);
 
 #endif

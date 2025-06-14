@@ -244,10 +244,6 @@ int main(void)
 
 		  // Update display
 		  display_StatusPage();
-
-		  char buf[64];
-		  sprintf(buf, "PA3: %d", HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3));
-		  usb_serial_println(buf);
 	  }
 
 	  // Every 10 seconds since pressing display button, go to main page

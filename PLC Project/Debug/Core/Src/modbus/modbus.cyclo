@@ -1,6 +1,6 @@
-../Core/Src/modbus/modbus.c:20:6:modbus_Setup	1
-../Core/Src/modbus/modbus.c:25:6:modbus_handle_frame	45
-../Core/Src/modbus/modbus.c:373:17:modbus_crc16	4
-../Core/Src/modbus/modbus.c:393:13:send_response	1
-../Core/Src/modbus/modbus.c:409:13:send_exception	1
-../Core/Src/modbus/modbus.c:425:9:modbusGetSlaveAddress	1
+../Core/Src/modbus/modbus.c:17:6:modbus_Setup	1
+../Core/Src/modbus/modbus.c:22:6:modbus_handle_frame	45
+../Core/Src/modbus/modbus.c:357:17:modbus_crc16	4
+../Core/Src/modbus/modbus.c:377:6:modbus_send_response	1
+../Core/Src/modbus/modbus.c:393:6:modbus_send_exception	1
+../Core/Src/modbus/modbus.c:409:9:modbusGetSlaveAddress	1

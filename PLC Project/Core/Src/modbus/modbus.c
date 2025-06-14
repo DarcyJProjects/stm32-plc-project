@@ -5,13 +5,10 @@
 // https://dev.to/madhav_baby_giraffe/bit-packing-the-secret-to-optimizing-data-storage-and-transmission-m70
 
 #include "modbus/modbus.h"
-
-#define MODBUS_MAX_FRAME_SIZE 256
+#include "modbus/modbus_vendor.h"
 
 // FUNCTIONS
 static uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
-static void send_response(uint8_t* frame, uint16_t len);
-static void send_exception(uint8_t address, uint8_t function, uint8_t exception);
 
 // SLAVE ADDRESS
 static uint8_t slave_address;
@@ -23,11 +20,6 @@ void modbus_Setup(uint8_t slaveAddress) {
 
 // Handle a full received modbus frame
 void modbus_handle_frame(uint8_t* frame, uint16_t len) {
-	//debug
-	static char debug_msg[256];
-	snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, First four = 0x%02X 0x%02X 0x%02X 0x%02X\r\n", len, frame[0], frame[1], frame[2], frame[3]);
-	CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
-
 	if (len < 6) return;
 
 	uint8_t address = frame[0];
@@ -40,9 +32,6 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 	// Check if the CRC is valid
 	uint16_t received_crc = (frame[len - 1] << 8) | frame[len - 2]; // MODBUS sends LSB first (unlike address, function)
 	uint16_t calculated_crc = modbus_crc16(frame, len - 2); // Exclude received CRC from CRC calculation
-	//static char debug_crc[256];
-	//snprintf(debug_crc, sizeof(debug_crc), "DEBUG: Received CRC = 0x%02X, Calculated CRC = 0x%02X\r\n", received_crc, calculated_crc);
-	//CDC_Transmit_FS((uint8_t*)debug_crc, strlen(debug_crc));
 
 	if (received_crc != calculated_crc) {
 		// Invalid CRC, No exception for a CRC failure
@@ -56,7 +45,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if coilCount value is legal for modbus specs
 			if (coilCount == 0 || coilCount > MAX_IO_COILS) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
@@ -64,7 +53,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if endAddress is outside the stored coils
 			if (endAddress >= io_coil_channel_count) { // io_coil_channel count external from io_coils
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
@@ -104,7 +93,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				startAddress++;
 			}
 
-			send_response(responseData, responseLen);
+			modbus_send_response(responseData, responseLen);
 			break;
 		}
 
@@ -114,7 +103,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if discreteCount value is legal for modbus specs
 			if (discreteCount == 0 || discreteCount > MAX_IO_DISCRETE_IN) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
@@ -122,7 +111,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if endAddress is outside the stored discrete inputs
 			if (endAddress >= io_discrete_in_channel_count) { // io_coil_channel count external from io_coils
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
@@ -162,7 +151,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				startAddress++;
 			}
 
-			send_response(responseData, responseLen);
+			modbus_send_response(responseData, responseLen);
 			break;
 		}
 
@@ -176,7 +165,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if regCount value is legal for modbus specs
 			if (regCount == 0 || regCount > io_holding_reg_channel_count) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
@@ -184,7 +173,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if endAddress is outside the stored registers
 			if (endAddress >= io_holding_reg_channel_count) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
@@ -207,7 +196,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				startAddress++;
 			}
 
-			send_response(responseData, responseLen);
+			modbus_send_response(responseData, responseLen);
 			break;
 		}
 
@@ -217,7 +206,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if regCount value is legal for modbus specs
 			if (regCount == 0 || regCount > io_input_reg_channel_count) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
@@ -225,7 +214,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 			// Check if endAddress is outside the stored registers
 			if (endAddress >= io_input_reg_channel_count) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
@@ -248,7 +237,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				startAddress++;
 			}
 
-			send_response(responseData, responseLen);
+			modbus_send_response(responseData, responseLen);
 			break;
 		}
 
@@ -257,7 +246,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t writeValue = (frame[4] << 8) | frame[5];
 
 			if (coilAddress >= io_coil_channel_count) { // io_coil_channel count external from io_coils
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
@@ -266,7 +255,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			// Write the GPIO state to the corresponding coil channel in io_coils
 			io_coil_write(coilAddress, writeState);
 
-			send_response(frame, 6); // Echo back 6 byes (as per spec) of the original request (to say it was successful)
+			modbus_send_response(frame, 6); // Echo back 6 byes (as per spec) of the original request (to say it was successful)
 			break;
 		}
 
@@ -275,12 +264,12 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t writeValue = (frame[4] << 8) | frame[5];
 
 			if (regAddress >= io_holding_reg_channel_count) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
 			io_holding_reg_write(regAddress, writeValue); // write the value to the register
-			send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
+			modbus_send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
 			break;
 		}
 
@@ -291,12 +280,12 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint16_t expectedBytes = (coilCount + 7) / 8;
 
 			if (startAddress + coilCount > io_coil_channel_count) { // io_coil_channel count external from io_coils
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
 			if (expectedBytes != byteCount) { // not enough values provided to write to all the coils
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
@@ -318,7 +307,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				io_coil_write(coilAddress, writeState);
 			}
 
-			send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
+			modbus_send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
 			break;
 		}
 
@@ -328,12 +317,12 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 			uint8_t byteCount = frame[6];
 
 			if (startAddress + regCount > io_holding_reg_channel_count) {
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDR);
 				return;
 			}
 
 			if (byteCount != regCount * 2) { // not enough values provided to write to all the registers
-				send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
@@ -350,22 +339,17 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 				frameIndex += 2; // Move to the next register value in frame (2 bytes per register so +=2)
 			}
 
-			send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
+			modbus_send_response(frame, 6); // Echo back 6 bytes (as per spec) of the original request (to say it was successful)
 			break;
 		}
 
-		default:
-			send_exception(address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
+		default: {
+			// Delegate unkown function codes to the vendor handler, which will send an exception if invalid
+			modbus_vendor_handle_frame(frame, len);
 			break;
+		}
 	}
 }
-
-/*void modbus_handle_frame(uint8_t* frame, uint16_t len) {
-    static char debug_msg[64];
-    snprintf(debug_msg, sizeof(debug_msg), "DEBUG: Frame len = %u, first byte = 0x%02X\r\n", len, frame[0]);
-    CDC_Transmit_FS((uint8_t*)debug_msg, strlen(debug_msg));
-    //HAL_Delay(10);
-}*/
 
 
 // Calculate CRC16
@@ -390,7 +374,7 @@ static uint16_t modbus_crc16(uint8_t* frame, uint16_t len) {
 }
 
 // Send the response over RS485
-static void send_response(uint8_t* frame, uint16_t len) {
+void modbus_send_response(uint8_t* frame, uint16_t len) {
 	// Add CRC
 	uint16_t crc = modbus_crc16(frame, len);
 	frame[len++] = crc & 0xFF;         // LSB first
@@ -406,7 +390,7 @@ static void send_response(uint8_t* frame, uint16_t len) {
 }
 
 // Send the exception over RS485
-static void send_exception(uint8_t address, uint8_t function, uint8_t exception) {
+void modbus_send_exception(uint8_t address, uint8_t function, uint8_t exception) {
 	// Craft exceptionFrame
 	uint8_t exceptionFrame[5];
 	exceptionFrame[0] = address;

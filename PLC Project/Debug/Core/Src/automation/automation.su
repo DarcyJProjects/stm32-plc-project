@@ -1,7 +1,8 @@
 ../Core/Src/automation/automation.c:8:17:read_register_value	16	static
 ../Core/Src/automation/automation.c:18:13:write_register_value	16	static
-../Core/Src/automation/automation.c:29:13:compare	16	static
-../Core/Src/automation/automation.c:39:13:evaluate_rule	24	static
-../Core/Src/automation/automation.c:61:13:apply_rule	16	static
-../Core/Src/automation/automation.c:67:6:automation_Init	64	static
-../Core/Src/automation/automation.c:88:6:automation_Tick	16	static
+../Core/Src/automation/automation.c:31:13:compare	16	static
+../Core/Src/automation/automation.c:43:13:evaluate_rule	24	static
+../Core/Src/automation/automation.c:65:13:apply_rule	16	static
+../Core/Src/automation/automation.c:71:6:automation_Init	4	static
+../Core/Src/automation/automation.c:92:6:automation_Tick	16	static
+../Core/Src/automation/automation.c:98:6:automation_add_rule	12	static

@@ -143,6 +143,17 @@ void RS485_TransmitPendingFrames(void) {
 			uint8_t* frame_data = (uint8_t*)rs485_tx_frame_queue[rs485_tx_frame_tail].data;
 			uint16_t frame_len = rs485_tx_frame_queue[rs485_tx_frame_tail].len;
 
+			/*
+			// TODO: REMOVE DEBUG ONLY
+			char hex_string[2 * frame_len + 1];
+
+			for (size_t i = 0; i < frame_len; i++) {
+				snprintf(&hex_string[2 * i], 3, "%02X", frame_data[i]);
+			}
+
+			usb_serial_println(hex_string);
+*/
+
 			RS485_SetTransmitMode();
 
 			// Disable TC interrupt
