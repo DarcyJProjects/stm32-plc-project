@@ -42,11 +42,11 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			}
 
 			// Ensure operations are valid
-			if (op1Raw == 0 || op1Raw >= AUTOMATION_OPERATION_COUNT) {
+			if (op1Raw == 0 || op1Raw > AUTOMATION_OPERATION_COUNT) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
-			if ((joinRaw != 1) && (op2Raw == 0 || op2Raw >= AUTOMATION_OPERATION_COUNT)) {
+			if ((joinRaw != 1) && (op2Raw == 0 || op2Raw > AUTOMATION_OPERATION_COUNT)) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}

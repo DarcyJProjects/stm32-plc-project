@@ -8772,12 +8772,12 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			}
 
 			// Ensure operations are valid
-			if (op1Raw == 0 || op1Raw >= AUTOMATION_OPERATION_COUNT) {
+			if (op1Raw == 0 || op1Raw > AUTOMATION_OPERATION_COUNT) {
  800405c:	f897 3137 	ldrb.w	r3, [r7, #311]	@ 0x137
  8004060:	2b00      	cmp	r3, #0
  8004062:	d003      	beq.n	800406c <modbus_vendor_handle_frame+0x234>
  8004064:	f897 3137 	ldrb.w	r3, [r7, #311]	@ 0x137
- 8004068:	2b05      	cmp	r3, #5
+ 8004068:	2b06      	cmp	r3, #6
  800406a:	d908      	bls.n	800407e <modbus_vendor_handle_frame+0x246>
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
  800406c:	f897 113d 	ldrb.w	r1, [r7, #317]	@ 0x13d
@@ -8788,7 +8788,7 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 				return;
  800407c:	e0b2      	b.n	80041e4 <modbus_vendor_handle_frame+0x3ac>
 			}
-			if ((joinRaw != 1) && (op2Raw == 0 || op2Raw >= AUTOMATION_OPERATION_COUNT)) {
+			if ((joinRaw != 1) && (op2Raw == 0 || op2Raw > AUTOMATION_OPERATION_COUNT)) {
  800407e:	f897 312b 	ldrb.w	r3, [r7, #299]	@ 0x12b
  8004082:	2b01      	cmp	r3, #1
  8004084:	d010      	beq.n	80040a8 <modbus_vendor_handle_frame+0x270>
@@ -8796,7 +8796,7 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
  800408a:	2b00      	cmp	r3, #0
  800408c:	d003      	beq.n	8004096 <modbus_vendor_handle_frame+0x25e>
  800408e:	f897 312f 	ldrb.w	r3, [r7, #303]	@ 0x12f
- 8004092:	2b05      	cmp	r3, #5
+ 8004092:	2b06      	cmp	r3, #6
  8004094:	d908      	bls.n	80040a8 <modbus_vendor_handle_frame+0x270>
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
  8004096:	f897 113d 	ldrb.w	r1, [r7, #317]	@ 0x13d
