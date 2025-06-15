@@ -6,3 +6,5 @@
 ../Core/Src/automation/automation.c:71:6:automation_Init	1
 ../Core/Src/automation/automation.c:92:6:automation_Tick	2
 ../Core/Src/automation/automation.c:98:6:automation_add_rule	2
+../Core/Src/automation/automation.c:108:10:automation_get_rule_count	1
+../Core/Src/automation/automation.c:112:6:automation_get_rule	2

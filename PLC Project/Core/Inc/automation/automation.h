@@ -60,4 +60,8 @@ void automation_Tick(void);
 
 bool automation_add_rule(LogicRule newRule);
 
+uint16_t automation_get_rule_count(void);
+
+bool automation_get_rule(uint16_t index, LogicRule* rule);
+
 #endif

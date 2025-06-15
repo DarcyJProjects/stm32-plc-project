@@ -104,7 +104,83 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			modbus_send_response(responseData, responseLen);
 			break;
 		}
+		case MODBUS_VENDOR_FUNC_GET_RULE_COUNT: {
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
 
+			uint16_t ruleCount = automation_get_rule_count();
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_ADD_RULE;
+			responseData[2] = 0x02; // byte count, 2 bytes follow (16 bits -> uint16_t)
+			responseData[3] = ruleCount >> 8; // high byte
+			responseData[4] = ruleCount & 0x00FF; // low byte
+
+			uint16_t responseLen = 5;
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_GET_RULE: {
+			// Check request length (Slave Address, Function Code, Index High, Index Low, CRC Low, CRC High)
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			uint16_t ruleIndex = (frame[2] << 8) | frame[3];
+
+			LogicRule rule;
+
+			bool status = automation_get_rule(ruleIndex, &rule);
+			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Extract fields from the rule struct
+			// Enumerations have + 1 as to make first index 1 (easier to detect 0 errors).
+			uint8_t input_type1Raw = (uint8_t)rule.input_type1 + 1;
+			uint16_t input_reg1 = (uint16_t)rule.input_reg1;
+			uint8_t op1Raw = (uint8_t)rule.op1 + 1;
+			uint16_t compare_value1 = (uint16_t)rule.compare_value1;
+			uint8_t input_type2Raw = (uint8_t)rule.input_type2 + 1;
+			uint16_t input_reg2 = (uint16_t)rule.input_reg2;
+			uint8_t op2Raw = (uint8_t)rule.op2 + 1;
+			uint16_t compare_value2 = (uint16_t)rule.compare_value2;
+			uint8_t joinRaw = (uint8_t)rule.join + 1;
+			uint8_t output_typeRaw = (uint8_t)rule.output_type + 1;
+			uint16_t output_reg = (uint16_t)rule.output_reg;
+			uint16_t output_value = (uint16_t)rule.output_value;
+
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			// Create the response frame
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_GET_RULE;
+
+			responseData[2] = input_type1Raw;
+			responseData[3] = input_reg1 >> 8; // high bit
+			responseData[4] = input_reg1 & 0xFF; // low bit
+			responseData[5] = op1Raw;
+			responseData[6] = compare_value1 >> 8;
+			responseData[7] = compare_value1 & 0xFF;
+			responseData[8] = input_type2Raw;
+			responseData[9] = input_reg2 >> 8;
+			responseData[10] = input_reg2 & 0xFF;
+			responseData[11] = op2Raw;
+			responseData[12] = compare_value2 >> 8;
+			responseData[13] = compare_value2 & 0xFF;
+			responseData[14] = joinRaw;
+			responseData[15] = output_typeRaw;
+			responseData[16] = output_reg >> 8;
+			responseData[17] = output_reg & 0xFF;
+			responseData[18] = output_value >> 8;
+			responseData[19] = output_value & 0xFF;
+
+			uint16_t responseLen = 20;
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
 		default: {
 			modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
 			break;

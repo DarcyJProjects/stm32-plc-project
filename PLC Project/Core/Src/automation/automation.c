@@ -104,3 +104,16 @@ bool automation_add_rule(LogicRule newRule) {
 		return false;
 	}
 }
+
+uint16_t automation_get_rule_count(void) {
+	return rule_count;
+}
+
+bool automation_get_rule(uint16_t index, LogicRule* rule) {
+	if (index >= rule_count) {
+		return false;
+	}
+
+	*rule = rules[index];
+	return true;
+}
