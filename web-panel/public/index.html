@@ -17,1372 +17,1522 @@
   <div class="container">
     <h1 class="mb-4">Embedded Controller Control Panel</h1>
 
-    <!-- Serial connection panel -->
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Serial Connection</h5>
-        <a class="btn btn-link" data-bs-toggle="collapse" href="#serialConnectionBody">Toggle</a>
-      </div>
-      <div class="card-body">
-        <div id="serialConnectionBody" class="collapse show">
-          <div class="mb-3">
-            <label for="portSelect" class="form-label">Select COM Port</label>
-            <select id="portSelect" class="form-select">
-              <option>Loading...</option>
-            </select>
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs" id="mainTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-connection" type="button" role="tab">Serial Connection</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-manual" type="button" role="tab">Manual Control</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-graphing" type="button" role="tab">Graphing</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-rules" type="button" role="tab">Rules Manager</button>
+      </li>
+    </ul>
+
+    <div class="tab-content mt-3" id="mainTabContent">
+      <!-- Serial connection panel -->
+      <div class="tab-pane fade show active" id="tab-connection" role="tabpanel">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Serial Connection</h5>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#serialConnectionBody">Toggle</a>
           </div>
-          <div class="mb-3">
-            <label for="baudSelect" class="form-label">Select Baud Rate</label>
-            <select id="baudSelect" class="form-select">
-              <option>9600</option> <!-- hardcoded only option for now -->
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="slaveAddress" class="form-label">Slave Address</label>
-            <input type="number" class="form-control" id="slaveAddress" placeholder="Enter slave address (e.g., 1)" min="0" />
+          <div class="card-body">
+            <div id="serialConnectionBody" class="collapse show">
+              <div class="mb-3">
+                <label for="portSelect" class="form-label">Select COM Port</label>
+                <select id="portSelect" class="form-select">
+                  <option>Loading...</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="baudSelect" class="form-label">Select Baud Rate</label>
+                <select id="baudSelect" class="form-select">
+                  <option>9600</option> <!-- hardcoded only option for now -->
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="slaveAddress" class="form-label">Slave Address</label>
+                <input type="number" class="form-control" id="slaveAddress" placeholder="Enter slave address (e.g., 1)" min="0" />
+              </div>
+            </div>
+            <button id="connectBtn" class="btn btn-success">Connect</button>
+            &nbsp;&nbsp;<div id="connectionStatus" class="mt-2 text-muted d-inline-block"></div>
           </div>
         </div>
-        <button id="connectBtn" class="btn btn-success">Connect</button>
-        &nbsp;&nbsp;<div id="connectionStatus" class="mt-2 text-muted d-inline-block"></div>
+        <script>
+        // Populate COM port dropdown
+        const portSelect = document.getElementById("portSelect");
+        const baudSelect = document.getElementById("baudSelect");
+        const slaveSelect = document.getElementById("slaveAddress");
+        const connectionStatus = document.getElementById("connectionStatus");
+        const connectBtn = document.getElementById("connectBtn");
+
+        const connectionStatusDefaultText = 'Select a port and click connect.';
+
+        let isConnected;
+        let currentPort; // only required for window.onload
+        let currentSlave; // only required for window.onload
+
+        async function getStatus() {
+          try {
+            const res = await fetch('/status');
+            const connected = await res.json();
+            isConnected = connected.status;
+            currentPort = connected.port;
+            currentSlave = connected.slave;
+          } catch (exception) {
+            isConnected = false; // assume
+          }
+        }
+
+        async function fetchPorts() {
+          try {
+            const res = await fetch('/ports');
+            const ports = await res.json();
+            portSelect.innerHTML = '';
+            ports.forEach(port => {
+              const option = document.createElement('option');
+              option.value = port;
+              option.textContent = port;
+              portSelect.appendChild(option);
+            });
+
+            connectionStatus.textContent = connectionStatusDefaultText;
+          } catch (exception) {
+            portSelect.innerHTML = '<option>Error loading ports</option>';
+            connectionStatus.textContent = 'Failed to fetch ports.';
+          }
+        }
+
+        function updateUI(connected, port, slave) {
+          connectionStatus.classList.remove("text-muted", "text-danger", "text-success");
+          if (connected) {
+            connectionStatus.textContent = `Connected to ${port}`;
+            connectionStatus.classList.add("text-success");
+            connectBtn.classList.remove("btn-success");
+            connectBtn.classList.add("btn-danger");
+            connectBtn.innerText = "Disconnect";
+          } else {
+            connectionStatus.textContent = `Disconnected from ${port}`;
+            connectionStatus.classList.add("text-muted");
+            connectBtn.classList.remove("btn-danger");
+            connectBtn.classList.add("btn-success");
+            connectBtn.innerText = "Connect";
+          }
+
+          if (slave !== undefined) {
+            slaveSelect.value = slave;
+          } 
+        }
+
+        connectBtn.addEventListener('click', async () => {
+          await getStatus();
+          const selectedPort = portSelect.value;
+          const selectedBaud = baudSelect.value;
+          const selectedSlave = slaveSelect.value;  
+
+          if (!isConnected) {
+            // Connect
+            const res = await fetch(`/connect?port=${encodeURIComponent(selectedPort)}&baud=${encodeURIComponent(selectedBaud)}&slave=${encodeURIComponent(selectedSlave)}`);
+            const data = await res.json();
+
+            
+            if (data.success) {
+              updateUI(true, selectedPort);
+              statusPolling(true);
+            } else {
+              statusPolling(false);
+              connectionStatus.textContent = `Failed: ${data.error}`;
+              connectionStatus.classList.remove("text-muted", "text-danger");
+              connectionStatus.classList.add("text-danger");
+              
+              connectBtn.classList.remove("btn-danger");
+              connectBtn.classList.add("btn-success");
+              connectBtn.innerText = "Connect";
+            }        
+          } else {
+            // Disconnect
+            const res = await fetch(`/disconnect`);
+            const data = await res.json();
+
+            statusPolling(false);
+
+            if (data.success) {
+              updateUI(false, selectedPort);
+            } else {
+              connectionStatus.textContent = `Failed to disconnect: ${data.error}`;
+              connectionStatus.classList.remove("text-success");
+              connectionStatus.classList.add("text-danger");
+            }
+          }
+        });
+        </script>
+
+        <!-- Status panel -->
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Status</h5>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#statusBody">Toggle</a>
+          </div>
+          <div class="card-body">
+            <div id="statusBody" class="collapse show">
+              <div class="mb-3">
+                <a id="statusVoltage">Please initiate a serial connection to view device status.</a><br>
+                <a id="statusCurrent"></a>
+              </div>
+              <div id="statusStatus" class="mt-3"></div>
+            </div>
+          </div>
+        </div>
+        <script>
+          const statusVoltage = document.getElementById('statusVoltage');
+          const statusCurrent = document.getElementById('statusCurrent');
+          const statusStatus = document.getElementById('statusStatus');
+
+          const statusVoltageAddress = 4; // current status must be the one after voltage
+          const statusVoltageScale = 0.00125; // V
+          const statusCurrentScale = 0.00015; // A
+
+          statusVoltageDefaultText = statusVoltage.innerText;
+
+          const statusPollingInterval = 2000; // ms
+
+          let statusTimer;
+
+          async function updateStatus() {
+            try {
+              const url = `/read?type=input&address=${encodeURIComponent(statusVoltageAddress)}&quantity=2`;
+              
+              const response = await fetch(url);
+              statusStatus.innerHTML = "";
+              if (response.ok) {
+                const data = await response.json();
+
+                const voltage = data.data[0] * statusVoltageScale;
+                const current = data.data[1] * statusCurrentScale * 1000; // * 1000 to mA
+
+                statusVoltage.innerText = "Supply Voltage: " + voltage.toFixed(2) + " V";
+                statusCurrent.innerText = "Current Draw: " + current.toFixed(2) + " mA";
+              } else {
+                statusVoltage.innerText = statusVoltageDefaultText;
+                statusCurrent.innerText = "";
+                statusStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              }
+            } catch (err) {
+                statusStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+            }
+          }
+
+          function statusPolling(enable) {
+            if (enable) {
+              clearInterval(statusTimer);
+              statusTimer = setInterval(updateStatus, statusPollingInterval);
+            } else {
+              statusVoltage.innerText = statusVoltageDefaultText;
+              statusCurrent.innerText = "";
+              clearInterval(statusTimer);
+            }
+          }
+        </script>
       </div>
-    </div>
-    <script>
-    // Populate COM port dropdown
-    const portSelect = document.getElementById("portSelect");
-    const baudSelect = document.getElementById("baudSelect");
-    const slaveSelect = document.getElementById("slaveAddress");
-    const connectionStatus = document.getElementById("connectionStatus");
-    const connectBtn = document.getElementById("connectBtn");
 
-    const connectionStatusDefaultText = 'Select a port and click connect.';
+      <!-- Functions control panel -->
+      <div class="tab-pane fade" id="tab-manual" role="tabpanel">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Manual Control</h5>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#functionsBody">Toggle</a>
+          </div>
+          <div class="card-body">
+            <div id="functionsBody" class="collapse show">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="coils-tab" data-bs-toggle="tab"
+                    data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
+                    aria-selected="true">Coils</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="discrete-tab" data-bs-toggle="tab"
+                    data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
+                    aria-selected="true">Discrete Inputs</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="holding-tab" data-bs-toggle="tab"
+                    data-bs-target="#holding" type="button" role="tab" aria-controls="holding"
+                    aria-selected="true">Holding Registers</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="input-tab" data-bs-toggle="tab"
+                    data-bs-target="#input" type="button" role="tab" aria-controls="input"
+                    aria-selected="true">Input Registers</button>
+                </li>
+              </ul>
+              <div class="tab-content mt-3" id="myTabContent">
+                <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
+                  <div class="card">
+                    <div class="card-body">
+                      <h6>Read Coils (0x01)</h6>
+                      <div class="mb-3">
+                        <label for="coilAddressR" class="form-label">Coil Address</label>
+                        <input type="number" class="form-control" id="coilAddressR" placeholder="Enter coil address (e.g., 0)" min="0" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="coilQuantityR" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="coilQuantityR" placeholder="Enter quantity of coils to read (e.g., 1)" min="1" />
+                      </div>
 
-    let isConnected;
-    let currentPort; // only required for window.onload
-    let currentSlave; // only required for window.onload
+                      <button id="coilSendR" class="btn btn-primary">Read</button>
 
-    async function getStatus() {
-      try {
-        const res = await fetch('/status');
-        const connected = await res.json();
-        isConnected = connected.status;
-        currentPort = connected.port;
-        currentSlave = connected.slave;
-      } catch (exception) {
-        isConnected = false; // assume
-      }
-    }
+                      <div id="coilStatusR" class="mt-3"></div>
 
-    async function fetchPorts() {
-      try {
-        const res = await fetch('/ports');
-        const ports = await res.json();
-        portSelect.innerHTML = '';
-        ports.forEach(port => {
-          const option = document.createElement('option');
-          option.value = port;
-          option.textContent = port;
-          portSelect.appendChild(option);
+                      <table id="coilResultTableR" class="table table-bordered">
+                        <thead class="table-light">
+                          <tr id="coilResultTableR_heading"></tr>
+                        </thead>
+                        <tbody>
+                          <tr id="coilResultTableR_value"></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="card-body">
+                      <h6>Write Single Coil (0x05)</h6>
+                      <div class="mb-3">
+                        <label for="coilAddressW" class="form-label">Coil Address</label>
+                        <input type="number" class="form-control" id="coilAddressW" placeholder="Enter coil address (e.g., 0)" min="0" />
+                      </div>
+
+                      <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="coilToggleW" disabled/>
+                        <label class="form-check-label" for="coilToggleW">Coil OFF/ON (0/1)</label>
+                      </div>
+
+                      <button id="coilSendW" class="btn btn-primary">Write</button>
+
+                      <div id="coilStatusW" class="mt-3"></div>
+                    </div>
+
+                    <div class="card-body">
+                      <h6>Write Multiple Coils (0x0f)</h6>
+                      <div class="mb-3">
+                        <label for="coilAddressWM" class="form-label">Coil Address</label>
+                        <input type="number" class="form-control" id="coilAddressWM" placeholder="Enter coil address (e.g., 0)" min="0" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="coilQuantityWM" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="coilQuantityWM" placeholder="Enter quantity of coils to write to (e.g., 2)" min="1" />
+                      </div>
+                      <div id="coilWriteMultipleToggleDiv">
+                        <!--<div class="form-check form-switch mb-3">
+                          <input class="form-check-input" type="checkbox" id="coilToggleWM" disabled/>
+                          <label class="form-check-label" for="coilToggleWM">Coil OFF/ON (0/1)</label>
+                        </div>-->
+                      </div>
+                      <button id="coilSendWM" class="btn btn-primary">Write</button>
+
+                      <div id="coilStatusWM" class="mt-3"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
+                  <div class="card">
+                    <div class="card-body">
+                      <h6>Read Discrete Inputs (0x02)</h6>
+                      <div class="mb-3">
+                        <label for="discreteAddressR" class="form-label">Input Address</label>
+                        <input type="number" class="form-control" id="discreteAddressR" placeholder="Enter discrete input address (e.g., 0)" min="0" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="discreteQuantityR" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="discreteQuantityR" placeholder="Enter quantity of discrete inputs to read (e.g., 1)" min="1" />
+                      </div>
+
+                      <button id="discreteSendR" class="btn btn-primary">Read</button>
+
+                      <div id="discreteStatusR" class="mt-3"></div>
+
+                      <table id="discreteResultTableR" class="table table-bordered">
+                        <thead class="table-light">
+                          <tr id="discreteResultTableR_heading"></tr>
+                        </thead>
+                        <tbody>
+                          <tr id="discreteResultTableR_value"></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade show" id="holding" role="tabpanel" aria-labelledby="holding-tab">
+                  <div class="card">
+                    <div class="card-body">
+                      <h6>Read Holding Registers (0x03)</h6>
+                      <div class="mb-3">
+                        <label for="holdingAddressR" class="form-label">Register Address</label>
+                        <input type="number" class="form-control" id="holdingAddressR" placeholder="Enter holding register address (e.g., 0)" min="0" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="holdingQuantityR" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="holdingQuantityR" placeholder="Enter quantity of holding registers to read (e.g., 1)" min="1" />
+                      </div>
+
+                      <button id="holdingSendR" class="btn btn-primary">Read</button>
+
+                      <div id="holdingStatusR" class="mt-3"></div>
+
+                      <table id="holdingResultTableR" class="table table-bordered">
+                        <thead class="table-light">
+                          <tr id="holdingResultTableR_heading"></tr>
+                        </thead>
+                        <tbody>
+                          <tr id="holdingResultTableR_value"></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="card-body">
+                      <h6>Write Single Register (0x06)</h6>
+                      <div class="mb-3">
+                        <label for="holdingAddressW" class="form-label">Register Address</label>
+                        <input type="number" class="form-control" id="holdingAddressW" placeholder="Enter holding register address (e.g., 0)" min="0" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="holdingValueW" class="form-label">Value</label>
+                        <input type="number" class="form-control" id="holdingValueW" placeholder="Enter value to write (0-65535)" min="0" />
+                      </div>
+
+                      <button id="holdingSendW" class="btn btn-primary">Write</button>
+
+                      <div id="holdingStatusW" class="mt-3"></div>
+                    </div>
+
+                    <div class="card-body">
+                      <h6>Write Multiple Registers (0x10)</h6>
+                      <div class="mb-3">
+                        <label for="holdingAddressWM" class="form-label">Register Address</label>
+                        <input type="number" class="form-control" id="holdingAddressWM" placeholder="Enter holding register address (e.g., 0)" min="0" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="holdingQuantityWM" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="holdingQuantityWM" placeholder="Enter quantity of holding registers to write to (e.g., 2)" min="1" />
+                      </div>
+                      <div id="holdingWriteMultipleToggleDiv">
+                      </div>
+                      <button id="holdingSendWM" class="btn btn-primary">Write</button>
+
+                      <div id="holdingStatusWM" class="mt-3"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade show" id="input" role="tabpanel" aria-labelledby="input-tab">
+                  <div class="card">
+                    <div class="card-body">
+                      <h6>Read Input Registers (0x04)</h6>
+                      <div class="mb-3">
+                        <label for="inputAddressR" class="form-label">Input Address</label>
+                        <input type="number" class="form-control" id="inputAddressR" placeholder="Enter input register address (e.g., 0)" min="0" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="inputQuantityR" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="inputQuantityR" placeholder="Enter quantity of inputs registers to read (e.g., 1)" min="1" />
+                      </div>
+
+                      <button id="inputSendR" class="btn btn-primary">Read</button>
+
+                      <div id="inputStatusR" class="mt-3"></div>
+
+                      <table id="inputResultTableR" class="table table-bordered">
+                        <thead class="table-light">
+                          <tr id="inputResultTableR_heading"></tr>
+                        </thead>
+                        <tbody>
+                          <tr id="inputResultTableR_value"></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coil Functions -->
+        <script>
+        const coilAddressR = document.getElementById('coilAddressR');
+        const coilQuantityR = document.getElementById('coilQuantityR');
+        const coilSendR = document.getElementById('coilSendR');
+        const coilStatusR = document.getElementById('coilStatusR');
+
+        const coilToggleW = document.getElementById('coilToggleW');
+        const coilAddressW = document.getElementById('coilAddressW');
+        const coilSendW = document.getElementById('coilSendW');
+        const coilStatusW = document.getElementById('coilStatusW');
+        
+        const coilQuantityWM = document.getElementById('coilQuantityWM');
+        const coilAddressWM = document.getElementById('coilAddressWM');
+        const coilSendWM = document.getElementById('coilSendWM');
+
+        // Enable toggle only when coil address is valid
+        coilAddressW.addEventListener('input', () => {
+          const val = coilAddressW.value;
+          coilToggleW.disabled = !(val !== '' && Number(val) >= 0);
+          coilStatusW.textContent = '';
         });
 
-        connectionStatus.textContent = connectionStatusDefaultText;
-      } catch (exception) {
-        portSelect.innerHTML = '<option>Error loading ports</option>';
-        connectionStatus.textContent = 'Failed to fetch ports.';
-      }
-    }
-
-    function updateUI(connected, port, slave) {
-      connectionStatus.classList.remove("text-muted", "text-danger", "text-success");
-      if (connected) {
-        connectionStatus.textContent = `Connected to ${port}`;
-        connectionStatus.classList.add("text-success");
-        connectBtn.classList.remove("btn-success");
-        connectBtn.classList.add("btn-danger");
-        connectBtn.innerText = "Disconnect";
-      } else {
-        connectionStatus.textContent = `Disconnected from ${port}`;
-        connectionStatus.classList.add("text-muted");
-        connectBtn.classList.remove("btn-danger");
-        connectBtn.classList.add("btn-success");
-        connectBtn.innerText = "Connect";
-      }
-
-      if (slave !== undefined) {
-        slaveSelect.value = slave;
-      } 
-    }
-
-    connectBtn.addEventListener('click', async () => {
-      await getStatus();
-      const selectedPort = portSelect.value;
-      const selectedBaud = baudSelect.value;
-      const selectedSlave = slaveSelect.value;  
-
-      if (!isConnected) {
-        // Connect
-        const res = await fetch(`/connect?port=${encodeURIComponent(selectedPort)}&baud=${encodeURIComponent(selectedBaud)}&slave=${encodeURIComponent(selectedSlave)}`);
-        const data = await res.json();
-
-        
-        if (data.success) {
-          updateUI(true, selectedPort);
-          statusPolling(true);
-        } else {
-          statusPolling(false);
-          connectionStatus.textContent = `Failed: ${data.error}`;
-          connectionStatus.classList.remove("text-muted", "text-danger");
-          connectionStatus.classList.add("text-danger");
-          
-          connectBtn.classList.remove("btn-danger");
-          connectBtn.classList.add("btn-success");
-          connectBtn.innerText = "Connect";
-        }        
-      } else {
-        // Disconnect
-        const res = await fetch(`/disconnect`);
-        const data = await res.json();
-
-        statusPolling(false);
-
-        if (data.success) {
-          updateUI(false, selectedPort);
-        } else {
-          connectionStatus.textContent = `Failed to disconnect: ${data.error}`;
-          connectionStatus.classList.remove("text-success");
-          connectionStatus.classList.add("text-danger");
-        }
-      }
-    });
-    </script>
-
-    <!-- Status panel -->
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Status</h5>
-        <a class="btn btn-link" data-bs-toggle="collapse" href="#statusBody">Toggle</a>
-      </div>
-      <div class="card-body">
-        <div id="statusBody" class="collapse hide">
-          <div class="mb-3">
-            <a id="statusVoltage">Please initiate a serial connection to view device status.</a><br>
-            <a id="statusCurrent"></a>
-          </div>
-          <div id="statusStatus" class="mt-3"></div>
-        </div>
-      </div>
-    </div>
-    <script>
-      const statusVoltage = document.getElementById('statusVoltage');
-      const statusCurrent = document.getElementById('statusCurrent');
-      const statusStatus = document.getElementById('statusStatus');
-
-      const statusVoltageAddress = 4; // current status must be the one after voltage
-      const statusVoltageScale = 0.00125; // V
-      const statusCurrentScale = 0.00015; // A
-
-      statusVoltageDefaultText = statusVoltage.innerText;
-
-      const statusPollingInterval = 2000; // ms
-
-      let statusTimer;
-
-      async function updateStatus() {
-        try {
-          const url = `/read?type=input&address=${encodeURIComponent(statusVoltageAddress)}&quantity=2`;
-          
-          const response = await fetch(url);
-          statusStatus.innerHTML = "";
-          if (response.ok) {
+        // Write Single
+        async function writeCoil(address, value) {
+          try {
+            coilStatusW.textContent = 'Sending request...';
+            const valInt = value ? 1 : 0;
+            const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valInt}`;
+            
+            const response = await fetch(url);
             const data = await response.json();
 
-            const voltage = data.data[0] * statusVoltageScale;
-            const current = data.data[1] * statusCurrentScale * 1000; // * 1000 to mA
-
-            statusVoltage.innerText = "Supply Voltage: " + voltage.toFixed(2) + " V";
-            statusCurrent.innerText = "Current Draw: " + current.toFixed(2) + " mA";
-          } else {
-            statusVoltage.innerText = statusVoltageDefaultText;
-            statusCurrent.innerText = "";
-            statusStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            if (response.ok) {
+              coilStatusW.innerHTML = `<div class="alert alert-success">Coil at address ${address} set to ${valInt}.</div>`;
+            } else {
+              coilStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+              coilStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
           }
-        } catch (err) {
-            statusStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
         }
-      }
 
-      function statusPolling(enable) {
-        if (enable) {
-          clearInterval(statusTimer);
-          statusTimer = setInterval(updateStatus, statusPollingInterval);
-        } else {
-          statusVoltage.innerText = statusVoltageDefaultText;
-          statusCurrent.innerText = "";
-          clearInterval(statusTimer);
+        // Write multiple 
+        async function writeMultipleCoils(address, valueArray) {
+          try {
+            coilStatusWM.textContent = 'Sending request...';
+            
+            const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valueArray}`;
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+              coilStatusWM.innerHTML = `<div class="alert alert-success">Coils starting at address ${address} set to ${valueArray}.</div>`;
+            } else {
+              coilStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+            coilStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          }
         }
-      }
-    </script>
-    
-    <!-- Functions control panel -->
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Manual Control</h5>
-        <a class="btn btn-link" data-bs-toggle="collapse" href="#functionsBody">Toggle</a>
-      </div>
-      <div class="card-body">
-        <div id="functionsBody" class="collapse show">
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="coils-tab" data-bs-toggle="tab"
-                data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
-                aria-selected="true">Coils</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="discrete-tab" data-bs-toggle="tab"
-                data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
-                aria-selected="true">Discrete Inputs</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="holding-tab" data-bs-toggle="tab"
-                data-bs-target="#holding" type="button" role="tab" aria-controls="holding"
-                aria-selected="true">Holding Registers</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="input-tab" data-bs-toggle="tab"
-                data-bs-target="#input" type="button" role="tab" aria-controls="input"
-                aria-selected="true">Input Registers</button>
-            </li>
-          </ul>
-          <div class="tab-content mt-3" id="myTabContent">
-            <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
-              <div class="card">
-                <div class="card-body">
-                  <h6>Read Coils (0x01)</h6>
-                  <div class="mb-3">
-                    <label for="coilAddressR" class="form-label">Coil Address</label>
-                    <input type="number" class="form-control" id="coilAddressR" placeholder="Enter coil address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="coilQuantityR" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="coilQuantityR" placeholder="Enter quantity of coils to read (e.g., 1)" min="1" />
-                  </div>
 
-                  <button id="coilSendR" class="btn btn-primary">Read</button>
+        // Read
+        async function readCoil(address, quantity) {
+          try {
+            const addr = parseInt(address);
+            const quan = parseInt(quantity);
 
-                  <div id="coilStatusR" class="mt-3"></div>
+            coilStatusR.textContent = 'Sending request...';
+            const url = `/read?type=coil&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+            console.log(url);
+            const response = await fetch(url);
+            const data = await response.json();
 
-                  <table id="coilResultTableR" class="table table-bordered">
-                    <thead class="table-light">
-                      <tr id="coilResultTableR_heading"></tr>
-                    </thead>
-                    <tbody>
-                      <tr id="coilResultTableR_value"></tr>
-                    </tbody>
-                  </table>
-                </div>
+            if (response.ok) {
+              coilStatusR.innerHTML = "";
+              const coilValues = data.data;
 
-                <div class="card-body">
-                  <h6>Write Single Coil (0x05)</h6>
-                  <div class="mb-3">
-                    <label for="coilAddressW" class="form-label">Coil Address</label>
-                    <input type="number" class="form-control" id="coilAddressW" placeholder="Enter coil address (e.g., 0)" min="0" />
-                  </div>
+              const headingRow = document.getElementById("coilResultTableR_heading");
+              const valueRow = document.getElementById("coilResultTableR_value");
 
-                  <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="coilToggleW" disabled/>
-                    <label class="form-check-label" for="coilToggleW">Coil OFF/ON (0/1)</label>
-                  </div>
+              for (let i = addr; i < addr + quan; i++) {
+                // Heading Cell
+                const cell = document.createElement('td'); // create a table cell
+                cell.textContent = i; // set cell content
+                headingRow.appendChild(cell); // add cell to row
 
-                  <button id="coilSendW" class="btn btn-primary">Write</button>
-
-                  <div id="coilStatusW" class="mt-3"></div>
-                </div>
-
-                <div class="card-body">
-                  <h6>Write Multiple Coils (0x0f)</h6>
-                  <div class="mb-3">
-                    <label for="coilAddressWM" class="form-label">Coil Address</label>
-                    <input type="number" class="form-control" id="coilAddressWM" placeholder="Enter coil address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="coilQuantityWM" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="coilQuantityWM" placeholder="Enter quantity of coils to write to (e.g., 2)" min="1" />
-                  </div>
-                  <div id="coilWriteMultipleToggleDiv">
-                    <!--<div class="form-check form-switch mb-3">
-                      <input class="form-check-input" type="checkbox" id="coilToggleWM" disabled/>
-                      <label class="form-check-label" for="coilToggleWM">Coil OFF/ON (0/1)</label>
-                    </div>-->
-                  </div>
-                  <button id="coilSendWM" class="btn btn-primary">Write</button>
-
-                  <div id="coilStatusWM" class="mt-3"></div>
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
-              <div class="card">
-                <div class="card-body">
-                  <h6>Read Discrete Inputs (0x02)</h6>
-                  <div class="mb-3">
-                    <label for="discreteAddressR" class="form-label">Input Address</label>
-                    <input type="number" class="form-control" id="discreteAddressR" placeholder="Enter discrete input address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="discreteQuantityR" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="discreteQuantityR" placeholder="Enter quantity of discrete inputs to read (e.g., 1)" min="1" />
-                  </div>
-
-                  <button id="discreteSendR" class="btn btn-primary">Read</button>
-
-                  <div id="discreteStatusR" class="mt-3"></div>
-
-                  <table id="discreteResultTableR" class="table table-bordered">
-                    <thead class="table-light">
-                      <tr id="discreteResultTableR_heading"></tr>
-                    </thead>
-                    <tbody>
-                      <tr id="discreteResultTableR_value"></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane fade show" id="holding" role="tabpanel" aria-labelledby="holding-tab">
-              <div class="card">
-                <div class="card-body">
-                  <h6>Read Holding Registers (0x03)</h6>
-                  <div class="mb-3">
-                    <label for="holdingAddressR" class="form-label">Register Address</label>
-                    <input type="number" class="form-control" id="holdingAddressR" placeholder="Enter holding register address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="holdingQuantityR" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="holdingQuantityR" placeholder="Enter quantity of holding registers to read (e.g., 1)" min="1" />
-                  </div>
-
-                  <button id="holdingSendR" class="btn btn-primary">Read</button>
-
-                  <div id="holdingStatusR" class="mt-3"></div>
-
-                  <table id="holdingResultTableR" class="table table-bordered">
-                    <thead class="table-light">
-                      <tr id="holdingResultTableR_heading"></tr>
-                    </thead>
-                    <tbody>
-                      <tr id="holdingResultTableR_value"></tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="card-body">
-                  <h6>Write Single Register (0x06)</h6>
-                  <div class="mb-3">
-                    <label for="holdingAddressW" class="form-label">Register Address</label>
-                    <input type="number" class="form-control" id="holdingAddressW" placeholder="Enter holding register address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="holdingValueW" class="form-label">Value</label>
-                    <input type="number" class="form-control" id="holdingValueW" placeholder="Enter value to write (0-65535)" min="0" />
-                  </div>
-
-                  <button id="holdingSendW" class="btn btn-primary">Write</button>
-
-                  <div id="holdingStatusW" class="mt-3"></div>
-                </div>
-
-                <div class="card-body">
-                  <h6>Write Multiple Registers (0x10)</h6>
-                  <div class="mb-3">
-                    <label for="holdingAddressWM" class="form-label">Register Address</label>
-                    <input type="number" class="form-control" id="holdingAddressWM" placeholder="Enter holding register address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="holdingQuantityWM" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="holdingQuantityWM" placeholder="Enter quantity of holding registers to write to (e.g., 2)" min="1" />
-                  </div>
-                  <div id="holdingWriteMultipleToggleDiv">
-                  </div>
-                  <button id="holdingSendWM" class="btn btn-primary">Write</button>
-
-                  <div id="holdingStatusWM" class="mt-3"></div>
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane fade show" id="input" role="tabpanel" aria-labelledby="input-tab">
-              <div class="card">
-                <div class="card-body">
-                  <h6>Read Input Registers (0x04)</h6>
-                  <div class="mb-3">
-                    <label for="inputAddressR" class="form-label">Input Address</label>
-                    <input type="number" class="form-control" id="inputAddressR" placeholder="Enter input register address (e.g., 0)" min="0" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputQuantityR" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="inputQuantityR" placeholder="Enter quantity of inputs registers to read (e.g., 1)" min="1" />
-                  </div>
-
-                  <button id="inputSendR" class="btn btn-primary">Read</button>
-
-                  <div id="inputStatusR" class="mt-3"></div>
-
-                  <table id="inputResultTableR" class="table table-bordered">
-                    <thead class="table-light">
-                      <tr id="inputResultTableR_heading"></tr>
-                    </thead>
-                    <tbody>
-                      <tr id="inputResultTableR_value"></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Coil Functions -->
-    <script>
-    const coilAddressR = document.getElementById('coilAddressR');
-    const coilQuantityR = document.getElementById('coilQuantityR');
-    const coilSendR = document.getElementById('coilSendR');
-    const coilStatusR = document.getElementById('coilStatusR');
-
-    const coilToggleW = document.getElementById('coilToggleW');
-    const coilAddressW = document.getElementById('coilAddressW');
-    const coilSendW = document.getElementById('coilSendW');
-    const coilStatusW = document.getElementById('coilStatusW');
-    
-    const coilQuantityWM = document.getElementById('coilQuantityWM');
-    const coilAddressWM = document.getElementById('coilAddressWM');
-    const coilSendWM = document.getElementById('coilSendWM');
-
-    // Enable toggle only when coil address is valid
-    coilAddressW.addEventListener('input', () => {
-      const val = coilAddressW.value;
-      coilToggleW.disabled = !(val !== '' && Number(val) >= 0);
-      coilStatusW.textContent = '';
-    });
-
-    // Write Single
-    async function writeCoil(address, value) {
-      try {
-        coilStatusW.textContent = 'Sending request...';
-        const valInt = value ? 1 : 0;
-        const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valInt}`;
-        
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (response.ok) {
-          coilStatusW.innerHTML = `<div class="alert alert-success">Coil at address ${address} set to ${valInt}.</div>`;
-        } else {
-          coilStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                // Value cell
+                const cell2 = document.createElement('td');
+                cell2.textContent = coilValues[i] ? "ON" : "OFF";
+                valueRow.appendChild(cell2);
+              }
+            } else {
+              coilStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+              coilStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          }
         }
-      } catch (err) {
-          coilStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
 
-    // Write multiple 
-    async function writeMultipleCoils(address, valueArray) {
-      try {
-        coilStatusWM.textContent = 'Sending request...';
-        
-        const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valueArray}`;
+        // Update WM toggles
+        function updateWMToggles() {
+          const addr = parseInt(coilAddressWM.value);
+          const quan = parseInt(coilQuantityWM.value);
+          const workingDiv = document.getElementById("coilWriteMultipleToggleDiv");
 
-        const response = await fetch(url);
-        const data = await response.json();
+          workingDiv.innerHTML = "";
+          coilStatusWM.innerHTML = "";
 
-        if (response.ok) {
-          coilStatusWM.innerHTML = `<div class="alert alert-success">Coils starting at address ${address} set to ${valueArray}.</div>`;
-        } else {
-          coilStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+          if (Number(quan) > 256) {
+            coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
+            return;
+          }
+
+          if (isNaN(quan) || quan < 1 || quan > 256 || isNaN(addr) || addr < 0) {
+            return;
+          }
+
+          /*<div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="coilToggleWM" disabled/>
+            <label class="form-check-label" for="coilToggleWM">Coil OFF/ON (0/1)</label>
+          </div>*/
+
+          workingDiv.innerHTML = "<h6>Coil OFF/ON (0/1)</h6>";
+
+          for (var i = addr; i < addr + quan; i++) {
+            const id = `coilToggleWM-${i}`;
+            
+            const formDiv = document.createElement("div");
+            formDiv.className = "form-check form-switch mb-3";
+            
+            const input = document.createElement("input");
+            input.className = "form-check-input";
+            input.type = "checkbox";
+            input.id = id;
+            
+            const label = document.createElement("label");
+            label.className = "form-check-label";
+            label.setAttribute("for", id);
+            label.textContent = `Coil ${i}`;
+
+            formDiv.appendChild(input);
+            formDiv.appendChild(label);
+
+            workingDiv.appendChild(formDiv);
+          }
         }
-      } catch (err) {
-        coilStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
 
-    // Read
-    async function readCoil(address, quantity) {
-      try {
-        const addr = parseInt(address);
-        const quan = parseInt(quantity);
+        coilSendW.addEventListener('click', () => {
+          const addr = coilAddressW.value;
+          if (addr === '' || Number(addr) < 0) {
+            coilStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+            return;
+          }
+          const val = coilToggleW.checked;
+          writeCoil(addr, val);
+        });
 
-        coilStatusR.textContent = 'Sending request...';
-        const url = `/read?type=coil&address=${encodeURIComponent(address)}&quantity=${quantity}`;
-        console.log(url);
-        const response = await fetch(url);
-        const data = await response.json();
+        coilSendWM.addEventListener('click', () => {
+          const address = parseInt(coilAddressWM.value);
+          const quantity = parseInt(coilQuantityWM.value);
 
-        if (response.ok) {
-          coilStatusR.innerHTML = "";
-          const coilValues = data.data;
+          if (isNaN(address) || address < 0) {
+            coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+            return;
+          }
+          if (isNaN(quantity) || quantity < 1) {
+            coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
+            return;
+          }
+
+          const valueArray = [];
+          for (var i = address; i < address + quantity; i++) {
+            const toggleElement = document.getElementById(`coilToggleWM-${i}`);
+            const toggleValue = toggleElement.checked ? 1 : 0;
+            valueArray.push(toggleValue);
+          }
+
+          writeMultipleCoils(address, valueArray); // handles value gathering in here
+        });
+
+        coilSendR.addEventListener('click', () => {
+          const addr = coilAddressR.value;
+          const quan = coilQuantityR.value;
 
           const headingRow = document.getElementById("coilResultTableR_heading");
           const valueRow = document.getElementById("coilResultTableR_value");
+          headingRow.innerHTML = "";
+          valueRow.innerHTML = "";
 
-          for (let i = addr; i < addr + quan; i++) {
-            // Heading Cell
-            const cell = document.createElement('td'); // create a table cell
-            cell.textContent = i; // set cell content
-            headingRow.appendChild(cell); // add cell to row
-
-            // Value cell
-            const cell2 = document.createElement('td');
-            cell2.textContent = coilValues[i] ? "ON" : "OFF";
-            valueRow.appendChild(cell2);
+          if (addr === '' || Number(addr) < 0) {
+            coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+            return;
           }
-        } else {
-          coilStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+          if (quan === '' || Number(quan) < 1) {
+            coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            return;
+          }
+          readCoil(addr, quan);
+        });
+
+        coilQuantityWM.addEventListener('input', () => {
+          updateWMToggles();
+        });
+
+        coilAddressWM.addEventListener('input', () => {
+          updateWMToggles();
+        });
+        </script>
+
+        <!-- Discrete Functions -->
+        <script>
+        const discreteAddressR = document.getElementById('discreteAddressR');
+        const discreteSendR = document.getElementById('discreteSendR');
+        const discreteStatusR = document.getElementById('discreteStatusR');
+        
+        // Read
+        async function readDiscrete(address, quantity) {
+          try {
+            const addr = parseInt(address);
+            const quan = parseInt(quantity);
+
+            discreteStatusR.textContent = 'Sending request...';
+            const url = `/read?type=discrete&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+            console.log(url);
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+              discreteStatusR.innerHTML = "";
+              const discreteValues = data.data;
+
+              const headingRow = document.getElementById("discreteResultTableR_heading");
+              const valueRow = document.getElementById("discreteResultTableR_value");
+
+              for (let i = addr; i < addr + quan; i++) {
+                // Heading Cell
+                const cell = document.createElement('td'); // create a table cell
+                cell.textContent = i; // set cell content
+                headingRow.appendChild(cell); // add cell to row
+
+                // Value cell
+                const cell2 = document.createElement('td');
+                cell2.textContent = discreteValues[i - addr] ? "ON" : "OFF";
+                valueRow.appendChild(cell2);
+              }
+            } else {
+              discreteStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+              discreteStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          }
         }
-      } catch (err) {
-          coilStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
 
-    // Update WM toggles
-    function updateWMToggles() {
-      const addr = parseInt(coilAddressWM.value);
-      const quan = parseInt(coilQuantityWM.value);
-      const workingDiv = document.getElementById("coilWriteMultipleToggleDiv");
-
-      workingDiv.innerHTML = "";
-      coilStatusWM.innerHTML = "";
-
-      if (Number(quan) > 256) {
-        coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
-        return;
-      }
-
-      if (isNaN(quan) || quan < 1 || quan > 256 || isNaN(addr) || addr < 0) {
-        return;
-      }
-
-      /*<div class="form-check form-switch mb-3">
-        <input class="form-check-input" type="checkbox" id="coilToggleWM" disabled/>
-        <label class="form-check-label" for="coilToggleWM">Coil OFF/ON (0/1)</label>
-      </div>*/
-
-      workingDiv.innerHTML = "<h6>Coil OFF/ON (0/1)</h6>";
-
-      for (var i = addr; i < addr + quan; i++) {
-        const id = `coilToggleWM-${i}`;
-        
-        const formDiv = document.createElement("div");
-        formDiv.className = "form-check form-switch mb-3";
-        
-        const input = document.createElement("input");
-        input.className = "form-check-input";
-        input.type = "checkbox";
-        input.id = id;
-        
-        const label = document.createElement("label");
-        label.className = "form-check-label";
-        label.setAttribute("for", id);
-        label.textContent = `Coil ${i}`;
-
-        formDiv.appendChild(input);
-        formDiv.appendChild(label);
-
-        workingDiv.appendChild(formDiv);
-      }
-    }
-
-    coilSendW.addEventListener('click', () => {
-      const addr = coilAddressW.value;
-      if (addr === '' || Number(addr) < 0) {
-        coilStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
-        return;
-      }
-      const val = coilToggleW.checked;
-      writeCoil(addr, val);
-    });
-
-    coilSendWM.addEventListener('click', () => {
-      const address = parseInt(coilAddressWM.value);
-      const quantity = parseInt(coilQuantityWM.value);
-
-      if (isNaN(address) || address < 0) {
-        coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
-        return;
-      }
-      if (isNaN(quantity) || quantity < 1) {
-        coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
-        return;
-      }
-
-      const valueArray = [];
-      for (var i = address; i < address + quantity; i++) {
-        const toggleElement = document.getElementById(`coilToggleWM-${i}`);
-        const toggleValue = toggleElement.checked ? 1 : 0;
-        valueArray.push(toggleValue);
-      }
-
-      writeMultipleCoils(address, valueArray); // handles value gathering in here
-    });
-
-    coilSendR.addEventListener('click', () => {
-      const addr = coilAddressR.value;
-      const quan = coilQuantityR.value;
-
-      const headingRow = document.getElementById("coilResultTableR_heading");
-      const valueRow = document.getElementById("coilResultTableR_value");
-      headingRow.innerHTML = "";
-      valueRow.innerHTML = "";
-
-      if (addr === '' || Number(addr) < 0) {
-        coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
-        return;
-      }
-      if (quan === '' || Number(quan) < 1) {
-        coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
-        return;
-      }
-      readCoil(addr, quan);
-    });
-
-    coilQuantityWM.addEventListener('input', () => {
-      updateWMToggles();
-    });
-
-    coilAddressWM.addEventListener('input', () => {
-      updateWMToggles();
-    });
-    </script>
-
-    <!-- Discrete Functions -->
-    <script>
-    const discreteAddressR = document.getElementById('discreteAddressR');
-    const discreteSendR = document.getElementById('discreteSendR');
-    const discreteStatusR = document.getElementById('discreteStatusR');
-    
-    // Read
-    async function readDiscrete(address, quantity) {
-      try {
-        const addr = parseInt(address);
-        const quan = parseInt(quantity);
-
-        discreteStatusR.textContent = 'Sending request...';
-        const url = `/read?type=discrete&address=${encodeURIComponent(address)}&quantity=${quantity}`;
-        console.log(url);
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (response.ok) {
-          discreteStatusR.innerHTML = "";
-          const discreteValues = data.data;
+        discreteSendR.addEventListener('click', () => {
+          const addr = discreteAddressR.value;
+          const quan = discreteQuantityR.value;
 
           const headingRow = document.getElementById("discreteResultTableR_heading");
           const valueRow = document.getElementById("discreteResultTableR_value");
+          headingRow.innerHTML = "";
+          valueRow.innerHTML = "";
 
-          for (let i = addr; i < addr + quan; i++) {
-            // Heading Cell
-            const cell = document.createElement('td'); // create a table cell
-            cell.textContent = i; // set cell content
-            headingRow.appendChild(cell); // add cell to row
-
-            // Value cell
-            const cell2 = document.createElement('td');
-            cell2.textContent = discreteValues[i - addr] ? "ON" : "OFF";
-            valueRow.appendChild(cell2);
+          if (addr === '' || Number(addr) < 0) {
+            discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid discrete input address (0 or higher).</div>`;
+            return;
           }
-        } else {
-          discreteStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+          if (quan === '' || Number(quan) < 1) {
+            discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            return;
+          }
+          readDiscrete(addr, quan);
+        });
+        </script>
+
+        <!-- Holding Functions -->
+        <script>
+        const holdingAddressR = document.getElementById('holdingAddressR');
+        const holdingQuantityR = document.getElementById('holdingQuantityR');
+        const holdingSendR = document.getElementById('holdingSendR');
+        const holdingStatusR = document.getElementById('holdingStatusR');
+
+        const holdingValueW = document.getElementById('holdingValueW');
+        const holdingAddressW = document.getElementById('holdingAddressW');
+        const holdingSendW = document.getElementById('holdingSendW');
+        const holdingStatusW = document.getElementById('holdingStatusW');
+
+        const holdingAddressWM = document.getElementById('holdingAddressWM');
+        const holdignSendWM = document.getElementById('holdingSendWM');
+        const holdingStatusWM = document.getElementById('holdingStatusWM');
+
+        // Write Single
+        async function writeHolding(address, value) {
+          try {
+            holdingStatusW.textContent = 'Sending request...';
+            const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${encodeURIComponent(value)}`;
+            
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+              holdingStatusW.innerHTML = `<div class="alert alert-success">Holding register at address ${address} set to ${value}.</div>`;
+            } else {
+              holdingStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+              holdingStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          }
         }
-      } catch (err) {
-          discreteStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
 
-    discreteSendR.addEventListener('click', () => {
-      const addr = discreteAddressR.value;
-      const quan = discreteQuantityR.value;
+        // Write multiple 
+        async function writeMultipleHolding(address, valueArray) {
+          try {
+            holdingStatusWM.textContent = 'Sending request...';
+            
+            const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${valueArray}`;
 
-      const headingRow = document.getElementById("discreteResultTableR_heading");
-      const valueRow = document.getElementById("discreteResultTableR_value");
-      headingRow.innerHTML = "";
-      valueRow.innerHTML = "";
+            const response = await fetch(url);
+            const data = await response.json();
 
-      if (addr === '' || Number(addr) < 0) {
-        discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid discrete input address (0 or higher).</div>`;
-        return;
-      }
-      if (quan === '' || Number(quan) < 1) {
-        discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
-        return;
-      }
-      readDiscrete(addr, quan);
-    });
-    </script>
-
-    <!-- Holding Functions -->
-    <script>
-    const holdingAddressR = document.getElementById('holdingAddressR');
-    const holdingQuantityR = document.getElementById('holdingQuantityR');
-    const holdingSendR = document.getElementById('holdingSendR');
-    const holdingStatusR = document.getElementById('holdingStatusR');
-
-    const holdingValueW = document.getElementById('holdingValueW');
-    const holdingAddressW = document.getElementById('holdingAddressW');
-    const holdingSendW = document.getElementById('holdingSendW');
-    const holdingStatusW = document.getElementById('holdingStatusW');
-
-    const holdingAddressWM = document.getElementById('holdingAddressWM');
-    const holdignSendWM = document.getElementById('holdingSendWM');
-    const holdingStatusWM = document.getElementById('holdingStatusWM');
-
-    // Write Single
-    async function writeHolding(address, value) {
-      try {
-        holdingStatusW.textContent = 'Sending request...';
-        const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${encodeURIComponent(value)}`;
-        
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (response.ok) {
-          holdingStatusW.innerHTML = `<div class="alert alert-success">Holding register at address ${address} set to ${value}.</div>`;
-        } else {
-          holdingStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            if (response.ok) {
+              holdingStatusWM.innerHTML = `<div class="alert alert-success">Holding registers starting at address ${address} set to ${valueArray}.</div>`;
+            } else {
+              holdingStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+            holdingStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          }
         }
-      } catch (err) {
-          holdingStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
 
-    // Write multiple 
-    async function writeMultipleHolding(address, valueArray) {
-      try {
-        holdingStatusWM.textContent = 'Sending request...';
-        
-        const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${valueArray}`;
+        // Read
+        async function readHolding(address, quantity) {
+          try {
+            const addr = parseInt(address);
+            const quan = parseInt(quantity);
 
-        const response = await fetch(url);
-        const data = await response.json();
+            holdingStatusR.textContent = 'Sending request...';
+            const url = `/read?type=holding&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+            console.log(url);
+            const response = await fetch(url);
+            const data = await response.json();
 
-        if (response.ok) {
-          holdingStatusWM.innerHTML = `<div class="alert alert-success">Holding registers starting at address ${address} set to ${valueArray}.</div>`;
-        } else {
-          holdingStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            if (response.ok) {
+              holdingStatusR.innerHTML = "";
+              const holdingValues = data.data;
+
+              const headingRow = document.getElementById("holdingResultTableR_heading");
+              const valueRow = document.getElementById("holdingResultTableR_value");
+
+              for (let i = addr; i < addr + quan; i++) {
+                // Heading Cell
+                const cell = document.createElement('td'); // create a table cell
+                cell.textContent = i; // set cell content
+                headingRow.appendChild(cell); // add cell to row
+
+                // Value cell
+                const cell2 = document.createElement('td');
+                cell2.textContent = holdingValues[i];
+                valueRow.appendChild(cell2);
+              }
+            } else {
+              holdingStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+              holdingStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          }
         }
-      } catch (err) {
-        holdingStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
 
-    // Read
-    async function readHolding(address, quantity) {
-      try {
-        const addr = parseInt(address);
-        const quan = parseInt(quantity);
+        // Update WM inputs
+        function updateWMInputs() {
+          const addr = parseInt(holdingAddressWM.value);
+          const quan = parseInt(holdingQuantityWM.value);
+          const workingDiv = document.getElementById("holdingWriteMultipleToggleDiv");
 
-        holdingStatusR.textContent = 'Sending request...';
-        const url = `/read?type=holding&address=${encodeURIComponent(address)}&quantity=${quantity}`;
-        console.log(url);
-        const response = await fetch(url);
-        const data = await response.json();
+          workingDiv.innerHTML = "";
+          holdingStatusWM.innerHTML = "";
 
-        if (response.ok) {
-          holdingStatusR.innerHTML = "";
-          const holdingValues = data.data;
+          if (Number(quan) > 256) {
+            holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
+            return;
+          }
+
+          if (isNaN(quan) || quan < 1 || quan > 256 || isNaN(addr) || addr < 0) {
+            return;
+          }
+
+          /*<div class="mb-3">
+            <label for="holdingValueW" class="form-label">Value</label>
+            <input type="number" class="form-control" id="holdingValueW" placeholder="Enter value to write (0-65535)" min="0" />
+          </div>*/
+
+          workingDiv.innerHTML = "<h6>Holding Register (Value 0-65535)</h6>";
+
+          for (var i = addr; i < addr + quan; i++) {
+            const id = `holdingInput-${i}`;
+            
+            const formDiv = document.createElement("div");
+            formDiv.className = "mb-3 d-flex align-items-center";
+
+            const label = document.createElement("label");
+            label.className = "me-2"; // right margin
+            label.setAttribute("for", id);
+            label.textContent = `Register ${i}`;
+            
+            const input = document.createElement("input");
+            input.className = "form-control";
+            input.style.width = "120px";
+            input.type = "number";
+            input.id = id;
+            input.min = "0";
+
+            formDiv.appendChild(label);
+            formDiv.appendChild(input);
+
+            workingDiv.appendChild(formDiv);
+          }
+        }
+
+        holdingSendW.addEventListener('click', () => {
+          const addr = holdingAddressW.value;
+          if (addr === '' || Number(addr) < 0) {
+            holdingStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+            return;
+          }
+          const val = holdingValueW.value;
+          writeHolding(addr, val);
+        });
+
+        holdingSendWM.addEventListener('click', () => {
+          const address = parseInt(holdingAddressWM.value);
+          const quantity = parseInt(holdingQuantityWM.value);
+
+          if (isNaN(address) || address < 0) {
+            holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+            return;
+          }
+          if (isNaN(quantity) || quantity < 1) {
+            holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
+            return;
+          }
+
+          const valueArray = [];
+          for (var i = address; i < address + quantity; i++) {
+            const inputElement = document.getElementById(`holdingInput-${i}`);
+            const inputValue = inputElement.value;
+            valueArray.push(inputValue);
+          }
+
+          writeMultipleHolding(address, valueArray); // handles value gathering in here
+        });
+
+        holdingSendR.addEventListener('click', () => {
+          const addr = holdingAddressR.value;
+          const quan = holdingQuantityR.value;
 
           const headingRow = document.getElementById("holdingResultTableR_heading");
           const valueRow = document.getElementById("holdingResultTableR_value");
+          headingRow.innerHTML = "";
+          valueRow.innerHTML = "";
 
-          for (let i = addr; i < addr + quan; i++) {
-            // Heading Cell
-            const cell = document.createElement('td'); // create a table cell
-            cell.textContent = i; // set cell content
-            headingRow.appendChild(cell); // add cell to row
-
-            // Value cell
-            const cell2 = document.createElement('td');
-            cell2.textContent = holdingValues[i];
-            valueRow.appendChild(cell2);
+          if (addr === '' || Number(addr) < 0) {
+            holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+            return;
           }
-        } else {
-          holdingStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+          if (quan === '' || Number(quan) < 1) {
+            holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            return;
+          }
+          readHolding(addr, quan);
+        });
+
+        holdingQuantityWM.addEventListener('input', () => {
+          updateWMInputs();
+        });
+
+        holdingAddressWM.addEventListener('input', () => {
+          updateWMInputs();
+        });
+        </script>
+
+        <!-- Input Functions -->
+        <script>
+        const inputAddressR = document.getElementById('inputAddressR');
+        const inputSendR = document.getElementById('inputSendR');
+        const inputStatusR = document.getElementById('inputStatusR');
+        
+        // Read
+        async function readInput(address, quantity) {
+          try {
+            const addr = parseInt(address);
+            const quan = parseInt(quantity);
+
+            inputStatusR.textContent = 'Sending request...';
+            const url = `/read?type=input&address=${encodeURIComponent(address)}&quantity=${quantity}`;
+            console.log(url);
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+              inputStatusR.innerHTML = "";
+              const inputValues = data.data;
+
+              const headingRow = document.getElementById("inputResultTableR_heading");
+              const valueRow = document.getElementById("inputResultTableR_value");
+
+              for (let i = addr; i < addr + quan; i++) {
+                // Heading Cell
+                const cell = document.createElement('td'); // create a table cell
+                cell.textContent = i; // set cell content
+                headingRow.appendChild(cell); // add cell to row
+
+                // Value cell
+                const cell2 = document.createElement('td');
+                cell2.textContent = inputValues[i - addr];
+                valueRow.appendChild(cell2);
+              }
+            } else {
+              inputStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+            }
+          } catch (err) {
+              inputStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+          }
         }
-      } catch (err) {
-          holdingStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
 
-    // Update WM inputs
-    function updateWMInputs() {
-      const addr = parseInt(holdingAddressWM.value);
-      const quan = parseInt(holdingQuantityWM.value);
-      const workingDiv = document.getElementById("holdingWriteMultipleToggleDiv");
-
-      workingDiv.innerHTML = "";
-      holdingStatusWM.innerHTML = "";
-
-      if (Number(quan) > 256) {
-        holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
-        return;
-      }
-
-      if (isNaN(quan) || quan < 1 || quan > 256 || isNaN(addr) || addr < 0) {
-        return;
-      }
-
-      /*<div class="mb-3">
-        <label for="holdingValueW" class="form-label">Value</label>
-        <input type="number" class="form-control" id="holdingValueW" placeholder="Enter value to write (0-65535)" min="0" />
-      </div>*/
-
-      workingDiv.innerHTML = "<h6>Holding Register (Value 0-65535)</h6>";
-
-      for (var i = addr; i < addr + quan; i++) {
-        const id = `holdingInput-${i}`;
-        
-        const formDiv = document.createElement("div");
-        formDiv.className = "mb-3 d-flex align-items-center";
-
-        const label = document.createElement("label");
-        label.className = "me-2"; // right margin
-        label.setAttribute("for", id);
-        label.textContent = `Register ${i}`;
-        
-        const input = document.createElement("input");
-        input.className = "form-control";
-        input.style.width = "120px";
-        input.type = "number";
-        input.id = id;
-        input.min = "0";
-
-        formDiv.appendChild(label);
-        formDiv.appendChild(input);
-
-        workingDiv.appendChild(formDiv);
-      }
-    }
-
-    holdingSendW.addEventListener('click', () => {
-      const addr = holdingAddressW.value;
-      if (addr === '' || Number(addr) < 0) {
-        holdingStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
-        return;
-      }
-      const val = holdingValueW.value;
-      writeHolding(addr, val);
-    });
-
-    holdingSendWM.addEventListener('click', () => {
-      const address = parseInt(holdingAddressWM.value);
-      const quantity = parseInt(holdingQuantityWM.value);
-
-      if (isNaN(address) || address < 0) {
-        holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
-        return;
-      }
-      if (isNaN(quantity) || quantity < 1) {
-        holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
-        return;
-      }
-
-      const valueArray = [];
-      for (var i = address; i < address + quantity; i++) {
-        const inputElement = document.getElementById(`holdingInput-${i}`);
-        const inputValue = inputElement.value;
-        valueArray.push(inputValue);
-      }
-
-      writeMultipleHolding(address, valueArray); // handles value gathering in here
-    });
-
-    holdingSendR.addEventListener('click', () => {
-      const addr = holdingAddressR.value;
-      const quan = holdingQuantityR.value;
-
-      const headingRow = document.getElementById("holdingResultTableR_heading");
-      const valueRow = document.getElementById("holdingResultTableR_value");
-      headingRow.innerHTML = "";
-      valueRow.innerHTML = "";
-
-      if (addr === '' || Number(addr) < 0) {
-        holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
-        return;
-      }
-      if (quan === '' || Number(quan) < 1) {
-        holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
-        return;
-      }
-      readHolding(addr, quan);
-    });
-
-    holdingQuantityWM.addEventListener('input', () => {
-      updateWMInputs();
-    });
-
-    holdingAddressWM.addEventListener('input', () => {
-      updateWMInputs();
-    });
-    </script>
-
-    <!-- Input Functions -->
-    <script>
-    const inputAddressR = document.getElementById('inputAddressR');
-    const inputSendR = document.getElementById('inputSendR');
-    const inputStatusR = document.getElementById('inputStatusR');
-    
-    // Read
-    async function readInput(address, quantity) {
-      try {
-        const addr = parseInt(address);
-        const quan = parseInt(quantity);
-
-        inputStatusR.textContent = 'Sending request...';
-        const url = `/read?type=input&address=${encodeURIComponent(address)}&quantity=${quantity}`;
-        console.log(url);
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (response.ok) {
-          inputStatusR.innerHTML = "";
-          const inputValues = data.data;
+        inputSendR.addEventListener('click', () => {
+          const addr = inputAddressR.value;
+          const quan = inputQuantityR.value;
 
           const headingRow = document.getElementById("inputResultTableR_heading");
           const valueRow = document.getElementById("inputResultTableR_value");
+          headingRow.innerHTML = "";
+          valueRow.innerHTML = "";
 
-          for (let i = addr; i < addr + quan; i++) {
-            // Heading Cell
-            const cell = document.createElement('td'); // create a table cell
-            cell.textContent = i; // set cell content
-            headingRow.appendChild(cell); // add cell to row
-
-            // Value cell
-            const cell2 = document.createElement('td');
-            cell2.textContent = inputValues[i - addr];
-            valueRow.appendChild(cell2);
+          if (addr === '' || Number(addr) < 0) {
+            inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid input register address (0 or higher).</div>`;
+            return;
           }
-        } else {
-          inputStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
-        }
-      } catch (err) {
-          inputStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-      }
-    }
-
-    inputSendR.addEventListener('click', () => {
-      const addr = inputAddressR.value;
-      const quan = inputQuantityR.value;
-
-      const headingRow = document.getElementById("inputResultTableR_heading");
-      const valueRow = document.getElementById("inputResultTableR_value");
-      headingRow.innerHTML = "";
-      valueRow.innerHTML = "";
-
-      if (addr === '' || Number(addr) < 0) {
-        inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid input register address (0 or higher).</div>`;
-        return;
-      }
-      if (quan === '' || Number(quan) < 1) {
-        inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
-        return;
-      }
-      readInput(addr, quan);
-    });
-    </script>
-
-    <!-- Registers over time -->
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Graphing</h5>
-        <a class="btn btn-link" data-bs-toggle="collapse" href="#graphingBody">Toggle</a>
+          if (quan === '' || Number(quan) < 1) {
+            inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            return;
+          }
+          readInput(addr, quan);
+        });
+        </script>
       </div>
-      <div class="card-body">
-        <div id="graphingBody" class="collapse show">
-          <div>
-            <!-- Register select, graph address, graph quantity not active yet -->
-            <div class="mb-3">
-              <label for="registerSelect" class="form-label">Select Register Type:</label>
-              <select id="registerSelect" class="form-select">
-                <option>Coil</option>
-                <option>Discrete Input</option>
-                <option>Holding Register</option>
-                <option>Input Register</option>
-              </select>
+      <div class="tab-pane fade" id="tab-graphing" role="tabpanel">
+        <!-- Graphing panel -->
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Graphing</h5>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#graphingBody">Toggle</a>
+          </div>
+          <div class="card-body">
+            <div id="graphingBody" class="collapse show">
+              <div>
+                <!-- Register select, graph address, graph quantity not active yet -->
+                <div class="mb-3">
+                  <label for="registerSelect" class="form-label">Select Register Type:</label>
+                  <select id="registerSelect" class="form-select">
+                    <option>Coil</option>
+                    <option>Discrete Input</option>
+                    <option>Holding Register</option>
+                    <option>Input Register</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="graphAddress" class="form-label">Address:</label>
+                  <input type="number" class="form-control" id="graphAddress" placeholder="Enter register address (e.g., 0)" min="0" />
+                </div>
+                <!--<div class="mb-3">
+                  <label for="graphQuantity" class="form-label">Quantity:</label>
+                  <input type="number" class="form-control" id="graphQuantity" placeholder="Enter quantity of registers to read (e.g., 1)" min="1" />
+                </div>-->
+
+                <button id="addGraphingItem" class="btn btn-primary">Add</button>&nbsp;&nbsp;
+                <button id="removeGraphingItem" class="btn btn-danger">Remove</button>
+                <div id="addGraphingItemStatus" class="mt-3"></div>
+                <div id="removeGraphingItemStatus" class="mt-3"></div>
+
+                <br>
+                <div id="graphStatus" class="mt-3"></div>
+
+
+                <div class="card-body">
+                  <canvas id="registerChart" height="100"></canvas>
+                </div>
+
+                <div class="mb-3">
+                  Polling Interval: 
+                  <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s&nbsp;&nbsp;
+                  <button id="chartStartStop" class="btn btn-success">Start</button>&nbsp;&nbsp;
+                  <button id="chartResetZoom" class="btn btn-secondary">Reset Zoom</button>&nbsp;&nbsp;
+                  <button id="chartExport" class="btn btn-secondary">Export to CSV</button>
+                </div>
+                
+              </div> 
             </div>
-            <div class="mb-3">
-              <label for="graphAddress" class="form-label">Address:</label>
-              <input type="number" class="form-control" id="graphAddress" placeholder="Enter register address (e.g., 0)" min="0" />
+          </div>
+        </div>
+        <script>
+          const addGraphingItem = document.getElementById('addGraphingItem');
+          const removeGraphingItem = document.getElementById('removeGraphingItem');
+          const addGraphingItemStatus = document.getElementById('addGraphingItemStatus');
+          const removeGraphingItemStatus = document.getElementById('removeGraphingItemStatus');
+
+          const chartStartStop = document.getElementById('chartStartStop');
+          const chartResetZoom = document.getElementById('chartResetZoom');
+          const chartExport = document.getElementById('chartExport');
+
+          const addType = document.getElementById('registerSelect');
+          const addAddress = document.getElementById('graphAddress');
+
+          const context = document.getElementById("registerChart").getContext("2d");
+
+          const chart = new Chart(context, {
+            type: 'line',
+            data: {
+              datasets: []
+            },
+            options: {
+              responsive: true,
+              animation: true,
+              parsing: false,
+              scales: {
+                //x: { title: { display: true, text: 'Time' }},
+                //y: { title: { display: true, text: 'Value' }}
+                x: {
+                  type: 'time',
+                  time: {
+                    unit: 'second',
+                    tooltipFormat: 'HH:mm:ss'
+                  },
+                  title: { display: true, text: 'Time' },
+                  ticks: {
+                    autoSkip: false,
+                    source: 'auto'
+                  },
+                  adapters: {
+                    date: luxon.DateTime
+                  },
+                  min: Date.now() - 60000, // show past 60 seconds
+                  max: Date.now()
+                },
+                /*y: {
+                  title: { display: true, text: 'Value' }
+                }*/
+                yDigital: {
+                  type: 'linear',
+                  position: 'left',
+                  min: 0,
+                  max: 1,
+                  title: {
+                    display: true,
+                    text: 'Digital'
+                  },
+                  grid: {
+                    drawOnChartArea: false, // avoid grid overlap
+                    drawTicks: false,
+                    drawBorder: false,
+                  },
+                },
+                yAnalogue: {
+                  type: 'linear',
+                  position: 'right',
+                  min: 0,
+                  max: 65535,
+                  title: {
+                    display: true,
+                    text: 'Analogue'
+                  },
+                  grid: {
+                    drawTicks: true,
+                    drawBorder: true,
+                    drawOnChartArea: true,
+                  },
+                }
+              },
+              plugins: {
+                zoom: {
+                  pan: {
+                    enabled: true,
+                    mode: 'x',
+                    modifierKey: 'ctrl'  // Optional
+                  },
+                  zoom: {
+                    wheel: {
+                      enabled: true
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    mode: 'x'
+                  }
+                }
+              },
+              tooltip: {
+                enabled: true,
+                mode: 'nearest',
+                intersect: false,
+                callbacks: {
+                  label: function(context) {
+                    const label = context.dataset.label || '';
+                    const yValue = context.parsed.y;
+                    return `${label}: ${yValue}`;
+                  }
+                }
+              }
+            }
+          });
+
+          let timer;
+          let addressToRead = 0; // SET ADDRESS
+          let quantity = 1;
+
+          async function fetchRegisterAndUpdateChart() {
+            addGraphingItemStatus.innerHTML = ""; 
+
+            try {
+              for (const dataset of chart.data.datasets) {
+                const address = dataset.address;
+                const type = dataset.regType;
+
+                const res = await fetch(`/read?type=${type}&address=${encodeURIComponent(address)}`);
+                const data = await res.json();
+
+                if (res.ok && data.data?.[0] !== undefined) {
+                  dataset.data.push({
+                    x: Date.now(),
+                    y: data.data[0]
+                  });
+                } else {
+                  addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                  return;
+                }
+              }
+              chart.options.scales.x.min = Date.now() - 60000;
+              chart.options.scales.x.max = Date.now();
+              chart.update();
+            } catch (err) {
+              addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+              console.error("Chart update error:", err);
+            }
+          }
+
+          function startPolling() {
+            clearInterval(timer);
+            const intervalSec = parseInt(document.getElementById('intervalInput').value || 5);
+            if (intervalSec < 1) {
+              graphStatus.innerHTML = `<div class="alert alert-warning">Please enter a interval greater than or equal to 1 second.</div>`;
+              return;
+            }
+
+            if (chart.data.datasets.length === 0) {
+              graphStatus.innerHTML = `<div class="alert alert-warning">Please add a dataset to the graph.</div>`;
+              return;
+            }
+
+            graphStatus.innerHTML = "";
+            timer = setInterval(fetchRegisterAndUpdateChart, intervalSec * 1000);
+
+            // Change start to stop button
+            chartStartStop.innerText = "Stop";
+            chartStartStop.classList.remove("btn-success");
+            chartStartStop.classList.add("btn-danger");
+          }
+
+          function endPolling() {
+            clearInterval(timer);
+            timer = null;
+
+            // Change stop to start button
+            chartStartStop.innerText = "Start";
+            chartStartStop.classList.remove("btn-danger");
+            chartStartStop.classList.add("btn-success");
+          }
+
+          function getRandomColour() {
+            const r = Math.floor(Math.random() * 200);
+            const g = Math.floor(Math.random() * 200);
+            const b = Math.floor(Math.random() * 200);
+            return `rgba(${r}, ${g}, ${b}, 1)`;
+          }
+
+          addGraphingItem.addEventListener('click', async () => {
+            addGraphingItemStatus.innerHTML = "";
+            removeGraphingItemStatus.innerHTML = "";
+
+            let type;
+            switch (addType.value) {
+              case "Coil":
+                type = "coil";
+                break;
+              case "Discrete Input":
+                type = "discrete";
+                break;
+              case "Holding Register":
+                type = "holding";
+                break;
+              case "Input Register":
+                type = "input";
+                break;
+              default:
+                addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
+                return;
+            }
+
+            const address = addAddress.value;
+
+            // Check and test validity
+            if (address === '' || Number(address) < 0) {
+              addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
+              return;
+            }
+
+            try {
+              const url = `/read?type=${type}&address=${encodeURIComponent(address)}`;
+              const res = await fetch(url);
+              const data = await res.json();
+              if (!res.ok) {
+                addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                return;
+              }
+            } catch (err) {
+              addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              return;
+            }
+
+            const yAxisID = (type === 'coil' || type === 'discrete') ? 'yDigital' : 'yAnalogue';
+
+            // Create new dataset
+            const newDataset = {
+              label: `${addType.value} ${address}`,
+              regType: type,
+              address: parseInt(address), 
+              data: [],
+              borderColor: getRandomColour(),
+              tension: 0.2,
+              fill: false,
+              yAxisID: yAxisID
+            };
+
+            // Push to chart
+            chart.data.datasets.push(newDataset);
+            chart.update();
+
+            // Reset state
+            addAddress.value = "";
+
+            // Start polling
+            startPolling();
+          });
+
+          removeGraphingItem.addEventListener('click', () => {
+              removeGraphingItemStatus.innerHTML = "";
+
+              let type;
+              switch (addType.value) {
+                case "Coil":
+                  type = "coil";
+                  break;
+                case "Discrete Input":
+                  type = "discrete";
+                  break;
+                case "Holding Register":
+                  type = "holding";
+                  break;
+                case "Input Register":
+                  type = "input";
+                  break;
+                default:
+                  removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
+                  return;
+              }
+
+              const address = parseInt(addAddress.value);
+
+              if (isNaN(address) || address < 0) {
+                removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
+                return;
+              }
+
+              // Label for comparsion (to find one to delete)
+              const labelToRemove = `${addType.value} ${address}`;
+
+              // Find dataset index
+              const index = chart.data.datasets.findIndex(ds => ds.label === labelToRemove);
+
+              if (index !== -1) {
+                chart.data.datasets.splice(index, 1); // Remove the dataset
+
+                if (chart.data.datasets.length === 0) {
+                  endPolling();
+                }
+
+                chart.update();
+              } else {
+                removeGraphingItemStatus.innerHTML = `<div class="alert alert-info">Dataset not found.</div>`;
+              }
+
+              addAddress.value = "";
+          });
+
+          document.getElementById('intervalInput').addEventListener('change', () => {
+            if (chart.data.datasets.length > 0 && (timer)) { 
+              startPolling();          
+            } else {
+              endPolling();
+            }
+          });
+
+          chartStartStop.addEventListener('click', () => {
+            if (chartStartStop.innerText == 'Start') {
+              startPolling();
+            } else {
+              endPolling();
+            }
+          });
+
+          chartResetZoom.addEventListener('click', () => {
+            chart.resetZoom();
+          });
+
+          chartExport.addEventListener('click', () => {
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            chart.data.datasets.forEach(dataset => {
+              csvContent += `\nDataset: ${dataset.label}\nTime,Value\n`;
+              dataset.data.forEach(point => {
+                const timestamp = new Date(point.x).toISOString();
+                csvContent += `${timestamp},${point.y}\n`;
+              });
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'export.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          });
+        </script>
+      </div>
+    <div class="tab-pane fade" id="tab-rules" role="tabpanel">
+      <!-- Rules Manager -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5>Rules Manager</h5>
+          <a class="btn btn-link" data-bs-toggle="collapse" href="#rulesBody">Toggle</a>
+        </div>
+        <div class="card m-3">
+          <div class="card-body">
+            <div id="rulesBody" class="collapse show">
+              <h6>Add New Rule</h6>
+              <div class="mb-3">
+                <span class="me-2">If</span>
+
+                <div class="d-inline-block me-2" style="width: 150px;">
+                  <select id="inputType1" class="form-select form-select-sm">
+                    <option>select</option>
+                    <option>Coil</option>
+                    <option>Discrete Input</option>
+                    <option>Holding Register</option>
+                    <option>Input Register</option>
+                  </select>
+                </div>
+
+                <div class="d-inline-block me-2" style="width: 100px;">
+                  <input type="number" class="form-control form-control-sm" id="inputRegister1" placeholder="address" min="0" />
+                </div>
+
+                <div class="d-inline-block me-2" style="width: 85px;">
+                  <select id="op1" class="form-select form-select-sm">
+                    <option>select</option>
+                    <option>==</option>
+                    <option>!=</option>
+                    <option>></option>
+                    <option><</option>
+                    <option>>=</option>
+                    <option><=</option>
+                  </select>
+                </div>
+
+                <div class="d-inline-block me-2" style="width: 100px;">
+                  <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
+                </div>
+
+                <span class="me-2">then set</span>
+
+                <div class="d-inline-block me-2" style="width: 150px;">
+                  <select id="outputType" class="form-select form-select-sm">
+                    <option>Coil</option>
+                    <option>Holding Register</option>
+                  </select>
+                </div>
+
+                <div class="d-inline-block me-2" style="width: 100px;">
+                  <input type="number" class="form-control form-control-sm" id="outputRegister" placeholder="address" min="0" />
+                </div>
+
+                <span class="me-2">to</span>
+
+                <div class="d-inline-block me-2" style="width: 100px;">
+                  <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
+                </div>
+
+                <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
+              </div>
+
+              <div id="rulesStatus" class="mt-3"></div>
+
+              <a href="http://localhost:5000/addrule?input_type1=4&input_reg1=0&op1=3&compare_value1=30000&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=1&output_reg=0&output_value=1">http://localhost:5000/addrule?input_type1=4&input_reg1=0&op1=3&compare_value1=30000&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=1&output_reg=0&output_value=1</a>
+
+              <label for="rulePreview" class="form-label">Rule Preview</label>
+              <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
+              <br>
+              <button id="ruleAdd" class="btn btn-success d-inline-block">Add Rule</button>
             </div>
-            <!--<div class="mb-3">
-              <label for="graphQuantity" class="form-label">Quantity:</label>
-              <input type="number" class="form-control" id="graphQuantity" placeholder="Enter quantity of registers to read (e.g., 1)" min="1" />
-            </div>-->
-
-            <button id="addGraphingItem" class="btn btn-primary">Add</button>&nbsp;&nbsp;
-            <button id="removeGraphingItem" class="btn btn-danger">Remove</button>
-            <div id="addGraphingItemStatus" class="mt-3"></div>
-            <div id="removeGraphingItemStatus" class="mt-3"></div>
-
-            <br>
-            <div id="graphStatus" class="mt-3"></div>
-
-
-            <div class="card-body">
-              <canvas id="registerChart" height="100"></canvas>
-            </div>
-
-            <div class="mb-3">
-              Polling Interval: 
-              <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s&nbsp;&nbsp;
-              <button id="chartStartStop" class="btn btn-success">Start</button>&nbsp;&nbsp;
-              <button id="chartResetZoom" class="btn btn-secondary">Reset Zoom</button>&nbsp;&nbsp;
-              <button id="chartExport" class="btn btn-secondary">Export to CSV</button>
-            </div>
-            
-          </div> 
+          </div>
         </div>
       </div>
     </div>
-    <script>
-      const addGraphingItem = document.getElementById('addGraphingItem');
-      const removeGraphingItem = document.getElementById('removeGraphingItem');
-      const addGraphingItemStatus = document.getElementById('addGraphingItemStatus');
-      const removeGraphingItemStatus = document.getElementById('removeGraphingItemStatus');
+  </div>
+  <script>
+    const inputType1 = document.getElementById("inputType1");
+    const inputRegister1 = document.getElementById("inputRegister1");
+    const op1 = document.getElementById("op1");
+    const compareValue1 = document.getElementById("compareValue1");
+    const outputType = document.getElementById("outputType");
+    const outputRegister = document.getElementById("outputRegister");
+    const outputValue = document.getElementById("outputValue");
 
-      const chartStartStop = document.getElementById('chartStartStop');
-      const chartResetZoom = document.getElementById('chartResetZoom');
-      const chartExport = document.getElementById('chartExport');
+    const rulePreview = document.getElementById("rulePreview");
 
-      const addType = document.getElementById('registerSelect');
-      const addAddress = document.getElementById('graphAddress');
-
-      const context = document.getElementById("registerChart").getContext("2d");
-
-      const chart = new Chart(context, {
-        type: 'line',
-        data: {
-          datasets: []
-        },
-        options: {
-          responsive: true,
-          animation: true,
-          parsing: false,
-          scales: {
-            //x: { title: { display: true, text: 'Time' }},
-            //y: { title: { display: true, text: 'Value' }}
-            x: {
-              type: 'time',
-              time: {
-                unit: 'second',
-                tooltipFormat: 'HH:mm:ss'
-              },
-              title: { display: true, text: 'Time' },
-              ticks: {
-                autoSkip: false,
-                source: 'auto'
-              },
-              adapters: {
-                date: luxon.DateTime
-              },
-              min: Date.now() - 60000, // show past 60 seconds
-              max: Date.now()
-            },
-            /*y: {
-              title: { display: true, text: 'Value' }
-            }*/
-            yDigital: {
-              type: 'linear',
-              position: 'left',
-              min: 0,
-              max: 1,
-              title: {
-                display: true,
-                text: 'Digital'
-              },
-              grid: {
-                drawOnChartArea: false, // avoid grid overlap
-                drawTicks: false,
-                drawBorder: false,
-              },
-            },
-            yAnalogue: {
-              type: 'linear',
-              position: 'right',
-              min: 0,
-              max: 65535,
-              title: {
-                display: true,
-                text: 'Analogue'
-              },
-              grid: {
-                drawTicks: true,
-                drawBorder: true,
-                drawOnChartArea: true,
-              },
-            }
-          },
-          plugins: {
-            zoom: {
-              pan: {
-                enabled: true,
-                mode: 'x',
-                modifierKey: 'ctrl'  // Optional
-              },
-              zoom: {
-                wheel: {
-                  enabled: true
-                },
-                pinch: {
-                  enabled: true
-                },
-                mode: 'x'
-              }
-            }
-          },
-          tooltip: {
-            enabled: true,
-            mode: 'nearest',
-            intersect: false,
-            callbacks: {
-              label: function(context) {
-                const label = context.dataset.label || '';
-                const yValue = context.parsed.y;
-                return `${label}: ${yValue}`;
-              }
-            }
-          }
-        }
-      });
-
-      let timer;
-      let addressToRead = 0; // SET ADDRESS
-      let quantity = 1;
-
-      async function fetchRegisterAndUpdateChart() {
-        addGraphingItemStatus.innerHTML = ""; 
-
-        try {
-          for (const dataset of chart.data.datasets) {
-            const address = dataset.address;
-            const type = dataset.regType;
-
-            const res = await fetch(`/read?type=${type}&address=${encodeURIComponent(address)}`);
-            const data = await res.json();
-
-            if (res.ok && data.data?.[0] !== undefined) {
-              dataset.data.push({
-                x: Date.now(),
-                y: data.data[0]
-              });
-            } else {
-              addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
-              return;
-            }
-          }
-          chart.options.scales.x.min = Date.now() - 60000;
-          chart.options.scales.x.max = Date.now();
-          chart.update();
-        } catch (err) {
-          addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
-          console.error("Chart update error:", err);
-        }
+    function getTypeString(type) {
+      switch (type) {
+        case "Coil": return "coil";
+        case "Discrete Input": return "discrete";
+        case "Holding Register": return "holding";
+        case "Input Register": return "input";
+        default: return "null";
       }
+    }
 
-      function startPolling() {
-        clearInterval(timer);
-        const intervalSec = parseInt(document.getElementById('intervalInput').value || 5);
-        if (intervalSec < 1) {
-          graphStatus.innerHTML = `<div class="alert alert-warning">Please enter a interval greater than or equal to 1 second.</div>`;
-          return;
-        }
-
-        if (chart.data.datasets.length === 0) {
-          graphStatus.innerHTML = `<div class="alert alert-warning">Please add a dataset to the graph.</div>`;
-          return;
-        }
-
-        graphStatus.innerHTML = "";
-        timer = setInterval(fetchRegisterAndUpdateChart, intervalSec * 1000);
-
-        // Change start to stop button
-        chartStartStop.innerText = "Stop";
-        chartStartStop.classList.remove("btn-success");
-        chartStartStop.classList.add("btn-danger");
+    function getOperationString(operation) {
+      switch (operation) {
+        case "==": return "CMP_EQ";
+        case "!=": return "CMP_NEQ";
+        case ">": return "CMP_GT";
+        case "<": return "CMP_LT";
+        case ">=": return "CMP_GTET";
+        case "<=": return "CMP_LTET";
+        default: return "null";
       }
+    }
 
-      function endPolling() {
-        clearInterval(timer);
-        timer = null;
+    function updateRulePreview() {
 
-        // Change stop to start button
-        chartStartStop.innerText = "Start";
-        chartStartStop.classList.remove("btn-danger");
-        chartStartStop.classList.add("btn-success");
-      }
+      const preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
 
-      function getRandomColour() {
-        const r = Math.floor(Math.random() * 200);
-        const g = Math.floor(Math.random() * 200);
-        const b = Math.floor(Math.random() * 200);
-        return `rgba(${r}, ${g}, ${b}, 1)`;
-      }
+      rulePreview.innerHTML = preview;
+    }
 
-      addGraphingItem.addEventListener('click', async () => {
-        addGraphingItemStatus.innerHTML = "";
-        removeGraphingItemStatus.innerHTML = "";
-
-        let type;
-        switch (addType.value) {
-          case "Coil":
-            type = "coil";
-            break;
-          case "Discrete Input":
-            type = "discrete";
-            break;
-          case "Holding Register":
-            type = "holding";
-            break;
-          case "Input Register":
-            type = "input";
-            break;
-          default:
-            addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
-            return;
-        }
-
-        const address = addAddress.value;
-
-        // Check and test validity
-        if (address === '' || Number(address) < 0) {
-          addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
-          return;
-        }
-
-        try {
-          const url = `/read?type=${type}&address=${encodeURIComponent(address)}`;
-          const res = await fetch(url);
-          const data = await res.json();
-          if (!res.ok) {
-            addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
-            return;
-          }
-        } catch (err) {
-          addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-          return;
-        }
-
-        const yAxisID = (type === 'coil' || type === 'discrete') ? 'yDigital' : 'yAnalogue';
-
-        // Create new dataset
-        const newDataset = {
-          label: `${addType.value} ${address}`,
-          regType: type,
-          address: parseInt(address), 
-          data: [],
-          borderColor: getRandomColour(),
-          tension: 0.2,
-          fill: false,
-          yAxisID: yAxisID
-        };
-
-        // Push to chart
-        chart.data.datasets.push(newDataset);
-        chart.update();
-
-        // Reset state
-        addAddress.value = "";
-
-        // Start polling
-        startPolling();
-      });
-
-      removeGraphingItem.addEventListener('click', () => {
-          removeGraphingItemStatus.innerHTML = "";
-
-          let type;
-          switch (addType.value) {
-            case "Coil":
-              type = "coil";
-              break;
-            case "Discrete Input":
-              type = "discrete";
-              break;
-            case "Holding Register":
-              type = "holding";
-              break;
-            case "Input Register":
-              type = "input";
-              break;
-            default:
-              removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
-              return;
-          }
-
-          const address = parseInt(addAddress.value);
-
-          if (isNaN(address) || address < 0) {
-            removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
-            return;
-          }
-
-          // Label for comparsion (to find one to delete)
-          const labelToRemove = `${addType.value} ${address}`;
-
-          // Find dataset index
-          const index = chart.data.datasets.findIndex(ds => ds.label === labelToRemove);
-
-          if (index !== -1) {
-            chart.data.datasets.splice(index, 1); // Remove the dataset
-
-            if (chart.data.datasets.length === 0) {
-              endPolling();
-            }
-
-            chart.update();
-          } else {
-            removeGraphingItemStatus.innerHTML = `<div class="alert alert-info">Dataset not found.</div>`;
-          }
-
-          addAddress.value = "";
-      });
-
-      document.getElementById('intervalInput').addEventListener('change', () => {
-        if (chart.data.datasets.length > 0 && (timer)) { 
-          startPolling();          
-        } else {
-          endPolling();
-        }
-      });
-
-      chartStartStop.addEventListener('click', () => {
-        if (chartStartStop.innerText == 'Start') {
-          startPolling();
-        } else {
-          endPolling();
-        }
-      });
-
-      chartResetZoom.addEventListener('click', () => {
-        chart.resetZoom();
-      });
-
-      chartExport.addEventListener('click', () => {
-        let csvContent = "data:text/csv;charset=utf-8,";
-
-        chart.data.datasets.forEach(dataset => {
-          csvContent += `\nDataset: ${dataset.label}\nTime,Value\n`;
-          dataset.data.forEach(point => {
-            const timestamp = new Date(point.x).toISOString();
-            csvContent += `${timestamp},${point.y}\n`;
-          });
-        });
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'export.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      });
-    </script>
+    inputType1.addEventListener('change', () => updateRulePreview());
+    inputRegister1.addEventListener('input', () => updateRulePreview());
+    op1.addEventListener('change', () => updateRulePreview());
+    compareValue1.addEventListener('input', () => updateRulePreview());
+    outputType.addEventListener('change', () => updateRulePreview());
+    outputRegister.addEventListener('input', () => updateRulePreview());
+    outputValue.addEventListener('input', () => updateRulePreview());
+  </script>
 
 
 

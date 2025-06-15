@@ -1,14 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-const ModbusRTU = require("modbus-serial");
-const { SerialPort } = require("serialport");
+const ModbusRTU = require("./modbus"); // custom
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-const client = new ModbusRTU;
+const modbus = new ModbusRTU();
 const timeoutMs = 1000; // timeout for all functions sent over modbus in milliseconds
 const timeoutRetry = 3; // number of times to try when querying over modbus
 
@@ -54,16 +53,16 @@ app.get("/read", async (req, res) => {
         let resultAwait;
         switch (type) {
             case "coil":
-                resultAwait = client.readCoils(addr, count);
+                resultAwait = modbus.readCoils(addr, count);
                 break;
             case "discrete":
-                resultAwait = client.readDiscreteInputs(addr, count);
+                resultAwait = modbus.readDiscreteInputs(addr, count);
                 break;
             case "holding":
-                resultAwait = client.readHoldingRegisters(addr, count);
+                resultAwait = modbus.readHoldingRegisters(addr, count);
                 break;
             case "input":
-                resultAwait = client.readInputRegisters(addr, count);
+                resultAwait = modbus.readInputRegisters(addr, count);
                 break;
             default:
                 return res.status(400).json({ error: "Invalid register type" });
@@ -72,7 +71,7 @@ app.get("/read", async (req, res) => {
         // timeout
         const result = await withTimeout(resultAwait, timeoutMs);
 
-        res.json({ data: result.data || result.dataValues || [] });
+        res.json({ data: result || [] });
     } catch (err) {
         console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
@@ -93,10 +92,10 @@ app.get("/write", async (req, res) => {
         let resultAwait;
         switch (type) {
             case "coil":
-                resultAwait = client.writeCoils(addr, vals);
+                resultAwait = modbus.writeCoils(addr, vals);
                 break;
             case "holding":
-                resultAwait = client.writeRegisters(addr, vals);
+                resultAwait = modbus.writeRegisters(addr, vals);
                 break;
             default:
                 return res.status(400).json({ error: "Invalid register type" });
@@ -112,14 +111,89 @@ app.get("/write", async (req, res) => {
     }
 });
 
+// -----
+
+function buildModbusFrame(slaveId, functionCode, payload) {
+    const frame = Buffer.alloc(payload.length + 2); // + 2 for slave & function
+    frame.writeUInt8(slaveId, 0);
+    frame.writeUInt8(functionCode, 1);
+    payload.copy(frame, 2);
+
+    const crcVal = ModbusRTU.crc16(frame);
+    const crcBuf = Buffer.alloc(2);
+    crcBuf.writeUInt16LE(crcVal, 0);
+
+    return Buffer.concat([frame, crcBuf]);
+}
+
+async function sendRule(slave, rule) {
+    // Custom function
+    const func = 0x65; // Function code 101
+
+    const b = Buffer.alloc(18); // 18 bytes for the rule data (no index)
+
+    b.writeUInt8(rule.input_type1, 0);
+    b.writeUInt16BE(rule.input_reg1, 1);
+    b.writeUInt8(rule.op1, 3);
+    b.writeUInt16BE(rule.compare_value1, 4);
+
+    b.writeUInt8(rule.input_type2, 6);
+    b.writeUInt16BE(rule.input_reg2, 7);
+    b.writeUInt8(rule.op2, 9);
+    b.writeUInt16BE(rule.compare_value2, 10);
+
+    b.writeUInt8(rule.join, 12);
+    b.writeUInt8(rule.output_type, 13);
+    b.writeUInt16BE(rule.output_reg, 14);
+    b.writeUInt16BE(rule.output_value, 16);
+
+    try {
+        const response = await modbus.sendRequest(func, b);
+        return response;
+    } catch (err) {
+        console.error("Failed to send rule", err);
+        throw err;
+    }
+}
+
+// Add a rule
+app.get("/addrule", async (req, res) => {
+    try {
+        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+        const rule = {
+            input_type1: parseInt(req.query.input_type1),
+            input_reg1: parseInt(req.query.input_reg1),
+            op1: parseInt(req.query.op1),
+            compare_value1: parseInt(req.query.compare_value1),
+            
+            input_type2: parseInt(req.query.input_type2),
+            input_reg2: parseInt(req.query.input_reg2),
+            op2: parseInt(req.query.op2),
+            compare_value2: parseInt(req.query.compare_value2),
+
+            join: parseInt(req.query.join),
+            output_type: parseInt(req.query.output_type),
+            output_reg: parseInt(req.query.output_reg),
+            output_value: parseInt(req.query.output_value),
+        };
+
+        const sendRes = await sendRule(currentSlave, rule);
+        res.json({ success: true, raw: sendRes.toString("hex") });
+
+    } catch (err) {
+        console.error("Failed to add rule:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 
 // ------
 // List serial ports
 app.get("/ports", async (req, res) => {
     try {
-        const ports = await SerialPort.list();
-        const portNames = ports.map(port => port.path);
+        const portNames = await ModbusRTU.listPorts();
         res.json(portNames);
     } catch (err) {
         console.error("Error listing ports:", err);
@@ -136,7 +210,7 @@ app.get("/status", async (req, res) => {
     }
 });
 
-// Connect to a selected port
+// Connect to a selected port UPDATED
 app.get("/connect", async (req, res) => {
     const { port, baud, slave } = req.query;
 
@@ -147,8 +221,7 @@ app.get("/connect", async (req, res) => {
         if (!baudRate) return res.status(400).json({ success: false, error: "No baud rate specified" });
         if (!slave) return res.status(400).json({ success: false, error: "No slave address specified" });
 
-        await client.connectRTUBuffered(port, { baudRate: baudRate, parity: "none" });
-        client.setID(slave); // slave address
+        await modbus.connect(slave, port, baudRate, "none");
         isConnected = true;
         currentPort = port;
         currentSlave = slave;
@@ -160,16 +233,15 @@ app.get("/connect", async (req, res) => {
     }
 });
 
-// Disconnect
+// Disconnect UPDATED
 app.get("/disconnect", async (req, res) => {
     try {
-        client.close(() => {
-            console.log("Disconnected.");
-            isConnected = false;
-            currentPort = null;
-            currentSlave = null;
-            res.json({ success: true });
-        });
+        await modbus.disconnect();
+        console.log("Disconnected.");
+        isConnected = false;
+        currentPort = null;
+        currentSlave = null;
+        res.json({ success: true });
     } catch (err) {
         console.log("Disconnection error:", err);
         res.json({ success: false, error: err.message });
@@ -179,4 +251,12 @@ app.get("/disconnect", async (req, res) => {
 
 app.listen(5000, () => {
     console.log("Server running on http://localhost:5000");
+});
+
+// Handle application shutdown cleanly
+process.on("SIGINT", async () => {
+    if (isConnected) {
+        await modbus.disconnect();
+    }
+    process.exit();
 });
