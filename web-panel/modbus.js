@@ -109,7 +109,7 @@ class ModbusRTU {
             0x0F: "Write Multiple Coils",
             0x10: "Write Multiple Registers",
         };
-        return map[code] || `Functin 0x${code.toString(16)}`;
+        return map[code] || `Function 0x${code.toString(16)}`;
     }
 
     decodeExceptionCode(code) {

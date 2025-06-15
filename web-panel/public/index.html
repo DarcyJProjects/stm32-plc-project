@@ -48,7 +48,7 @@
                 <select id="portSelect" class="form-select">
                   <option>Loading...</option>
                 </select>
-              </div>
+              </div> 
               <div class="mb-3">
                 <label for="baudSelect" class="form-label">Select Baud Rate</label>
                 <select id="baudSelect" class="form-select">
@@ -73,6 +73,7 @@
         const connectBtn = document.getElementById("connectBtn");
 
         const connectionStatusDefaultText = 'Select a port and click connect.';
+        const noPortsText = "No ports found";
 
         let isConnected;
         let currentPort; // only required for window.onload
@@ -94,14 +95,24 @@
           try {
             const res = await fetch('/ports');
             const ports = await res.json();
-            portSelect.innerHTML = '';
-            ports.forEach(port => {
-              const option = document.createElement('option');
-              option.value = port;
-              option.textContent = port;
-              portSelect.appendChild(option);
-            });
 
+            portSelect.innerHTML = '';
+            
+            if (ports.length == 0) {
+              const option = document.createElement('option');
+              option.value = noPortsText;
+              option.textContent = noPortsText;
+              portSelect.appendChild(option);
+            } else {
+              ports.forEach(port => {
+                const option = document.createElement('option');
+                option.value = port;
+                option.textContent = port;
+                portSelect.appendChild(option);
+              });
+            }
+            
+            
             connectionStatus.textContent = connectionStatusDefaultText;
           } catch (exception) {
             portSelect.innerHTML = '<option>Error loading ports</option>';
@@ -135,6 +146,13 @@
           const selectedPort = portSelect.value;
           const selectedBaud = baudSelect.value;
           const selectedSlave = slaveSelect.value;  
+
+          if (selectedPort == noPortsText) {
+            connectionStatus.textContent = `No valid port was selected.`;
+            connectionStatus.classList.remove("text-muted", "text-success");
+            connectionStatus.classList.add("text-danger");
+            return;
+          }
 
           if (!isConnected) {
             // Connect
@@ -1415,13 +1433,18 @@
         <div class="card m-3">
           <div class="card-body">
             <div id="rulesBody" class="collapse show">
-              <h6>Add New Rule</h6>
               <div class="mb-3">
+                <h6>Add New Rule</h6>
+                <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
+              </div>
+
+              <!-- New Rule If 1 -->
+              <div id="ruleNewIf1" class="mb-3 d-none">
                 <span class="me-2">If</span>
 
                 <div class="d-inline-block me-2" style="width: 150px;">
                   <select id="inputType1" class="form-select form-select-sm">
-                    <option>select</option>
+                    <option>Select</option>
                     <option>Coil</option>
                     <option>Discrete Input</option>
                     <option>Holding Register</option>
@@ -1435,7 +1458,7 @@
 
                 <div class="d-inline-block me-2" style="width: 85px;">
                   <select id="op1" class="form-select form-select-sm">
-                    <option>select</option>
+                    <option>Select</option>
                     <option>==</option>
                     <option>!=</option>
                     <option>></option>
@@ -1448,11 +1471,61 @@
                 <div class="d-inline-block me-2" style="width: 100px;">
                   <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
                 </div>
+                
+                <!-- join -->
+                <div id="ruleJoinDiv" class="d-inline-block me-2 d-none" style="width: 80px;">
+                  <select id="ruleJoin" class="form-select form-select-sm">
+                    <option>And</option>
+                    <option>Or</option>
+                  </select>
+                </div>
 
-                <span class="me-2">then set</span>
+                <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
+              </div>
+
+              <!-- New Rule If 2 -->
+              <div id="ruleNewIf2" class="mb-3 d-none">
+
+                <span class="me-2">If</span>
+
+                <div class="d-inline-block me-2" style="width: 150px;">
+                  <select id="inputType2" class="form-select form-select-sm">
+                    <option>Select</option>
+                    <option>Coil</option>
+                    <option>Discrete Input</option>
+                    <option>Holding Register</option>
+                    <option>Input Register</option>
+                  </select>
+                </div>
+
+                <div class="d-inline-block me-2" style="width: 100px;">
+                  <input type="number" class="form-control form-control-sm" id="inputRegister2" placeholder="address" min="0" />
+                </div>
+
+                <div class="d-inline-block me-2" style="width: 85px;">
+                  <select id="op2" class="form-select form-select-sm">
+                    <option>Select</option>
+                    <option>==</option>
+                    <option>!=</option>
+                    <option>></option>
+                    <option><</option>
+                    <option>>=</option>
+                    <option><=</option>
+                  </select>
+                </div>
+
+                <div class="d-inline-block me-2" style="width: 100px;">
+                  <input type="number" class="form-control form-control-sm" id="compareValue2" placeholder="value" min="0" />
+                </div>
+              </div>
+
+              <!-- New Rule Then -->
+              <div id="ruleNewOutput"class="mb-3 d-none">
+                <span class="me-2">Then set</span>
 
                 <div class="d-inline-block me-2" style="width: 150px;">
                   <select id="outputType" class="form-select form-select-sm">
+                    <option>Select</option>
                     <option>Coil</option>
                     <option>Holding Register</option>
                   </select>
@@ -1467,18 +1540,19 @@
                 <div class="d-inline-block me-2" style="width: 100px;">
                   <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
                 </div>
-
-                <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
+              </div>
+  
+              <div id="rulePreviewArea" class="d-none mb-3">
+                <label for="rulePreview" class="form-label">Rule Preview:</label>
+                <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
               </div>
 
-              <div id="rulesStatus" class="mt-3"></div>
+              <div>
+                <button id="ruleSubmit" class="btn btn-success d-inline-block d-none">Add Rule</button>
+              </div>
 
-              <a href="http://localhost:5000/addrule?input_type1=4&input_reg1=0&op1=3&compare_value1=30000&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=1&output_reg=0&output_value=1">http://localhost:5000/addrule?input_type1=4&input_reg1=0&op1=3&compare_value1=30000&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=1&output_reg=0&output_value=1</a>
+              <div id="ruleStatus" class="mt-3"></div>
 
-              <label for="rulePreview" class="form-label">Rule Preview</label>
-              <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
-              <br>
-              <button id="ruleAdd" class="btn btn-success d-inline-block">Add Rule</button>
             </div>
           </div>
         </div>
@@ -1487,14 +1561,33 @@
   </div>
   <script>
     const inputType1 = document.getElementById("inputType1");
+    const inputType2 = document.getElementById("inputType2");
     const inputRegister1 = document.getElementById("inputRegister1");
+    const inputRegister2 = document.getElementById("inputRegister2");
     const op1 = document.getElementById("op1");
+    const op2 = document.getElementById("op2");
     const compareValue1 = document.getElementById("compareValue1");
+    const compareValue2 = document.getElementById("compareValue2");
     const outputType = document.getElementById("outputType");
     const outputRegister = document.getElementById("outputRegister");
     const outputValue = document.getElementById("outputValue");
 
     const rulePreview = document.getElementById("rulePreview");
+    const rulePreviewArea = document.getElementById("rulePreviewArea");
+
+    const ruleNew = document.getElementById('ruleNew');
+    const ruleNewIf1 = document.getElementById('ruleNewIf1');
+    const ruleJoin = document.getElementById('ruleJoin');
+    const ruleJoinDiv = document.getElementById('ruleJoinDiv');
+    const ruleNewIf2 = document.getElementById('ruleNewIf2');
+    const ruleNewOutput = document.getElementById('ruleNewOutput');
+
+    const ruleAddJoin = document.getElementById('ruleAddJoin');
+    const ruleSubmit = document.getElementById('ruleSubmit');
+
+    const ruleStatus = document.getElementById('ruleStatus');
+
+    let joinActive = false;
 
     function getTypeString(type) {
       switch (type) {
@@ -1519,19 +1612,160 @@
     }
 
     function updateRulePreview() {
-
-      const preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
-
+      let preview;
+      if (joinActive) {
+        preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(inputType2.value).toUpperCase()}, ${inputRegister2.value}, ${getOperationString(op2.value)}, ${compareValue2.value},\n\tLOGIC_${ruleJoin.value.toUpperCase()},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
+      } else {
+        preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
+      }
       rulePreview.innerHTML = preview;
     }
 
-    inputType1.addEventListener('change', () => updateRulePreview());
-    inputRegister1.addEventListener('input', () => updateRulePreview());
-    op1.addEventListener('change', () => updateRulePreview());
-    compareValue1.addEventListener('input', () => updateRulePreview());
-    outputType.addEventListener('change', () => updateRulePreview());
-    outputRegister.addEventListener('input', () => updateRulePreview());
-    outputValue.addEventListener('input', () => updateRulePreview());
+    function newRuleProcessInput() {
+      updateRulePreview();
+
+      if (joinActive) {
+        if (inputType2.value == "Select" || Number(inputRegister2.value) < 0 || inputRegister2.value === "" || op2.value == "Select" || Number(compareValue2) < 0 || compareValue2.value === "") {
+          ruleSubmit.classList.add("d-none");
+          return;
+        }
+      }
+
+      if (inputType1.value == "Select" || Number(inputRegister1.value) < 0 || inputRegister1.value === "" || op1.value == "Select" || Number(compareValue1) < 0 || compareValue1.value === "" || outputType.value == "Select" || Number(outputRegister.value) < 0 || outputRegister.value === "" || Number(outputValue.value) < 0 || outputValue.value === "") {
+        ruleSubmit.classList.add("d-none");
+        return;
+      }
+
+      ruleSubmit.classList.remove("d-none");
+    }
+
+    ruleNew.addEventListener('click', () => {
+      ruleNew.classList.add("d-none");
+      ruleNewIf1.classList.remove("d-none");
+      ruleNewOutput.classList.remove("d-none");
+      rulePreviewArea.classList.remove("d-none");
+      ruleStatus.innerHTML = "";
+    });
+
+    ruleAddJoin.addEventListener('click', () => {
+      if (!joinActive) {
+        ruleJoinDiv.classList.remove("d-none");
+        ruleNewIf2.classList.remove("d-none");
+        ruleSubmit.classList.add("d-none");
+        joinActive = true;
+        newRuleProcessInput();
+
+        ruleAddJoin.innerText = "Remove Join";
+        ruleAddJoin.classList.remove("btn-primary");
+        ruleAddJoin.classList.add("btn-danger");
+      } else {
+        ruleJoinDiv.classList.add("d-none");
+        ruleNewIf2.classList.add("d-none");
+        joinActive = false;
+        newRuleProcessInput();
+
+        ruleAddJoin.innerText = "Add Join";
+        ruleAddJoin.classList.add("btn-primary");
+        ruleAddJoin.classList.remove("btn-danger");
+      }
+    });
+
+    function getJoinIndex(joinString) {
+      switch (joinString.toLowerCase()) {
+        case "and": return 2;
+        case "or": return 3;
+        default: return 0;
+      }
+    }
+
+    function getTypeIndex(typeString) {
+      switch (typeString.toLowerCase()) {
+        case "coil": return 1;
+        case "discrete input": return 2;
+        case "holding register": return 3;
+        case "input register": return 4;
+        default: return 0;
+      }
+    }
+
+    function getOperationIndex(operationString) {
+      switch (operationString.toLowerCase()) {
+        case "==": return 1;
+        case "!=": return 2;
+        case ">": return 3;
+        case "<": return 4;
+        case ">=": return 5;
+        case "<=": return 6;
+        default: return 0;
+      }
+    }
+
+    ruleSubmit.addEventListener('click', async () => {
+      try {
+        ruleStatus.textContent = 'Sending request...';
+
+        let url;
+        if (joinActive) {
+          url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+        } else {
+          url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          ruleStatus.innerHTML = `<div class="alert alert-success">Successfully added the rule.</div>`;
+
+          // Clean up
+          ruleNew.classList.remove("d-none");
+          ruleNewIf1.classList.add("d-none");
+          ruleNewOutput.classList.add("d-none");
+          rulePreviewArea.classList.add("d-none");
+          rulePreview.innerHTML = "";
+
+          inputType1.selectedIndex = 0;
+          inputType2.selectedIndex = 0;
+          inputRegister1.value = "";
+          inputRegister2.value = "";
+          op1.selectedIndex = 0;
+          op2.selectedIndex = 0;
+          compareValue1.value = "";
+          compareValue2.value = "";
+          outputType.selectedIndex = 0;
+          outputRegister.value = "";
+          outputValue.value = "";
+          ruleJoin. selectedIndex = 0;
+          
+          joinActive = false;
+          ruleAddJoin.classList.add("d-none");
+          ruleAddJoin.innerText = "Add Join";
+          ruleAddJoin.classList.add("btn-primary");
+          ruleAddJoin.classList.remove("btn-danger");
+
+          ruleSubmit.classList.add("d-none");
+
+        } else {
+          ruleStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+          ruleStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+      }
+    });
+
+
+    inputType1.addEventListener('change', () => newRuleProcessInput());
+    inputType2.addEventListener('change', () => newRuleProcessInput());
+    inputRegister1.addEventListener('input', () => newRuleProcessInput());
+    inputRegister2.addEventListener('input', () => newRuleProcessInput());
+    op1.addEventListener('change', () => newRuleProcessInput());
+    op2.addEventListener('change', () => newRuleProcessInput());
+    compareValue1.addEventListener('input', () => newRuleProcessInput());
+    compareValue2.addEventListener('input', () => newRuleProcessInput());
+    outputType.addEventListener('change', () => newRuleProcessInput());
+    outputRegister.addEventListener('input', () => newRuleProcessInput());
+    outputValue.addEventListener('input', () => newRuleProcessInput());
+    ruleJoin.addEventListener('change', () => newRuleProcessInput());
   </script>
 
 
