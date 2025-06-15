@@ -163,6 +163,7 @@
             if (data.success) {
               updateUI(true, selectedPort);
               statusPolling(true);
+              ruleListUpdate();
             } else {
               statusPolling(false);
               connectionStatus.textContent = `Failed: ${data.error}`;
@@ -182,6 +183,7 @@
 
             if (data.success) {
               updateUI(false, selectedPort);
+              ruleListUpdate();
             } else {
               connectionStatus.textContent = `Failed to disconnect: ${data.error}`;
               connectionStatus.classList.remove("text-success");
@@ -1432,11 +1434,19 @@
         </div>
         <div class="card m-3">
           <div class="card-body">
+            <div class="mb-3">
+              <h6>Statistics</h6>
+              <span id="ruleCount">Unknown Rules</span>
+            </div>
+          </div>
+        </div>
+        <div class="card m-3">
+          <div class="card-body">
             <div id="rulesBody" class="collapse show">
               <div class="mb-3">
-                <h6>Add New Rule</h6>
-                <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
+                <h6>Rule Creator</h6>
               </div>
+              <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
 
               <!-- New Rule If 1 -->
               <div id="ruleNewIf1" class="mb-3 d-none">
@@ -1556,6 +1566,26 @@
             </div>
           </div>
         </div>
+
+        <div class="card m-3">
+          <div class="card-body">
+            <div id="rulesBody" class="collapse show">
+              <div class="mb-3">
+                <h6>Active Rules</h6>
+              </div>
+
+              <div class="list-group mb-3" id="ruleList">
+                <!-- dynamically updated-->
+              </div>
+
+              <div id="ruleListViewArea" class="d-none mb-3">
+                <textarea id="ruleListViewAreaContent" class="form-control" rows="6" readonly></textarea>
+              </div>
+
+              <button id="ruleListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1587,7 +1617,16 @@
 
     const ruleStatus = document.getElementById('ruleStatus');
 
+    const ruleCount = document.getElementById('ruleCount');
+
+    const ruleList = document.getElementById('ruleList');
+    const ruleListRefresh = document.getElementById('ruleListRefresh');
+    const ruleListViewArea = document.getElementById('ruleListViewArea');
+    const ruleListViewAreaContent = document.getElementById('ruleListViewAreaContent');
+
     let joinActive = false;
+    let ruleCountNum = 0;
+    let ruleListArray = [];
 
     function getTypeString(type) {
       switch (type) {
@@ -1678,6 +1717,14 @@
       }
     }
 
+    function getJoinStringFromIndex(joinIndex) {
+      switch (joinIndex) {
+        case 2: return "LOGIC_AND";
+        case 3: return "LOGIC_OR";
+        default: return "LOGIC_NONE";
+      }
+    }
+
     function getTypeIndex(typeString) {
       switch (typeString.toLowerCase()) {
         case "coil": return 1;
@@ -1685,6 +1732,16 @@
         case "holding register": return 3;
         case "input register": return 4;
         default: return 0;
+      }
+    }
+
+    function getTypeStringFromIndex(typeIndex) {
+      switch (typeIndex) {
+        case 1: return "COIL";
+        case 2: return "DISCRETE";
+        case 3: return "HOLDING";
+        case 4: return "INPUT";
+        default: return "NULL";
       }
     }
 
@@ -1700,13 +1757,25 @@
       }
     }
 
+    function getOperationStringFromIndex(operationIndex) {
+      switch (operationIndex) {
+        case 1: return "CMP_EQ";
+        case 2: return "CMP_NEQ";
+        case 3: return "CMP_GT";
+        case 4: return "CMP_LT";
+        case 5: return "CMP_GTET";
+        case 6: return "CMP_LTET";
+        default: return "NULL";
+      }
+    }
+
     ruleSubmit.addEventListener('click', async () => {
       try {
         ruleStatus.textContent = 'Sending request...';
 
         let url;
         if (joinActive) {
-          url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+          url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2.value}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
         } else {
           url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
         }
@@ -1744,7 +1813,7 @@
           ruleAddJoin.classList.remove("btn-danger");
 
           ruleSubmit.classList.add("d-none");
-
+          ruleListUpdate();
         } else {
           ruleStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
         }
@@ -1753,6 +1822,58 @@
       }
     });
 
+    async function ruleCountUpdate() {
+      if (isConnected) {
+        let url = "/getrulecount";
+        const response = await fetch(url);
+        const data = await response.json();
+        ruleCountNum = parseInt(data.data);
+        let ruleText = "rule is";
+        if (ruleCountNum > 1 || ruleCountNum == 0) ruleText = "rules are";
+        ruleCount.innerText = `${ruleCountNum} ${ruleText} active.`;
+      } else {
+        ruleCount.innerText = "Please initiate a serial connection to view device status.";
+      }
+    }
+
+    async function ruleListUpdate() {
+      ruleList.innerHTML = "";
+      ruleListArray.length = 0;
+
+      if (isConnected) {
+        await ruleCountUpdate();
+        for (let i = 0; i < ruleCountNum; i++) {
+          // Actually store the rule data
+          let url = `/getrule?index=${i}`;
+          const response = await fetch(url);
+          const data = await response.json();
+          ruleListArray.push(data);
+          
+          // Update the ruleList
+          const item = document.createElement("button");
+          item.className = "list-group-item list-group-item-action";
+          item.textContent = `Rule ${i}`;
+          item.addEventListener("click", () => viewRule(i));
+          ruleList.appendChild(item);
+        }
+      }
+    }
+
+    function viewRule(index) {
+      if (index >= ruleListArray.length) return;
+      
+      ruleListViewArea.classList.remove("d-none");
+
+      const ruleData = ruleListArray[index].data;
+
+      let preview;
+      if (parseInt(ruleData.joinRaw) != 1) {
+        preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.input_type2Raw)}, ${ruleData.input_reg2}, ${getOperationStringFromIndex(ruleData.op2Raw)}, ${ruleData.compare_value2},\n\tLOGIC_${getJoinStringFromIndex(ruleData.joinRaw)},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
+      } else {
+        preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
+      }
+      ruleListViewAreaContent.innerHTML = preview;
+    }
 
     inputType1.addEventListener('change', () => newRuleProcessInput());
     inputType2.addEventListener('change', () => newRuleProcessInput());
@@ -1766,6 +1887,12 @@
     outputRegister.addEventListener('input', () => newRuleProcessInput());
     outputValue.addEventListener('input', () => newRuleProcessInput());
     ruleJoin.addEventListener('change', () => newRuleProcessInput());
+
+    ruleListRefresh.addEventListener('click', () => {
+      ruleListUpdate();
+      ruleListViewAreaContent.innerHTML = "";
+      ruleListViewArea.classList.add("d-none");
+    });
   </script>
 
 
@@ -1779,6 +1906,7 @@
       updateUI(true, currentPort, currentSlave);
       statusPolling(true);
     }
+    await ruleListUpdate();
   };
 </script>
   

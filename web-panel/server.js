@@ -113,19 +113,6 @@ app.get("/write", async (req, res) => {
 
 // -----
 
-function buildModbusFrame(slaveId, functionCode, payload) {
-    const frame = Buffer.alloc(payload.length + 2); // + 2 for slave & function
-    frame.writeUInt8(slaveId, 0);
-    frame.writeUInt8(functionCode, 1);
-    payload.copy(frame, 2);
-
-    const crcVal = ModbusRTU.crc16(frame);
-    const crcBuf = Buffer.alloc(2);
-    crcBuf.writeUInt16LE(crcVal, 0);
-
-    return Buffer.concat([frame, crcBuf]);
-}
-
 async function sendRule(slave, rule) {
     // Custom function
     const func = 0x65; // Function code 101
@@ -187,6 +174,88 @@ app.get("/addrule", async (req, res) => {
     }
 });
 
+
+// Get rule count
+app.get("/getrulecount", async (req, res) => {
+    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+    const func = 0x66;
+
+    const request = Buffer.alloc(2); // empty, but 2 bytes as the minimum modbus request length on the controller is 6 bytes
+
+    try {
+        const result = await modbus.sendRequest(func, request);
+
+        // Decode response
+        if (result.length < 5) throw new Error("Invalid response length");
+        if (result[2] !== 0x02) throw new Error("Unexpected byte count");
+
+        const ruleCount = (result[3] << 8) | result[4];
+
+        res.json({ data: ruleCount });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Get Rule
+app.get("/getrule", async (req, res) => {
+    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+    const func = 0x67;
+    const index = parseInt(req.query.index);
+
+    if (isNaN(index) || index < 0 || index > 0xFFFF) {
+        return res.status(400).json({ error: "Invalid or missing rule index" });
+    }
+
+    const request = Buffer.alloc(2);
+    request.writeUInt16BE(index, 0);
+
+    try {
+        const result = await modbus.sendRequest(func, request);
+
+        if (result.length < 20) {
+            throw new Error(`Response too short: expected 20+, got ${result.length}`);
+        }
+
+        // Decode result
+        const input_type1Raw = result[2];
+        const input_reg1 = (result[3] << 8) | result[4];
+        const op1Raw = result[5];
+        const compare_value1 = (result[6] << 8) | result[7];
+        const input_type2Raw = result[8];
+        const input_reg2 = (result[9] << 8) | result[10];
+        const op2Raw = result[11];
+        const compare_value2 = (result[12] << 8) | result[13];
+        const joinRaw = result[14];
+        const output_typeRaw = result[15];
+        const output_reg = (result[16] << 8) | result[17];
+        const output_value = (result[18] << 8) | result[19];
+
+        // Send parsed data
+        res.json({
+            data: {
+                input_type1Raw,
+                input_reg1,
+                op1Raw,
+                compare_value1,
+                input_type2Raw,
+                input_reg2,
+                op2Raw,
+                compare_value2,
+                joinRaw,
+                output_typeRaw,
+                output_reg,
+                output_value
+            }
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 // ------
