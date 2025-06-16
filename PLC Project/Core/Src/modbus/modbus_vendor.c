@@ -90,14 +90,20 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 				.output_value = output_value
 			};
 
-			automation_add_rule(newRule);
+
+			uint8_t statusByte = 0x01; // Successful
+
+			bool status = automation_add_rule(newRule);
+			if (status == false) {
+				statusByte = 0x00; // Unsuccessful -> no more rules allowable.
+			}
 
 			// Create the response frame
 			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
 
 			responseData[0] = slave_address; // the address of us
 			responseData[1] = MODBUS_VENDOR_FUNC_ADD_RULE;
-			responseData[2] = 0x01; // 1 byte to indicate success
+			responseData[2] = statusByte; // 1 byte to indicate success/failure
 
 			uint16_t responseLen = 3;
 
