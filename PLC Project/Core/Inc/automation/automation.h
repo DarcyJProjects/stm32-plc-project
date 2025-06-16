@@ -64,4 +64,6 @@ uint16_t automation_get_rule_count(void);
 
 bool automation_get_rule(uint16_t index, LogicRule* rule);
 
+bool automation_delete_rule(uint16_t index);
+
 #endif

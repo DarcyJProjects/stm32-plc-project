@@ -187,6 +187,33 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			modbus_send_response(responseData, responseLen);
 			break;
 		}
+		case MODBUS_VENDOR_FUNC_DEL_RULE: {
+			// Check request length (Slave Address, Function Code, Index High, Index Low, CRC Low, CRC High)
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			uint16_t ruleIndex = (frame[2] << 8) | frame[3];
+
+			bool status = automation_delete_rule(ruleIndex);
+			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_DEL_RULE;
+			responseData[2] = 0x01; // 1 byte to indicate success --> no failure byte at this point
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
 		default: {
 			modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
 			break;

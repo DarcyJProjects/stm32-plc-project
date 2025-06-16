@@ -8,3 +8,4 @@
 ../Core/Src/automation/automation.c:98:6:automation_add_rule	12	static
 ../Core/Src/automation/automation.c:108:10:automation_get_rule_count	4	static
 ../Core/Src/automation/automation.c:112:6:automation_get_rule	24	static
+../Core/Src/automation/automation.c:121:6:automation_delete_rule	16	static

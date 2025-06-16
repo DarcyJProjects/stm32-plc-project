@@ -117,3 +117,21 @@ bool automation_get_rule(uint16_t index, LogicRule* rule) {
 	*rule = rules[index];
 	return true;
 }
+
+bool automation_delete_rule(uint16_t index) {
+	if (index >= rule_count) {
+		return false;
+	}
+
+	// Shift elements after index down by 1
+	if (index < rule_count - 1) {
+		memmove(&rules[index], &rules[index + 1], (rule_count - index - 1) * sizeof(LogicRule));
+	}
+
+	// Clear the last element
+	memset(&rules[rule_count -1], 0, sizeof(LogicRule));
+
+	// Decrement the count
+	rule_count--;
+	return true;
+}
