@@ -5,14 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Control Panel - Embedded Controller</title>
   <!-- Bootstrap CSS CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="bg-light py-4">
+  
+  <!-- MODALS -->
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="confirmDeleteRuleModal" tabindex="-1" aria-labelledby="confirmDeleteRuleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteRuleModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        Are you sure you want to delete this rule? This action is irreversible.
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteRuleButton">Delete</button>
+      </div>
+
+    </div>
+  </div>
+  </div>
+
 
   <div class="container">
     <h1 class="mb-4">Embedded Controller Control Panel</h1>
@@ -30,6 +57,9 @@
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-rules" type="button" role="tab">Rules Manager</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-virtual" type="button" role="tab">Virtual Registers</button>
       </li>
     </ul>
 
@@ -1434,529 +1464,607 @@
         </script>
       </div>
       <div class="tab-pane fade" id="tab-rules" role="tabpanel">
-      <!-- Rules Manager -->
-      <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5>Rules Manager</h5>
-          <a class="btn btn-link" data-bs-toggle="collapse" href="#rulesBody">Toggle</a>
-        </div>
-        <div class="card m-3">
-          <div class="card-body">
-            <div class="mb-3">
-              <h6>Statistics</h6>
-              <span id="ruleCount">Unknown Rules</span>
-            </div>
+        <!-- Rules Manager -->
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Rules Manager</h5>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#rulesBody">Toggle</a>
           </div>
-        </div>
-        <div class="card m-3">
-          <div class="card-body">
-            <div id="rulesBody" class="collapse show">
+          <div class="card m-3">
+            <div class="card-body">
               <div class="mb-3">
-                <h6>Rule Designer</h6>
+                <h6>Statistics</h6>
+                <span id="ruleCount">Unknown Rules</span>
               </div>
-              <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
-
-              <!-- New Rule If 1 -->
-              <div id="ruleNewIf1" class="mb-3 d-none">
-                <span class="me-2">If</span>
-
-                <div class="d-inline-block me-2" style="width: 150px;">
-                  <select id="inputType1" class="form-select form-select-sm">
-                    <option>Select</option>
-                    <option>Coil</option>
-                    <option>Discrete Input</option>
-                    <option>Holding Register</option>
-                    <option>Input Register</option>
-                  </select>
-                </div>
-
-                <div class="d-inline-block me-2" style="width: 100px;">
-                  <input type="number" class="form-control form-control-sm" id="inputRegister1" placeholder="address" min="0" />
-                </div>
-
-                <div class="d-inline-block me-2" style="width: 85px;">
-                  <select id="op1" class="form-select form-select-sm">
-                    <option>Select</option>
-                    <option>==</option>
-                    <option>!=</option>
-                    <option>></option>
-                    <option><</option>
-                    <option>>=</option>
-                    <option><=</option>
-                  </select>
-                </div>
-
-                <div class="d-inline-block me-2" style="width: 100px;">
-                  <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
-                </div>
-                
-                <!-- join -->
-                <div id="ruleJoinDiv" class="d-inline-block me-2 d-none" style="width: 80px;">
-                  <select id="ruleJoin" class="form-select form-select-sm">
-                    <option>And</option>
-                    <option>Or</option>
-                  </select>
-                </div>
-
-                <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
-              </div>
-
-              <!-- New Rule If 2 -->
-              <div id="ruleNewIf2" class="mb-3 d-none">
-
-                <span class="me-2">If</span>
-
-                <div class="d-inline-block me-2" style="width: 150px;">
-                  <select id="inputType2" class="form-select form-select-sm">
-                    <option>Select</option>
-                    <option>Coil</option>
-                    <option>Discrete Input</option>
-                    <option>Holding Register</option>
-                    <option>Input Register</option>
-                  </select>
-                </div>
-
-                <div class="d-inline-block me-2" style="width: 100px;">
-                  <input type="number" class="form-control form-control-sm" id="inputRegister2" placeholder="address" min="0" />
-                </div>
-
-                <div class="d-inline-block me-2" style="width: 85px;">
-                  <select id="op2" class="form-select form-select-sm">
-                    <option>Select</option>
-                    <option>==</option>
-                    <option>!=</option>
-                    <option>></option>
-                    <option><</option>
-                    <option>>=</option>
-                    <option><=</option>
-                  </select>
-                </div>
-
-                <div class="d-inline-block me-2" style="width: 100px;">
-                  <input type="number" class="form-control form-control-sm" id="compareValue2" placeholder="value" min="0" />
-                </div>
-              </div>
-
-              <!-- New Rule Then -->
-              <div id="ruleNewOutput"class="mb-3 d-none">
-                <span class="me-2">Then set</span>
-
-                <div class="d-inline-block me-2" style="width: 150px;">
-                  <select id="outputType" class="form-select form-select-sm">
-                    <option>Select</option>
-                    <option>Coil</option>
-                    <option>Holding Register</option>
-                  </select>
-                </div>
-
-                <div class="d-inline-block me-2" style="width: 100px;">
-                  <input type="number" class="form-control form-control-sm" id="outputRegister" placeholder="address" min="0" />
-                </div>
-
-                <span class="me-2">to</span>
-
-                <div class="d-inline-block me-2" style="width: 100px;">
-                  <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
-                </div>
-              </div>
-  
-              <div id="rulePreviewArea" class="d-none mb-3">
-                <label for="rulePreview" class="form-label">Rule Preview:</label>
-                <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
-              </div>
-
-              <div>
-                <button id="ruleSubmit" class="btn btn-success d-inline-block d-none me-1">Add Rule</button>
-                <button id="ruleCancel" class="btn btn-danger d-inline-block d-none">Discard</button>
-              </div>
-
-              <div id="ruleStatus" class="mt-3"></div>
-
             </div>
           </div>
-        </div>
+          <div class="card m-3">
+            <div class="card-body">
+              <div id="rulesBody" class="collapse show">
+                <div class="mb-3">
+                  <h6>Rule Designer</h6>
+                </div>
+                <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
 
-        <div class="card m-3">
-          <div class="card-body">
-            <div id="rulesBody" class="collapse show">
-              <div class="mb-3">
-                <h6>Active Rules</h6>
+                <!-- New Rule If 1 -->
+                <div id="ruleNewIf1" class="mb-3 d-none">
+                  <span class="me-2">If</span>
+
+                  <div class="d-inline-block me-2" style="width: 150px;">
+                    <select id="inputType1" class="form-select form-select-sm">
+                      <option>Select</option>
+                      <option>Coil</option>
+                      <option>Discrete Input</option>
+                      <option>Holding Register</option>
+                      <option>Input Register</option>
+                    </select>
+                  </div>
+
+                  <div class="d-inline-block me-2" style="width: 100px;">
+                    <input type="number" class="form-control form-control-sm" id="inputRegister1" placeholder="address" min="0" />
+                  </div>
+
+                  <div class="d-inline-block me-2" style="width: 85px;">
+                    <select id="op1" class="form-select form-select-sm">
+                      <option>Select</option>
+                      <option>==</option>
+                      <option>!=</option>
+                      <option>></option>
+                      <option><</option>
+                      <option>>=</option>
+                      <option><=</option>
+                    </select>
+                  </div>
+
+                  <div class="d-inline-block me-2" style="width: 100px;">
+                    <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
+                  </div>
+                  
+                  <!-- join -->
+                  <div id="ruleJoinDiv" class="d-inline-block me-2 d-none" style="width: 80px;">
+                    <select id="ruleJoin" class="form-select form-select-sm">
+                      <option>And</option>
+                      <option>Or</option>
+                    </select>
+                  </div>
+
+                  <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
+                </div>
+
+                <!-- New Rule If 2 -->
+                <div id="ruleNewIf2" class="mb-3 d-none">
+
+                  <span class="me-2">If</span>
+
+                  <div class="d-inline-block me-2" style="width: 150px;">
+                    <select id="inputType2" class="form-select form-select-sm">
+                      <option>Select</option>
+                      <option>Coil</option>
+                      <option>Discrete Input</option>
+                      <option>Holding Register</option>
+                      <option>Input Register</option>
+                    </select>
+                  </div>
+
+                  <div class="d-inline-block me-2" style="width: 100px;">
+                    <input type="number" class="form-control form-control-sm" id="inputRegister2" placeholder="address" min="0" />
+                  </div>
+
+                  <div class="d-inline-block me-2" style="width: 85px;">
+                    <select id="op2" class="form-select form-select-sm">
+                      <option>Select</option>
+                      <option>==</option>
+                      <option>!=</option>
+                      <option>></option>
+                      <option><</option>
+                      <option>>=</option>
+                      <option><=</option>
+                    </select>
+                  </div>
+
+                  <div class="d-inline-block me-2" style="width: 100px;">
+                    <input type="number" class="form-control form-control-sm" id="compareValue2" placeholder="value" min="0" />
+                  </div>
+                </div>
+
+                <!-- New Rule Then -->
+                <div id="ruleNewOutput"class="mb-3 d-none">
+                  <span class="me-2">Then set</span>
+
+                  <div class="d-inline-block me-2" style="width: 150px;">
+                    <select id="outputType" class="form-select form-select-sm">
+                      <option>Select</option>
+                      <option>Coil</option>
+                      <option>Holding Register</option>
+                    </select>
+                  </div>
+
+                  <div class="d-inline-block me-2" style="width: 100px;">
+                    <input type="number" class="form-control form-control-sm" id="outputRegister" placeholder="address" min="0" />
+                  </div>
+
+                  <span class="me-2">to</span>
+
+                  <div class="d-inline-block me-2" style="width: 100px;">
+                    <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
+                  </div>
+                </div>
+    
+                <div id="rulePreviewArea" class="d-none mb-3">
+                  <label for="rulePreview" class="form-label">Rule Preview:</label>
+                  <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
+                </div>
+
+                <div>
+                  <button id="ruleSubmit" class="btn btn-success d-inline-block d-none me-1">Add Rule</button>
+                  <button id="ruleCancel" class="btn btn-danger d-inline-block d-none">Discard</button>
+                </div>
+
+                <div id="ruleStatus" class="mt-3"></div>
+
               </div>
-
-              <div class="list-group mb-3" id="ruleList">
-                <!-- dynamically updated-->
-              </div>
-
-              <div id="ruleListViewArea" class="d-none mb-3">
-                <textarea id="ruleListViewAreaContent" class="form-control" rows="6" readonly></textarea>
-              </div>
-
-              <button id="ruleListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
-              <button id="ruleListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
-
-              <div id="ruleListStatus" class="mt-3"></div>
             </div>
           </div>
-        </div>
-      </div>
-      </div>
-    </div>
-    <script>
-      const inputType1 = document.getElementById("inputType1");
-      const inputType2 = document.getElementById("inputType2");
-      const inputRegister1 = document.getElementById("inputRegister1");
-      const inputRegister2 = document.getElementById("inputRegister2");
-      const op1 = document.getElementById("op1");
-      const op2 = document.getElementById("op2");
-      const compareValue1 = document.getElementById("compareValue1");
-      const compareValue2 = document.getElementById("compareValue2");
-      const outputType = document.getElementById("outputType");
-      const outputRegister = document.getElementById("outputRegister");
-      const outputValue = document.getElementById("outputValue");
 
-      const rulePreview = document.getElementById("rulePreview");
-      const rulePreviewArea = document.getElementById("rulePreviewArea");
+          <div class="card m-3">
+            <div class="card-body">
+              <div id="rulesBody" class="collapse show">
+                <div class="mb-3">
+                  <h6>Active Rules</h6>
+                </div>
 
-      const ruleNew = document.getElementById('ruleNew');
-      const ruleNewIf1 = document.getElementById('ruleNewIf1');
-      const ruleJoin = document.getElementById('ruleJoin');
-      const ruleJoinDiv = document.getElementById('ruleJoinDiv');
-      const ruleNewIf2 = document.getElementById('ruleNewIf2');
-      const ruleNewOutput = document.getElementById('ruleNewOutput');
+                <div class="list-group mb-3" id="ruleList">
+                  <!-- dynamically updated-->
+                </div>
 
-      const ruleAddJoin = document.getElementById('ruleAddJoin');
-      const ruleSubmit = document.getElementById('ruleSubmit');
+                <div id="ruleListViewArea" class="d-none mb-3">
+                  <label id="ruleListViewAreaLabel" for="ruleListViewAreaContent" class="form-label">Rule:</label>
+                  <textarea id="ruleListViewAreaContent" class="form-control" rows="6" readonly></textarea>
+                </div>
 
-      const ruleStatus = document.getElementById('ruleStatus');
+                <button id="ruleListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
+                <button id="ruleListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
 
-      const ruleCount = document.getElementById('ruleCount');
+                <button id="ruleListDelete" class="btn btn-danger d-inline-block d-none">Delete</button>
 
-      const ruleList = document.getElementById('ruleList');
-      const ruleListRefresh = document.getElementById('ruleListRefresh');
-      const ruleListRefreshBusy = document.getElementById('ruleListRefreshBusy');
-      const ruleListViewArea = document.getElementById('ruleListViewArea');
-      const ruleListViewAreaContent = document.getElementById('ruleListViewAreaContent');
-      const ruleListStatus = document.getElementById('ruleListStatus');
+                <div id="ruleListStatus" class="mt-3"></div>
+              </div>
+            </div>
+          </div>
+          <script>
+            const inputType1 = document.getElementById("inputType1");
+            const inputType2 = document.getElementById("inputType2");
+            const inputRegister1 = document.getElementById("inputRegister1");
+            const inputRegister2 = document.getElementById("inputRegister2");
+            const op1 = document.getElementById("op1");
+            const op2 = document.getElementById("op2");
+            const compareValue1 = document.getElementById("compareValue1");
+            const compareValue2 = document.getElementById("compareValue2");
+            const outputType = document.getElementById("outputType");
+            const outputRegister = document.getElementById("outputRegister");
+            const outputValue = document.getElementById("outputValue");
 
-      const ruleCancel = document.getElementById('ruleCancel');
+            const rulePreview = document.getElementById("rulePreview");
+            const rulePreviewArea = document.getElementById("rulePreviewArea");
 
-      let joinActive = false;
-      let ruleCountNum = 0;
-      let ruleListArray = [];
+            const ruleNew = document.getElementById('ruleNew');
+            const ruleNewIf1 = document.getElementById('ruleNewIf1');
+            const ruleJoin = document.getElementById('ruleJoin');
+            const ruleJoinDiv = document.getElementById('ruleJoinDiv');
+            const ruleNewIf2 = document.getElementById('ruleNewIf2');
+            const ruleNewOutput = document.getElementById('ruleNewOutput');
 
-      function getTypeString(type) {
-        switch (type) {
-          case "Coil": return "coil";
-          case "Discrete Input": return "discrete";
-          case "Holding Register": return "holding";
-          case "Input Register": return "input";
-          default: return "null";
-        }
-      }
+            const ruleAddJoin = document.getElementById('ruleAddJoin');
+            const ruleSubmit = document.getElementById('ruleSubmit');
 
-      function getOperationString(operation) {
-        switch (operation) {
-          case "==": return "CMP_EQ";
-          case "!=": return "CMP_NEQ";
-          case ">": return "CMP_GT";
-          case "<": return "CMP_LT";
-          case ">=": return "CMP_GTET";
-          case "<=": return "CMP_LTET";
-          default: return "null";
-        }
-      }
+            const ruleStatus = document.getElementById('ruleStatus');
 
-      function updateRulePreview() {
-        let preview;
-        if (joinActive) {
-          preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(inputType2.value).toUpperCase()}, ${inputRegister2.value}, ${getOperationString(op2.value)}, ${compareValue2.value},\n\tLOGIC_${ruleJoin.value.toUpperCase()},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
-        } else {
-          preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
-        }
-        rulePreview.innerHTML = preview;
-      }
+            const ruleCount = document.getElementById('ruleCount');
 
-      function newRuleProcessInput() {
-        updateRulePreview();
+            const ruleList = document.getElementById('ruleList');
+            const ruleListRefresh = document.getElementById('ruleListRefresh');
+            const ruleListRefreshBusy = document.getElementById('ruleListRefreshBusy');
+            const ruleListViewArea = document.getElementById('ruleListViewArea');
+            const ruleListViewAreaLabel = document.getElementById('ruleListViewAreaLabel');
+            const ruleListViewAreaContent = document.getElementById('ruleListViewAreaContent');
+            const ruleListStatus = document.getElementById('ruleListStatus');
 
-        if (joinActive) {
-          if (inputType2.value == "Select" || Number(inputRegister2.value) < 0 || inputRegister2.value === "" || op2.value == "Select" || Number(compareValue2) < 0 || compareValue2.value === "") {
-            ruleSubmit.classList.add("d-none");
-            return;
-          }
-        }
+            const ruleCancel = document.getElementById('ruleCancel');
 
-        if (inputType1.value == "Select" || Number(inputRegister1.value) < 0 || inputRegister1.value === "" || op1.value == "Select" || Number(compareValue1) < 0 || compareValue1.value === "" || outputType.value == "Select" || Number(outputRegister.value) < 0 || outputRegister.value === "" || Number(outputValue.value) < 0 || outputValue.value === "") {
-          ruleSubmit.classList.add("d-none");
-          return;
-        }
+            const ruleListDelete = document.getElementById('ruleListDelete');
+            const confirmDeleteRuleButton = document.getElementById('confirmDeleteRuleButton');
+            const modalRTD = new bootstrap.Modal(document.getElementById('confirmDeleteRuleModal'));
 
-        ruleSubmit.classList.remove("d-none");
-      }
+            let ruleToDelete = null;
 
-      ruleNew.addEventListener('click', () => {
-        ruleNew.classList.add("d-none");
-        ruleNewIf1.classList.remove("d-none");
-        ruleNewOutput.classList.remove("d-none");
-        rulePreviewArea.classList.remove("d-none");
-        ruleCancel.classList.remove("d-none");
-        ruleStatus.innerHTML = "";
-      });
+            let joinActive = false;
+            let ruleCountNum = 0;
+            let ruleListArray = [];
 
-      ruleAddJoin.addEventListener('click', () => {
-        if (!joinActive) {
-          ruleJoinDiv.classList.remove("d-none");
-          ruleNewIf2.classList.remove("d-none");
-          ruleSubmit.classList.add("d-none");
-          joinActive = true;
-          newRuleProcessInput();
-
-          ruleAddJoin.innerText = "Remove Join";
-          ruleAddJoin.classList.remove("btn-primary");
-          ruleAddJoin.classList.add("btn-danger");
-        } else {
-          ruleJoinDiv.classList.add("d-none");
-          ruleNewIf2.classList.add("d-none");
-          joinActive = false;
-          newRuleProcessInput();
-
-          ruleAddJoin.innerText = "Add Join";
-          ruleAddJoin.classList.add("btn-primary");
-          ruleAddJoin.classList.remove("btn-danger");
-        }
-      });
-
-      function getJoinIndex(joinString) {
-        switch (joinString.toLowerCase()) {
-          case "and": return 2;
-          case "or": return 3;
-          default: return 0;
-        }
-      }
-
-      function getJoinStringFromIndex(joinIndex) {
-        switch (joinIndex) {
-          case 2: return "LOGIC_AND";
-          case 3: return "LOGIC_OR";
-          default: return "LOGIC_NONE";
-        }
-      }
-
-      function getTypeIndex(typeString) {
-        switch (typeString.toLowerCase()) {
-          case "coil": return 1;
-          case "discrete input": return 2;
-          case "holding register": return 3;
-          case "input register": return 4;
-          default: return 0;
-        }
-      }
-
-      function getTypeStringFromIndex(typeIndex) {
-        switch (typeIndex) {
-          case 1: return "COIL";
-          case 2: return "DISCRETE";
-          case 3: return "HOLDING";
-          case 4: return "INPUT";
-          default: return "NULL";
-        }
-      }
-
-      function getOperationIndex(operationString) {
-        switch (operationString.toLowerCase()) {
-          case "==": return 1;
-          case "!=": return 2;
-          case ">": return 3;
-          case "<": return 4;
-          case ">=": return 5;
-          case "<=": return 6;
-          default: return 0;
-        }
-      }
-
-      function getOperationStringFromIndex(operationIndex) {
-        switch (operationIndex) {
-          case 1: return "CMP_EQ";
-          case 2: return "CMP_NEQ";
-          case 3: return "CMP_GT";
-          case 4: return "CMP_LT";
-          case 5: return "CMP_GTET";
-          case 6: return "CMP_LTET";
-          default: return "NULL";
-        }
-      }
-
-      ruleSubmit.addEventListener('click', async () => {
-        try {
-          ruleStatus.textContent = 'Sending request...';
-
-          let url;
-          if (joinActive) {
-            url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2.value}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
-          } else {
-            url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
-          }
-          
-          const response = await fetch(url);
-          const data = await response.json();
-
-          if (response.ok) {
-            ruleStatus.innerHTML = `<div class="alert alert-success">Successfully added the rule.</div>`;
-
-            ruleCleanup();
-            ruleListUpdate();
-          } else {
-            ruleStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
-          }
-        } catch (err) {
-            ruleStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
-        }
-      });
-
-      function ruleCleanup() {
-        // Clean up
-        ruleNew.classList.remove("d-none");
-        ruleNewIf1.classList.add("d-none");
-        ruleNewOutput.classList.add("d-none");
-        ruleNewIf2.classList.add("d-none");
-        rulePreviewArea.classList.add("d-none");
-        rulePreview.innerHTML = "";
-
-        ruleCancel.classList.add("d-none");
-
-        inputType1.selectedIndex = 0;
-        inputType2.selectedIndex = 0;
-        inputRegister1.value = "";
-        inputRegister2.value = "";
-        op1.selectedIndex = 0;
-        op2.selectedIndex = 0;
-        compareValue1.value = "";
-        compareValue2.value = "";
-        outputType.selectedIndex = 0;
-        outputRegister.value = "";
-        outputValue.value = "";
-        ruleJoin.selectedIndex = 0;
-
-        ruleStatus.innerHTML = "";
-        
-        joinActive = false;
-        ruleAddJoin.innerText = "Add Join";
-        ruleAddJoin.classList.add("btn-primary");
-        ruleAddJoin.classList.remove("btn-danger");
-
-        ruleJoinDiv.classList.add("d-none");
-
-        ruleSubmit.classList.add("d-none");
-      }
-
-      ruleCancel.addEventListener('click', () => {
-        ruleCleanup();
-      });
-
-      async function ruleCountUpdate() {
-        if (isConnected) {
-          let url = "/getrulecount";
-          const response = await fetch(url);
-          const data = await response.json();
-          ruleCountNum = parseInt(data.data);
-          let ruleText = "rule is";
-          if (ruleCountNum > 1 || ruleCountNum == 0) ruleText = "rules are";
-          ruleCount.innerText = `${ruleCountNum} ${ruleText} active.`;
-        } else {
-          ruleCount.innerText = "Please initiate a serial connection to view device status.";
-        }
-      }
-
-      async function ruleListUpdate() {
-        // Pause status polling as this repeated modbus TX and RX can take some time
-        await statusPolling(false);
-        
-        ruleListRefresh.classList.add("d-none");
-        ruleListRefreshBusy.classList.remove("d-none");
-
-        let ruleListStatusBuffer = "";
-        ruleList.innerHTML = "";
-        ruleListArray.length = 0;
-
-        if (isConnected) {
-          await ruleCountUpdate();
-          ruleListStatus.innerHTML = '';
-          for (let i = 0; i < ruleCountNum; i++) {
-            // Actually store the rule data
-            let url = `/getrule?index=${i}`;
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (!response.ok) {
-              ruleListStatusBuffer = ruleListStatusBuffer + `Error: ${data.error || 'Unknown error'}<br>`;
-              continue;
+            function getTypeString(type) {
+              switch (type) {
+                case "Coil": return "coil";
+                case "Discrete Input": return "discrete";
+                case "Holding Register": return "holding";
+                case "Input Register": return "input";
+                default: return "null";
+              }
             }
 
-            ruleListArray.push(data);
-            
-            // Update the ruleList
-            const item = document.createElement("button");
-            item.className = "list-group-item list-group-item-action";
-            item.textContent = `Rule ${i}`;
-            item.addEventListener("click", () => viewRule(i));
-            ruleList.appendChild(item);
-          }
-        }
+            function getOperationString(operation) {
+              switch (operation) {
+                case "==": return "CMP_EQ";
+                case "!=": return "CMP_NEQ";
+                case ">": return "CMP_GT";
+                case "<": return "CMP_LT";
+                case ">=": return "CMP_GTET";
+                case "<=": return "CMP_LTET";
+                default: return "null";
+              }
+            }
 
-        if (ruleListArray.length != ruleCountNum) {
-          ruleListStatusBuffer = ruleListStatusBuffer + `Error: The number of successfully read rules does not equal the reported number of rules.<br><br><b>If graph polling is active, try stopping it temporarily. If another instance (browser tab) of the web panel is open, it's status update requests (and if active, graph polling requests) will likely interfere.</b><br>`;
-        }
+            function updateRulePreview() {
+              let preview;
+              if (joinActive) {
+                preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(inputType2.value).toUpperCase()}, ${inputRegister2.value}, ${getOperationString(op2.value)}, ${compareValue2.value},\n\tLOGIC_${ruleJoin.value.toUpperCase()},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
+              } else {
+                preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
+              }
+              rulePreview.innerHTML = preview;
+            }
 
-        if (ruleListStatusBuffer != "") {
-          ruleListStatus.innerHTML = `<div class="alert alert-danger">${ruleListStatusBuffer}</div>`;
-          ruleList.innerHTML = "";
-        }
+            function newRuleProcessInput() {
+              updateRulePreview();
 
-        await statusPolling(true);
+              if (joinActive) {
+                if (inputType2.value == "Select" || Number(inputRegister2.value) < 0 || inputRegister2.value === "" || op2.value == "Select" || Number(compareValue2) < 0 || compareValue2.value === "") {
+                  ruleSubmit.classList.add("d-none");
+                  return;
+                }
+              }
 
-        ruleListRefresh.classList.remove("d-none");
-        ruleListRefreshBusy.classList.add("d-none");
-      }
+              if (inputType1.value == "Select" || Number(inputRegister1.value) < 0 || inputRegister1.value === "" || op1.value == "Select" || Number(compareValue1) < 0 || compareValue1.value === "" || outputType.value == "Select" || Number(outputRegister.value) < 0 || outputRegister.value === "" || Number(outputValue.value) < 0 || outputValue.value === "") {
+                ruleSubmit.classList.add("d-none");
+                return;
+              }
 
-      function viewRule(index) {
-        if (index >= ruleListArray.length) return;
-        
-        ruleListViewArea.classList.remove("d-none");
+              ruleSubmit.classList.remove("d-none");
+            }
 
-        const ruleData = ruleListArray[index].data;
+            ruleNew.addEventListener('click', () => {
+              ruleNew.classList.add("d-none");
+              ruleNewIf1.classList.remove("d-none");
+              ruleNewOutput.classList.remove("d-none");
+              rulePreviewArea.classList.remove("d-none");
+              ruleCancel.classList.remove("d-none");
+              ruleStatus.innerHTML = "";
+            });
 
-        let preview;
-        if (parseInt(ruleData.joinRaw) != 1) {
-          preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.input_type2Raw)}, ${ruleData.input_reg2}, ${getOperationStringFromIndex(ruleData.op2Raw)}, ${ruleData.compare_value2},\n\tLOGIC_${getJoinStringFromIndex(ruleData.joinRaw)},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
-        } else {
-          preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
-        }
-        ruleListViewAreaContent.innerHTML = preview;
-      }
+            ruleAddJoin.addEventListener('click', () => {
+              if (!joinActive) {
+                ruleJoinDiv.classList.remove("d-none");
+                ruleNewIf2.classList.remove("d-none");
+                ruleSubmit.classList.add("d-none");
+                joinActive = true;
+                newRuleProcessInput();
 
-      inputType1.addEventListener('change', () => newRuleProcessInput());
-      inputType2.addEventListener('change', () => newRuleProcessInput());
-      inputRegister1.addEventListener('input', () => newRuleProcessInput());
-      inputRegister2.addEventListener('input', () => newRuleProcessInput());
-      op1.addEventListener('change', () => newRuleProcessInput());
-      op2.addEventListener('change', () => newRuleProcessInput());
-      compareValue1.addEventListener('input', () => newRuleProcessInput());
-      compareValue2.addEventListener('input', () => newRuleProcessInput());
-      outputType.addEventListener('change', () => newRuleProcessInput());
-      outputRegister.addEventListener('input', () => newRuleProcessInput());
-      outputValue.addEventListener('input', () => newRuleProcessInput());
-      ruleJoin.addEventListener('change', () => newRuleProcessInput());
+                ruleAddJoin.innerText = "Remove Join";
+                ruleAddJoin.classList.remove("btn-primary");
+                ruleAddJoin.classList.add("btn-danger");
+              } else {
+                ruleJoinDiv.classList.add("d-none");
+                ruleNewIf2.classList.add("d-none");
+                joinActive = false;
+                newRuleProcessInput();
 
-      ruleListRefresh.addEventListener('click', () => {
-        ruleListUpdate();
-        ruleListViewAreaContent.innerHTML = "";
-        ruleListViewArea.classList.add("d-none");
-      });
-    </script>
+                ruleAddJoin.innerText = "Add Join";
+                ruleAddJoin.classList.add("btn-primary");
+                ruleAddJoin.classList.remove("btn-danger");
+              }
+            });
+
+            function getJoinIndex(joinString) {
+              switch (joinString.toLowerCase()) {
+                case "and": return 2;
+                case "or": return 3;
+                default: return 0;
+              }
+            }
+
+            function getJoinStringFromIndex(joinIndex) {
+              switch (joinIndex) {
+                case 2: return "LOGIC_AND";
+                case 3: return "LOGIC_OR";
+                default: return "LOGIC_NONE";
+              }
+            }
+
+            function getTypeIndex(typeString) {
+              switch (typeString.toLowerCase()) {
+                case "coil": return 1;
+                case "discrete input": return 2;
+                case "holding register": return 3;
+                case "input register": return 4;
+                default: return 0;
+              }
+            }
+
+            function getTypeStringFromIndex(typeIndex) {
+              switch (typeIndex) {
+                case 1: return "COIL";
+                case 2: return "DISCRETE";
+                case 3: return "HOLDING";
+                case 4: return "INPUT";
+                default: return "NULL";
+              }
+            }
+
+            function getOperationIndex(operationString) {
+              switch (operationString.toLowerCase()) {
+                case "==": return 1;
+                case "!=": return 2;
+                case ">": return 3;
+                case "<": return 4;
+                case ">=": return 5;
+                case "<=": return 6;
+                default: return 0;
+              }
+            }
+
+            function getOperationStringFromIndex(operationIndex) {
+              switch (operationIndex) {
+                case 1: return "CMP_EQ";
+                case 2: return "CMP_NEQ";
+                case 3: return "CMP_GT";
+                case 4: return "CMP_LT";
+                case 5: return "CMP_GTET";
+                case 6: return "CMP_LTET";
+                default: return "NULL";
+              }
+            }
+
+            ruleSubmit.addEventListener('click', async () => {
+              try {
+                ruleStatus.textContent = 'Sending request...';
+
+                let url;
+                if (joinActive) {
+                  url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2.value}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+                } else {
+                  url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (response.ok) {
+                  ruleStatus.innerHTML = `<div class="alert alert-success">Successfully added the rule.</div>`;
+
+                  ruleCleanup();
+                  ruleListUpdate();
+                } else {
+                  ruleStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                }
+              } catch (err) {
+                  ruleStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              }
+            });
+
+            function ruleCleanup() {
+              // Clean up
+              
+              ruleNew.classList.remove("d-none");
+              ruleNewIf1.classList.add("d-none");
+              ruleNewOutput.classList.add("d-none");
+              ruleNewIf2.classList.add("d-none");
+              rulePreviewArea.classList.add("d-none");
+              rulePreview.innerHTML = "";
+
+              ruleCancel.classList.add("d-none");
+
+              inputType1.selectedIndex = 0;
+              inputType2.selectedIndex = 0;
+              inputRegister1.value = "";
+              inputRegister2.value = "";
+              op1.selectedIndex = 0;
+              op2.selectedIndex = 0;
+              compareValue1.value = "";
+              compareValue2.value = "";
+              outputType.selectedIndex = 0;
+              outputRegister.value = "";
+              outputValue.value = "";
+              ruleJoin.selectedIndex = 0;
+
+              ruleStatus.innerHTML = "";
+              
+              joinActive = false;
+              ruleAddJoin.innerText = "Add Join";
+              ruleAddJoin.classList.add("btn-primary");
+              ruleAddJoin.classList.remove("btn-danger");
+
+              ruleJoinDiv.classList.add("d-none");
+
+              ruleSubmit.classList.add("d-none");
+            }
+
+            ruleCancel.addEventListener('click', () => {
+              ruleCleanup();
+            });
+
+            async function ruleCountUpdate() {
+              if (isConnected) {
+                let url = "/getrulecount";
+                const response = await fetch(url);
+                const data = await response.json();
+                ruleCountNum = parseInt(data.data);
+                let ruleText = "rule is";
+                if (ruleCountNum > 1 || ruleCountNum == 0) ruleText = "rules are";
+                ruleCount.innerText = `${ruleCountNum} ${ruleText} active.`;
+              } else {
+                ruleCount.innerText = "Please initiate a serial connection to view device status.";
+              }
+            }
+
+            async function ruleListUpdate() {
+              // Pause status polling as this repeated modbus TX and RX can take some time
+              await statusPolling(false);
+
+              ruleToDelete = null;
+              ruleListDelete.classList.add("d-none");
+              
+              ruleListRefresh.classList.add("d-none");
+              ruleListRefreshBusy.classList.remove("d-none");
+
+              let ruleListStatusBuffer = "";
+              ruleList.innerHTML = "";
+              ruleListArray.length = 0;
+
+              if (isConnected) {
+                await ruleCountUpdate();
+                ruleListStatus.innerHTML = '';
+                for (let i = 0; i < ruleCountNum; i++) {
+                  // Actually store the rule data
+                  let url = `/getrule?index=${i}`;
+                  const response = await fetch(url);
+                  const data = await response.json();
+
+                  if (!response.ok) {
+                    ruleListStatusBuffer = ruleListStatusBuffer + `Error: ${data.error || 'Unknown error'}<br>`;
+                    continue;
+                  }
+
+                  ruleListArray.push(data);
+                  
+                  // Update the ruleList
+                  const item = document.createElement("button");
+                  item.className = "list-group-item list-group-item-action";
+                  item.textContent = `Rule ${i}`;
+                  item.addEventListener("click", () => viewRule(i));
+                  ruleList.appendChild(item);
+                }
+              }
+
+              if (ruleListArray.length != ruleCountNum) {
+                ruleListStatusBuffer = ruleListStatusBuffer + `Error: The number of successfully read rules does not equal the reported number of rules.<br><br><b>If graph polling is active, try stopping it temporarily. If another instance (browser tab) of the web panel is open, it's status update requests (and if active, graph polling requests) will likely interfere.</b><br>`;
+              }
+
+              if (ruleListStatusBuffer != "") {
+                ruleListStatus.innerHTML = `<div class="alert alert-danger">${ruleListStatusBuffer}</div>`;
+                ruleList.innerHTML = "";
+              }
+
+              await statusPolling(true);
+
+              ruleListRefresh.classList.remove("d-none");
+              ruleListRefreshBusy.classList.add("d-none");
+            }
+
+            function viewRule(index) {
+              if (index >= ruleListArray.length) {
+                ruleToDelete = null;
+                return;
+              }
+
+              ruleToDelete = index;
+              ruleListDelete.classList.remove("d-none");
+              
+              ruleListViewAreaLabel.innerHTML = `<b>Viewing Rule ${index}:</b>`;
+              ruleListViewArea.classList.remove("d-none");
+
+              const ruleData = ruleListArray[index].data;
+
+              let preview;
+              if (parseInt(ruleData.joinRaw) != 1) {
+                preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.input_type2Raw)}, ${ruleData.input_reg2}, ${getOperationStringFromIndex(ruleData.op2Raw)}, ${ruleData.compare_value2},\n\tLOGIC_${getJoinStringFromIndex(ruleData.joinRaw)},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
+              } else {
+                preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
+              }
+              ruleListViewAreaContent.innerHTML = preview;
+            }
+
+            confirmDeleteRuleButton.addEventListener('click', () => {
+              if (ruleToDelete !== null) {
+                deleteRule(ruleToDelete);
+
+                ruleToDelete = null;
+                bootstrap.Modal.getInstance(document.getElementById('confirmDeleteRuleModal')).hide();
+              }
+            });
+
+            async function deleteRule(index) {
+              try{
+                if (isConnected) {
+                  let url = `/deleterule?index=${index}`;
+                  const response = await fetch(url);
+                  const data = await response.json();
+
+                  if (response.ok) {
+                    await ruleListUpdate();
+                    ruleListStatus.innerHTML = `<div class="alert alert-success">Successfully deleted the rule with ID=${index}.</div>`;
+                    ruleListViewArea.classList.add("d-none");
+                  } else {
+                    ruleListStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                  }
+                } else {
+                  ruleListStatus.innerText = "No serial connection is currently active.";
+                }
+              } catch (err) {
+                  ruleStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              }
+            }
+
+            inputType1.addEventListener('change', () => newRuleProcessInput());
+            inputType2.addEventListener('change', () => newRuleProcessInput());
+            inputRegister1.addEventListener('input', () => newRuleProcessInput());
+            inputRegister2.addEventListener('input', () => newRuleProcessInput());
+            op1.addEventListener('change', () => newRuleProcessInput());
+            op2.addEventListener('change', () => newRuleProcessInput());
+            compareValue1.addEventListener('input', () => newRuleProcessInput());
+            compareValue2.addEventListener('input', () => newRuleProcessInput());
+            outputType.addEventListener('change', () => newRuleProcessInput());
+            outputRegister.addEventListener('input', () => newRuleProcessInput());
+            outputValue.addEventListener('input', () => newRuleProcessInput());
+            ruleJoin.addEventListener('change', () => newRuleProcessInput());
+
+            ruleListDelete.addEventListener('click', () => modalRTD.show());
+
+            ruleListRefresh.addEventListener('click', () => {
+              ruleListUpdate();
+              ruleListViewAreaContent.innerHTML = "";
+              ruleListViewArea.classList.add("d-none");
+            });
+          </script>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="tab-virtual" role="tabpanel">
+        <!-- Virtual Registers -->
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Virtual Registers</h5>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#virualBody">Toggle</a>
+          </div>
+          <div class="card m-3">
+            <div class="card-body">
+              <div class="mb-3">
+                <h6>Statistics</h6>
+                <span id="ruleCount">Unknown Rules</span>
+              </div>
+            </div>
+          </div>
+          <div class="card m-3">
+            <div class="card-body">
+              <div id="rulesBody" class="collapse show">
+                <div class="mb-3">
+                  <h6>Rule Designer</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
-
 
 <!-- WINDOW ON LOAD -->
 <script>
@@ -1970,12 +2078,6 @@
     await ruleListUpdate();
   };
 </script>
-  
-
-  
-
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
 </body>
 </html>

@@ -270,6 +270,38 @@ app.get("/getrule", async (req, res) => {
     }
 });
 
+// Delete Rule
+app.get("/deleterule", async (req, res) => {
+    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+    const func = 0x68;
+
+    const index = parseInt(req.query.index);
+
+    if (isNaN(index) || index < 0 || index > 0xFFFF) {
+        return res.status(400).json({ error: "Invalid or missing rule index" });
+    }
+
+    const request = Buffer.alloc(2);
+    request.writeUInt16BE(index, 0);
+
+    try {
+        const result = await modbus.sendRequest(func, request);
+
+        // Check response
+        if (result.length < 3) throw new Error("Invalid response length");
+        if (result[2] !== 0x01) throw new Error("Invalid status byte");
+
+        res.json({
+            success: true,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 // ------
 // List serial ports
