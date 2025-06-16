@@ -166,8 +166,21 @@ app.get("/addrule", async (req, res) => {
         };
 
         const sendRes = await sendRule(currentSlave, rule);
-        res.json({ success: true, raw: sendRes.toString("hex") });
 
+        // Get status byte to discern success
+        const statusByte = sendRes[2]; // index 2 = 3rd byte
+
+        if (statusByte === 1) { // true if 0x01 (success)
+            res.json({
+                success: true,
+                raw: sendRes.toString("hex") 
+            });
+        } else { // false if 0x00 (failure due to max rules reached)
+            res.status(409).json({
+                error: "Rule not added - maximum number of rules already reached.",
+                statusByte
+            });
+        }
     } catch (err) {
         console.error("Failed to add rule:", err);
         res.status(500).json({ error: err.message });
