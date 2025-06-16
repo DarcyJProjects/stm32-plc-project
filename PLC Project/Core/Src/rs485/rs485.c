@@ -82,7 +82,7 @@ void RS485_Transmit(uint8_t *data, uint16_t len) {
 		rs485_tx_frame_queue[rs485_tx_frame_head].len = len;
 		rs485_tx_frame_head = next;
     } else {
-    	// TODO: Handle overflow...
+    	usb_serial_println("TX queue overflow!");
     }
 }
 
@@ -101,11 +101,13 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 				rs485_rx_frame_head = next;
 			}
 		} else {
-			// TODO: Handle overflow...
+			usb_serial_println("RX queue overflow!");
 		}
 
 		// Ready for next reception
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
+		if (HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE) != HAL_OK) {
+		    usb_serial_println("Failed to re-arm UART RX DMA!");
+		}
 	}
 }
 
@@ -177,9 +179,12 @@ void RS485_TransmitPendingFrames(void) {
 	}
 }
 
-
-
-
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART1) {
+        usb_serial_println("UART Error! Reinitializing RX...");
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RS485_DMA_BUFFER, RS485_DMA_BUFFER_SIZE);
+    }
+}
 
 
 

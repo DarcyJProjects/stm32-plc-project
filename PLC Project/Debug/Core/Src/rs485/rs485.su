@@ -3,6 +3,7 @@
 ../Core/Src/rs485/rs485.c:56:6:RS485_Setup	16	static
 ../Core/Src/rs485/rs485.c:71:6:RS485_Transmit	24	static
 ../Core/Src/rs485/rs485.c:90:6:HAL_UARTEx_RxEventCallback	24	static
-../Core/Src/rs485/rs485.c:112:6:RS485_TCCallback	8	static
-../Core/Src/rs485/rs485.c:127:6:RS485_ProcessPendingFrames	16	static
-../Core/Src/rs485/rs485.c:138:6:RS485_TransmitPendingFrames	16	static
+../Core/Src/rs485/rs485.c:114:6:RS485_TCCallback	8	static
+../Core/Src/rs485/rs485.c:129:6:RS485_ProcessPendingFrames	16	static
+../Core/Src/rs485/rs485.c:140:6:RS485_TransmitPendingFrames	16	static
+../Core/Src/rs485/rs485.c:182:6:HAL_UART_ErrorCallback	16	static
