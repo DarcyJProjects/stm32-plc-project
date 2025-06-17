@@ -40,6 +40,14 @@
   </div>
   </div>
 
+  <!-- STATUS ALERTS -->
+  <script>
+    function newStatus(alertClass, message) {
+      let html = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+      return html;
+    }
+  </script>
+
 
   <div class="container">
     <h1 class="mb-4">Embedded Controller Control Panel</h1>
@@ -272,10 +280,10 @@
               } else {
                 statusVoltage.innerText = statusVoltageDefaultText;
                 statusCurrent.innerText = "";
-                statusStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                statusStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
               }
             } catch (err) {
-                statusStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+                statusStatus.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
             }
           }
 
@@ -547,12 +555,12 @@
             const data = await response.json();
 
             if (response.ok) {
-              coilStatusW.innerHTML = `<div class="alert alert-success">Coil at address ${address} set to ${valInt}.</div>`;
+              coilStatusW.innerHTML = newStatus("alert-success", `Coil at address ${address} set to ${valInt}`);
             } else {
-              coilStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              coilStatusW.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-              coilStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              coilStatusW.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -567,12 +575,12 @@
             const data = await response.json();
 
             if (response.ok) {
-              coilStatusWM.innerHTML = `<div class="alert alert-success">Coils starting at address ${address} set to ${valueArray}.</div>`;
+              coilStatusWM.innerHTML = newStatus("alert-success", `Coils starting at address ${address} set to ${valueArray}.`);
             } else {
-              coilStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              coilStatusWM.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-            coilStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+            coilStatusWM.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -607,10 +615,10 @@
                 valueRow.appendChild(cell2);
               }
             } else {
-              coilStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              coilStatusR.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-              coilStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              coilStatusR.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -624,7 +632,7 @@
           coilStatusWM.innerHTML = "";
 
           if (Number(quan) > 256) {
-            coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
+            coilStatusWM.innerHTML = newStatus("alert-warning", `Please enter a quantity less than or equal to 256.`);
             return;
           }
 
@@ -665,7 +673,7 @@
         coilSendW.addEventListener('click', () => {
           const addr = coilAddressW.value;
           if (addr === '' || Number(addr) < 0) {
-            coilStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+            coilStatusW.innerHTML = newStatus("alert-warning", `Please enter a valid coil address (0 or higher).`);
             return;
           }
           const val = coilToggleW.checked;
@@ -677,11 +685,11 @@
           const quantity = parseInt(coilQuantityWM.value);
 
           if (isNaN(address) || address < 0) {
-            coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+            coilStatusWM.innerHTML = newStatus("alert-warning", `Please enter a valid coil address (0 or higher).`);
             return;
           }
           if (isNaN(quantity) || quantity < 1) {
-            coilStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
+            coilStatusWM.innerHTML = newStatus("alert-warning", `Please enter a valid quantity to write (1 or higher).`);
             return;
           }
 
@@ -705,11 +713,11 @@
           valueRow.innerHTML = "";
 
           if (addr === '' || Number(addr) < 0) {
-            coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid coil address (0 or higher).</div>`;
+            coilStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid coil address (0 or higher).`);
             return;
           }
           if (quan === '' || Number(quan) < 1) {
-            coilStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            coilStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid quantity to read (1 or higher).`);
             return;
           }
           readCoil(addr, quan);
@@ -761,10 +769,10 @@
                 valueRow.appendChild(cell2);
               }
             } else {
-              discreteStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              discreteStatusR.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-              discreteStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              discreteStatusR.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -778,11 +786,11 @@
           valueRow.innerHTML = "";
 
           if (addr === '' || Number(addr) < 0) {
-            discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid discrete input address (0 or higher).</div>`;
+            discreteStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid discrete input address (0 or higher).`);
             return;
           }
           if (quan === '' || Number(quan) < 1) {
-            discreteStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            discreteStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid quantity to read (1 or higher).`);
             return;
           }
           readDiscrete(addr, quan);
@@ -815,12 +823,12 @@
             const data = await response.json();
 
             if (response.ok) {
-              holdingStatusW.innerHTML = `<div class="alert alert-success">Holding register at address ${address} set to ${value}.</div>`;
+              holdingStatusW.innerHTML = newStatus("alert-success", `Holding register at address ${address} set to ${value}.`);
             } else {
-              holdingStatusW.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              holdingStatusW.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-              holdingStatusW.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              holdingStatusW.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -835,12 +843,12 @@
             const data = await response.json();
 
             if (response.ok) {
-              holdingStatusWM.innerHTML = `<div class="alert alert-success">Holding registers starting at address ${address} set to ${valueArray}.</div>`;
+              holdingStatusWM.innerHTML = newStatus("alert-success", `Holding registers starting at address ${address} set to ${valueArray}.`);
             } else {
-              holdingStatusWM.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              holdingStatusWM.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-            holdingStatusWM.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+            holdingStatusWM.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -875,10 +883,10 @@
                 valueRow.appendChild(cell2);
               }
             } else {
-              holdingStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              holdingStatusR.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-              holdingStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              holdingStatusR.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -892,7 +900,7 @@
           holdingStatusWM.innerHTML = "";
 
           if (Number(quan) > 256) {
-            holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a quantity less than or equal to 256.</div>`;
+            holdingStatusWM.innerHTML = newStatus("alert-warning", `Please enter a quantity less than or equal to 256.`);
             return;
           }
 
@@ -935,7 +943,7 @@
         holdingSendW.addEventListener('click', () => {
           const addr = holdingAddressW.value;
           if (addr === '' || Number(addr) < 0) {
-            holdingStatusW.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+            holdingStatusW.innerHTML = newStatus("alert-warning", `Please enter a valid holding register address (0 or higher).`);
             return;
           }
           const val = holdingValueW.value;
@@ -947,11 +955,11 @@
           const quantity = parseInt(holdingQuantityWM.value);
 
           if (isNaN(address) || address < 0) {
-            holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+            holdingStatusWM.innerHTML = newStatus("alert-warning", `Please enter a valid holding register address (0 or higher).`);
             return;
           }
           if (isNaN(quantity) || quantity < 1) {
-            holdingStatusWM.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to write (1 or higher).</div>`;
+            holdingStatusWM.innerHTML = newStatus("alert-warning", `Please enter a valid quantity to write (1 or higher).`);
             return;
           }
 
@@ -975,11 +983,11 @@
           valueRow.innerHTML = "";
 
           if (addr === '' || Number(addr) < 0) {
-            holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid holding register address (0 or higher).</div>`;
+            holdingStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid holding register address (0 or higher).`);
             return;
           }
           if (quan === '' || Number(quan) < 1) {
-            holdingStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            holdingStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid quantity to read (1 or higher).`);
             return;
           }
           readHolding(addr, quan);
@@ -1031,10 +1039,10 @@
                 valueRow.appendChild(cell2);
               }
             } else {
-              inputStatusR.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              inputStatusR.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
             }
           } catch (err) {
-              inputStatusR.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              inputStatusR.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
 
@@ -1048,11 +1056,11 @@
           valueRow.innerHTML = "";
 
           if (addr === '' || Number(addr) < 0) {
-            inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid input register address (0 or higher).</div>`;
+            inputStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid input register address (0 or higher).`);
             return;
           }
           if (quan === '' || Number(quan) < 1) {
-            inputStatusR.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity to read (1 or higher).</div>`;
+            inputStatusR.innerHTML = newStatus("alert-warning", `Please enter a valid quantity to read (1 or higher).`);
             return;
           }
           readInput(addr, quan);
@@ -1248,7 +1256,7 @@
                     y: data.data[0]
                   });
                 } else {
-                  addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                  addGraphingItemStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
                   return;
                 }
               }
@@ -1256,7 +1264,7 @@
               chart.options.scales.x.max = Date.now();
               chart.update();
             } catch (err) {
-              addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+              addGraphingItemStatus.innerHTML = newStatus("alert-danger", `Error: ${err.message}`);
               console.error("Chart update error:", err);
             }
 
@@ -1268,12 +1276,12 @@
             clearInterval(timer);
             const intervalSec = parseInt(document.getElementById('intervalInput').value || 5);
             if (intervalSec < 1) {
-              graphStatus.innerHTML = `<div class="alert alert-warning">Please enter a interval greater than or equal to 1 second.</div>`;
+              graphStatus.innerHTML = newStatus("alert-warning", `Please enter a interval greater than or equal to 1 second.`);
               return;
             }
 
             if (chart.data.datasets.length === 0) {
-              graphStatus.innerHTML = `<div class="alert alert-warning">Please add a dataset to the graph.</div>`;
+              graphStatus.innerHTML = newStatus("alert-warning", `Please add a dataset to the graph.`);
               return;
             }
 
@@ -1322,7 +1330,7 @@
                 type = "input";
                 break;
               default:
-                addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
+                addGraphingItemStatus.innerHTML = newStatus("alert-warning", `Please select a valid register type.`);
                 return;
             }
 
@@ -1330,7 +1338,7 @@
 
             // Check and test validity
             if (address === '' || Number(address) < 0) {
-              addGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
+              addGraphingItemStatus.innerHTML = newStatus("alert-warning", `Please enter a valid register address (0 or higher).`);
               return;
             }
 
@@ -1339,11 +1347,11 @@
               const res = await fetch(url);
               const data = await res.json();
               if (!res.ok) {
-                addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                addGraphingItemStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
                 return;
               }
             } catch (err) {
-              addGraphingItemStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              addGraphingItemStatus.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
               return;
             }
 
@@ -1390,14 +1398,14 @@
                   type = "input";
                   break;
                 default:
-                  removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please select a valid register type.</div>`;
+                  removeGraphingItemStatus.innerHTML = newStatus("alert-warning", `Please select a valid register type.`);
                   return;
               }
 
               const address = parseInt(addAddress.value);
 
               if (isNaN(address) || address < 0) {
-                removeGraphingItemStatus.innerHTML = `<div class="alert alert-warning">Please enter a valid register address (0 or higher).</div>`;
+                removeGraphingItemStatus.innerHTML = newStatus("alert-warning", `Please enter a valid register address (0 or higher).`);
                 return;
               }
 
@@ -1416,7 +1424,7 @@
 
                 chart.update();
               } else {
-                removeGraphingItemStatus.innerHTML = `<div class="alert alert-info">Dataset not found.</div>`;
+                removeGraphingItemStatus.innerHTML = newStatus("alert-info", `Dataset not found.`);
               }
 
               addAddress.value = "";
@@ -1470,570 +1478,572 @@
             <h5>Rules Manager</h5>
             <a class="btn btn-link" data-bs-toggle="collapse" href="#rulesBody">Toggle</a>
           </div>
-          <div class="card m-3">
-            <div class="card-body">
-              <div class="mb-3">
-                <h6>Statistics</h6>
-                <span id="ruleCount">Unknown Rules</span>
-              </div>
-            </div>
-          </div>
-          <div class="card m-3">
-            <div class="card-body">
-              <div id="rulesBody" class="collapse show">
+          <div id="rulesBody" class="collapse show">
+            <div class="card m-3">
+              <div class="card-body">
                 <div class="mb-3">
-                  <h6>Rule Designer</h6>
+                  <h6>Statistics</h6>
+                  <span id="ruleCount">Unknown Rules</span>
                 </div>
-                <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
-
-                <!-- New Rule If 1 -->
-                <div id="ruleNewIf1" class="mb-3 d-none">
-                  <span class="me-2">If</span>
-
-                  <div class="d-inline-block me-2" style="width: 150px;">
-                    <select id="inputType1" class="form-select form-select-sm">
-                      <option>Select</option>
-                      <option>Coil</option>
-                      <option>Discrete Input</option>
-                      <option>Holding Register</option>
-                      <option>Input Register</option>
-                    </select>
-                  </div>
-
-                  <div class="d-inline-block me-2" style="width: 100px;">
-                    <input type="number" class="form-control form-control-sm" id="inputRegister1" placeholder="address" min="0" />
-                  </div>
-
-                  <div class="d-inline-block me-2" style="width: 85px;">
-                    <select id="op1" class="form-select form-select-sm">
-                      <option>Select</option>
-                      <option>==</option>
-                      <option>!=</option>
-                      <option>></option>
-                      <option><</option>
-                      <option>>=</option>
-                      <option><=</option>
-                    </select>
-                  </div>
-
-                  <div class="d-inline-block me-2" style="width: 100px;">
-                    <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
-                  </div>
-                  
-                  <!-- join -->
-                  <div id="ruleJoinDiv" class="d-inline-block me-2 d-none" style="width: 80px;">
-                    <select id="ruleJoin" class="form-select form-select-sm">
-                      <option>And</option>
-                      <option>Or</option>
-                    </select>
-                  </div>
-
-                  <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
-                </div>
-
-                <!-- New Rule If 2 -->
-                <div id="ruleNewIf2" class="mb-3 d-none">
-
-                  <span class="me-2">If</span>
-
-                  <div class="d-inline-block me-2" style="width: 150px;">
-                    <select id="inputType2" class="form-select form-select-sm">
-                      <option>Select</option>
-                      <option>Coil</option>
-                      <option>Discrete Input</option>
-                      <option>Holding Register</option>
-                      <option>Input Register</option>
-                    </select>
-                  </div>
-
-                  <div class="d-inline-block me-2" style="width: 100px;">
-                    <input type="number" class="form-control form-control-sm" id="inputRegister2" placeholder="address" min="0" />
-                  </div>
-
-                  <div class="d-inline-block me-2" style="width: 85px;">
-                    <select id="op2" class="form-select form-select-sm">
-                      <option>Select</option>
-                      <option>==</option>
-                      <option>!=</option>
-                      <option>></option>
-                      <option><</option>
-                      <option>>=</option>
-                      <option><=</option>
-                    </select>
-                  </div>
-
-                  <div class="d-inline-block me-2" style="width: 100px;">
-                    <input type="number" class="form-control form-control-sm" id="compareValue2" placeholder="value" min="0" />
-                  </div>
-                </div>
-
-                <!-- New Rule Then -->
-                <div id="ruleNewOutput"class="mb-3 d-none">
-                  <span class="me-2">Then set</span>
-
-                  <div class="d-inline-block me-2" style="width: 150px;">
-                    <select id="outputType" class="form-select form-select-sm">
-                      <option>Select</option>
-                      <option>Coil</option>
-                      <option>Holding Register</option>
-                    </select>
-                  </div>
-
-                  <div class="d-inline-block me-2" style="width: 100px;">
-                    <input type="number" class="form-control form-control-sm" id="outputRegister" placeholder="address" min="0" />
-                  </div>
-
-                  <span class="me-2">to</span>
-
-                  <div class="d-inline-block me-2" style="width: 100px;">
-                    <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
-                  </div>
-                </div>
-    
-                <div id="rulePreviewArea" class="d-none mb-3">
-                  <label for="rulePreview" class="form-label">Rule Preview:</label>
-                  <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
-                </div>
-
-                <div>
-                  <button id="ruleSubmit" class="btn btn-success d-inline-block d-none me-1">Add Rule</button>
-                  <button id="ruleCancel" class="btn btn-danger d-inline-block d-none">Discard</button>
-                </div>
-
-                <div id="ruleStatus" class="mt-3"></div>
-
               </div>
             </div>
-          </div>
+            <div class="card m-3">
+              <div class="card-body">
+                <div id="rulesDesignerBody" class="collapse show">
+                  <div class="mb-3">
+                    <h6>Rule Designer</h6>
+                  </div>
+                  <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
 
-          <div class="card m-3">
-            <div class="card-body">
-              <div id="rulesBody" class="collapse show">
-                <div class="mb-3">
-                  <h6>Active Rules</h6>
+                  <!-- New Rule If 1 -->
+                  <div id="ruleNewIf1" class="mb-3 d-none">
+                    <span class="me-2">If</span>
+
+                    <div class="d-inline-block me-2" style="width: 150px;">
+                      <select id="inputType1" class="form-select form-select-sm">
+                        <option>Select</option>
+                        <option>Coil</option>
+                        <option>Discrete Input</option>
+                        <option>Holding Register</option>
+                        <option>Input Register</option>
+                      </select>
+                    </div>
+
+                    <div class="d-inline-block me-2" style="width: 100px;">
+                      <input type="number" class="form-control form-control-sm" id="inputRegister1" placeholder="address" min="0" />
+                    </div>
+
+                    <div class="d-inline-block me-2" style="width: 85px;">
+                      <select id="op1" class="form-select form-select-sm">
+                        <option>Select</option>
+                        <option>==</option>
+                        <option>!=</option>
+                        <option>></option>
+                        <option><</option>
+                        <option>>=</option>
+                        <option><=</option>
+                      </select>
+                    </div>
+
+                    <div class="d-inline-block me-2" style="width: 100px;">
+                      <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
+                    </div>
+                    
+                    <!-- join -->
+                    <div id="ruleJoinDiv" class="d-inline-block me-2 d-none" style="width: 80px;">
+                      <select id="ruleJoin" class="form-select form-select-sm">
+                        <option>And</option>
+                        <option>Or</option>
+                      </select>
+                    </div>
+
+                    <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
+                  </div>
+
+                  <!-- New Rule If 2 -->
+                  <div id="ruleNewIf2" class="mb-3 d-none">
+
+                    <span class="me-2">If</span>
+
+                    <div class="d-inline-block me-2" style="width: 150px;">
+                      <select id="inputType2" class="form-select form-select-sm">
+                        <option>Select</option>
+                        <option>Coil</option>
+                        <option>Discrete Input</option>
+                        <option>Holding Register</option>
+                        <option>Input Register</option>
+                      </select>
+                    </div>
+
+                    <div class="d-inline-block me-2" style="width: 100px;">
+                      <input type="number" class="form-control form-control-sm" id="inputRegister2" placeholder="address" min="0" />
+                    </div>
+
+                    <div class="d-inline-block me-2" style="width: 85px;">
+                      <select id="op2" class="form-select form-select-sm">
+                        <option>Select</option>
+                        <option>==</option>
+                        <option>!=</option>
+                        <option>></option>
+                        <option><</option>
+                        <option>>=</option>
+                        <option><=</option>
+                      </select>
+                    </div>
+
+                    <div class="d-inline-block me-2" style="width: 100px;">
+                      <input type="number" class="form-control form-control-sm" id="compareValue2" placeholder="value" min="0" />
+                    </div>
+                  </div>
+
+                  <!-- New Rule Then -->
+                  <div id="ruleNewOutput"class="mb-3 d-none">
+                    <span class="me-2">Then set</span>
+
+                    <div class="d-inline-block me-2" style="width: 150px;">
+                      <select id="outputType" class="form-select form-select-sm">
+                        <option>Select</option>
+                        <option>Coil</option>
+                        <option>Holding Register</option>
+                      </select>
+                    </div>
+
+                    <div class="d-inline-block me-2" style="width: 100px;">
+                      <input type="number" class="form-control form-control-sm" id="outputRegister" placeholder="address" min="0" />
+                    </div>
+
+                    <span class="me-2">to</span>
+
+                    <div class="d-inline-block me-2" style="width: 100px;">
+                      <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
+                    </div>
+                  </div>
+      
+                  <div id="rulePreviewArea" class="d-none mb-3">
+                    <label for="rulePreview" class="form-label">Rule Preview:</label>
+                    <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
+                  </div>
+
+                  <div>
+                    <button id="ruleSubmit" class="btn btn-success d-inline-block d-none me-1">Add Rule</button>
+                    <button id="ruleCancel" class="btn btn-danger d-inline-block d-none">Discard</button>
+                  </div>
+
+                  <div id="ruleStatus" class="mt-3"></div>
+
                 </div>
-
-                <div class="list-group mb-3" id="ruleList">
-                  <!-- dynamically updated-->
-                </div>
-
-                <div id="ruleListViewArea" class="d-none mb-3">
-                  <label id="ruleListViewAreaLabel" for="ruleListViewAreaContent" class="form-label">Rule:</label>
-                  <textarea id="ruleListViewAreaContent" class="form-control" rows="6" readonly></textarea>
-                </div>
-
-                <button id="ruleListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
-                <button id="ruleListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
-
-                <button id="ruleListDelete" class="btn btn-danger d-inline-block d-none">Delete</button>
-
-                <div id="ruleListStatus" class="mt-3"></div>
               </div>
             </div>
-          </div>
-          <script>
-            const inputType1 = document.getElementById("inputType1");
-            const inputType2 = document.getElementById("inputType2");
-            const inputRegister1 = document.getElementById("inputRegister1");
-            const inputRegister2 = document.getElementById("inputRegister2");
-            const op1 = document.getElementById("op1");
-            const op2 = document.getElementById("op2");
-            const compareValue1 = document.getElementById("compareValue1");
-            const compareValue2 = document.getElementById("compareValue2");
-            const outputType = document.getElementById("outputType");
-            const outputRegister = document.getElementById("outputRegister");
-            const outputValue = document.getElementById("outputValue");
 
-            const rulePreview = document.getElementById("rulePreview");
-            const rulePreviewArea = document.getElementById("rulePreviewArea");
+            <div class="card m-3">
+              <div class="card-body">
+                <div id="activeRulesBody" class="collapse show">
+                  <div class="mb-3">
+                    <h6>Active Rules</h6>
+                  </div>
 
-            const ruleNew = document.getElementById('ruleNew');
-            const ruleNewIf1 = document.getElementById('ruleNewIf1');
-            const ruleJoin = document.getElementById('ruleJoin');
-            const ruleJoinDiv = document.getElementById('ruleJoinDiv');
-            const ruleNewIf2 = document.getElementById('ruleNewIf2');
-            const ruleNewOutput = document.getElementById('ruleNewOutput');
+                  <div class="list-group mb-3" id="ruleList">
+                    <!-- dynamically updated-->
+                  </div>
 
-            const ruleAddJoin = document.getElementById('ruleAddJoin');
-            const ruleSubmit = document.getElementById('ruleSubmit');
+                  <div id="ruleListViewArea" class="d-none mb-3">
+                    <label id="ruleListViewAreaLabel" for="ruleListViewAreaContent" class="form-label">Rule:</label>
+                    <textarea id="ruleListViewAreaContent" class="form-control" rows="6" readonly></textarea>
+                  </div>
 
-            const ruleStatus = document.getElementById('ruleStatus');
+                  <button id="ruleListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
+                  <button id="ruleListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
 
-            const ruleCount = document.getElementById('ruleCount');
+                  <button id="ruleListDelete" class="btn btn-danger d-inline-block d-none">Delete</button>
 
-            const ruleList = document.getElementById('ruleList');
-            const ruleListRefresh = document.getElementById('ruleListRefresh');
-            const ruleListRefreshBusy = document.getElementById('ruleListRefreshBusy');
-            const ruleListViewArea = document.getElementById('ruleListViewArea');
-            const ruleListViewAreaLabel = document.getElementById('ruleListViewAreaLabel');
-            const ruleListViewAreaContent = document.getElementById('ruleListViewAreaContent');
-            const ruleListStatus = document.getElementById('ruleListStatus');
+                  <div id="ruleListStatus" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+            <script>
+              const inputType1 = document.getElementById("inputType1");
+              const inputType2 = document.getElementById("inputType2");
+              const inputRegister1 = document.getElementById("inputRegister1");
+              const inputRegister2 = document.getElementById("inputRegister2");
+              const op1 = document.getElementById("op1");
+              const op2 = document.getElementById("op2");
+              const compareValue1 = document.getElementById("compareValue1");
+              const compareValue2 = document.getElementById("compareValue2");
+              const outputType = document.getElementById("outputType");
+              const outputRegister = document.getElementById("outputRegister");
+              const outputValue = document.getElementById("outputValue");
 
-            const ruleCancel = document.getElementById('ruleCancel');
+              const rulePreview = document.getElementById("rulePreview");
+              const rulePreviewArea = document.getElementById("rulePreviewArea");
 
-            const ruleListDelete = document.getElementById('ruleListDelete');
-            const confirmDeleteRuleButton = document.getElementById('confirmDeleteRuleButton');
-            const modalRTD = new bootstrap.Modal(document.getElementById('confirmDeleteRuleModal'));
+              const ruleNew = document.getElementById('ruleNew');
+              const ruleNewIf1 = document.getElementById('ruleNewIf1');
+              const ruleJoin = document.getElementById('ruleJoin');
+              const ruleJoinDiv = document.getElementById('ruleJoinDiv');
+              const ruleNewIf2 = document.getElementById('ruleNewIf2');
+              const ruleNewOutput = document.getElementById('ruleNewOutput');
 
-            let ruleToDelete = null;
+              const ruleAddJoin = document.getElementById('ruleAddJoin');
+              const ruleSubmit = document.getElementById('ruleSubmit');
 
-            let joinActive = false;
-            let ruleCountNum = 0;
-            let ruleListArray = [];
+              const ruleStatus = document.getElementById('ruleStatus');
 
-            function getTypeString(type) {
-              switch (type) {
-                case "Coil": return "coil";
-                case "Discrete Input": return "discrete";
-                case "Holding Register": return "holding";
-                case "Input Register": return "input";
-                default: return "null";
+              const ruleCount = document.getElementById('ruleCount');
+
+              const ruleList = document.getElementById('ruleList');
+              const ruleListRefresh = document.getElementById('ruleListRefresh');
+              const ruleListRefreshBusy = document.getElementById('ruleListRefreshBusy');
+              const ruleListViewArea = document.getElementById('ruleListViewArea');
+              const ruleListViewAreaLabel = document.getElementById('ruleListViewAreaLabel');
+              const ruleListViewAreaContent = document.getElementById('ruleListViewAreaContent');
+              const ruleListStatus = document.getElementById('ruleListStatus');
+
+              const ruleCancel = document.getElementById('ruleCancel');
+
+              const ruleListDelete = document.getElementById('ruleListDelete');
+              const confirmDeleteRuleButton = document.getElementById('confirmDeleteRuleButton');
+              const modalRTD = new bootstrap.Modal(document.getElementById('confirmDeleteRuleModal'));
+
+              let ruleToDelete = null;
+
+              let joinActive = false;
+              let ruleCountNum = 0;
+              let ruleListArray = [];
+
+              function getTypeString(type) {
+                switch (type) {
+                  case "Coil": return "coil";
+                  case "Discrete Input": return "discrete";
+                  case "Holding Register": return "holding";
+                  case "Input Register": return "input";
+                  default: return "null";
+                }
               }
-            }
 
-            function getOperationString(operation) {
-              switch (operation) {
-                case "==": return "CMP_EQ";
-                case "!=": return "CMP_NEQ";
-                case ">": return "CMP_GT";
-                case "<": return "CMP_LT";
-                case ">=": return "CMP_GTET";
-                case "<=": return "CMP_LTET";
-                default: return "null";
+              function getOperationString(operation) {
+                switch (operation) {
+                  case "==": return "CMP_EQ";
+                  case "!=": return "CMP_NEQ";
+                  case ">": return "CMP_GT";
+                  case "<": return "CMP_LT";
+                  case ">=": return "CMP_GTET";
+                  case "<=": return "CMP_LTET";
+                  default: return "null";
+                }
               }
-            }
 
-            function updateRulePreview() {
-              let preview;
-              if (joinActive) {
-                preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(inputType2.value).toUpperCase()}, ${inputRegister2.value}, ${getOperationString(op2.value)}, ${compareValue2.value},\n\tLOGIC_${ruleJoin.value.toUpperCase()},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
-              } else {
-                preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
+              function updateRulePreview() {
+                let preview;
+                if (joinActive) {
+                  preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(inputType2.value).toUpperCase()}, ${inputRegister2.value}, ${getOperationString(op2.value)}, ${compareValue2.value},\n\tLOGIC_${ruleJoin.value.toUpperCase()},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
+                } else {
+                  preview = `rule = (LogicRule){\n\tREG_${getTypeString(inputType1.value).toUpperCase()}, ${inputRegister1.value}, ${getOperationString(op1.value)}, ${compareValue1.value},\n\tREG_${getTypeString(outputType.value).toUpperCase()}, ${outputRegister.value}, ${outputValue.value}\n};`;
+                }
+                rulePreview.innerHTML = preview;
               }
-              rulePreview.innerHTML = preview;
-            }
 
-            function newRuleProcessInput() {
-              updateRulePreview();
+              function newRuleProcessInput() {
+                updateRulePreview();
 
-              if (joinActive) {
-                if (inputType2.value == "Select" || Number(inputRegister2.value) < 0 || inputRegister2.value === "" || op2.value == "Select" || Number(compareValue2) < 0 || compareValue2.value === "") {
+                if (joinActive) {
+                  if (inputType2.value == "Select" || Number(inputRegister2.value) < 0 || inputRegister2.value === "" || op2.value == "Select" || Number(compareValue2) < 0 || compareValue2.value === "") {
+                    ruleSubmit.classList.add("d-none");
+                    return;
+                  }
+                }
+
+                if (inputType1.value == "Select" || Number(inputRegister1.value) < 0 || inputRegister1.value === "" || op1.value == "Select" || Number(compareValue1) < 0 || compareValue1.value === "" || outputType.value == "Select" || Number(outputRegister.value) < 0 || outputRegister.value === "" || Number(outputValue.value) < 0 || outputValue.value === "") {
                   ruleSubmit.classList.add("d-none");
                   return;
                 }
+
+                ruleSubmit.classList.remove("d-none");
               }
 
-              if (inputType1.value == "Select" || Number(inputRegister1.value) < 0 || inputRegister1.value === "" || op1.value == "Select" || Number(compareValue1) < 0 || compareValue1.value === "" || outputType.value == "Select" || Number(outputRegister.value) < 0 || outputRegister.value === "" || Number(outputValue.value) < 0 || outputValue.value === "") {
-                ruleSubmit.classList.add("d-none");
-                return;
-              }
+              ruleNew.addEventListener('click', () => {
+                ruleNew.classList.add("d-none");
+                ruleNewIf1.classList.remove("d-none");
+                ruleNewOutput.classList.remove("d-none");
+                rulePreviewArea.classList.remove("d-none");
+                ruleCancel.classList.remove("d-none");
+                ruleStatus.innerHTML = "";
+              });
 
-              ruleSubmit.classList.remove("d-none");
-            }
+              ruleAddJoin.addEventListener('click', () => {
+                if (!joinActive) {
+                  ruleJoinDiv.classList.remove("d-none");
+                  ruleNewIf2.classList.remove("d-none");
+                  ruleSubmit.classList.add("d-none");
+                  joinActive = true;
+                  newRuleProcessInput();
 
-            ruleNew.addEventListener('click', () => {
-              ruleNew.classList.add("d-none");
-              ruleNewIf1.classList.remove("d-none");
-              ruleNewOutput.classList.remove("d-none");
-              rulePreviewArea.classList.remove("d-none");
-              ruleCancel.classList.remove("d-none");
-              ruleStatus.innerHTML = "";
-            });
-
-            ruleAddJoin.addEventListener('click', () => {
-              if (!joinActive) {
-                ruleJoinDiv.classList.remove("d-none");
-                ruleNewIf2.classList.remove("d-none");
-                ruleSubmit.classList.add("d-none");
-                joinActive = true;
-                newRuleProcessInput();
-
-                ruleAddJoin.innerText = "Remove Join";
-                ruleAddJoin.classList.remove("btn-primary");
-                ruleAddJoin.classList.add("btn-danger");
-              } else {
-                ruleJoinDiv.classList.add("d-none");
-                ruleNewIf2.classList.add("d-none");
-                joinActive = false;
-                newRuleProcessInput();
-
-                ruleAddJoin.innerText = "Add Join";
-                ruleAddJoin.classList.add("btn-primary");
-                ruleAddJoin.classList.remove("btn-danger");
-              }
-            });
-
-            function getJoinIndex(joinString) {
-              switch (joinString.toLowerCase()) {
-                case "and": return 2;
-                case "or": return 3;
-                default: return 0;
-              }
-            }
-
-            function getJoinStringFromIndex(joinIndex) {
-              switch (joinIndex) {
-                case 2: return "LOGIC_AND";
-                case 3: return "LOGIC_OR";
-                default: return "LOGIC_NONE";
-              }
-            }
-
-            function getTypeIndex(typeString) {
-              switch (typeString.toLowerCase()) {
-                case "coil": return 1;
-                case "discrete input": return 2;
-                case "holding register": return 3;
-                case "input register": return 4;
-                default: return 0;
-              }
-            }
-
-            function getTypeStringFromIndex(typeIndex) {
-              switch (typeIndex) {
-                case 1: return "COIL";
-                case 2: return "DISCRETE";
-                case 3: return "HOLDING";
-                case 4: return "INPUT";
-                default: return "NULL";
-              }
-            }
-
-            function getOperationIndex(operationString) {
-              switch (operationString.toLowerCase()) {
-                case "==": return 1;
-                case "!=": return 2;
-                case ">": return 3;
-                case "<": return 4;
-                case ">=": return 5;
-                case "<=": return 6;
-                default: return 0;
-              }
-            }
-
-            function getOperationStringFromIndex(operationIndex) {
-              switch (operationIndex) {
-                case 1: return "CMP_EQ";
-                case 2: return "CMP_NEQ";
-                case 3: return "CMP_GT";
-                case 4: return "CMP_LT";
-                case 5: return "CMP_GTET";
-                case 6: return "CMP_LTET";
-                default: return "NULL";
-              }
-            }
-
-            ruleSubmit.addEventListener('click', async () => {
-              try {
-                ruleStatus.textContent = 'Sending request...';
-
-                let url;
-                if (joinActive) {
-                  url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2.value}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+                  ruleAddJoin.innerText = "Remove Join";
+                  ruleAddJoin.classList.remove("btn-primary");
+                  ruleAddJoin.classList.add("btn-danger");
                 } else {
-                  url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+                  ruleJoinDiv.classList.add("d-none");
+                  ruleNewIf2.classList.add("d-none");
+                  joinActive = false;
+                  newRuleProcessInput();
+
+                  ruleAddJoin.innerText = "Add Join";
+                  ruleAddJoin.classList.add("btn-primary");
+                  ruleAddJoin.classList.remove("btn-danger");
                 }
-                
-                const response = await fetch(url);
-                const data = await response.json();
+              });
 
-                if (response.ok) {
-                  ruleStatus.innerHTML = `<div class="alert alert-success">Successfully added the rule.</div>`;
-
-                  ruleCleanup();
-                  ruleListUpdate();
-                } else {
-                  ruleStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+              function getJoinIndex(joinString) {
+                switch (joinString.toLowerCase()) {
+                  case "and": return 2;
+                  case "or": return 3;
+                  default: return 0;
                 }
-              } catch (err) {
-                  ruleStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
               }
-            });
 
-            function ruleCleanup() {
-              // Clean up
-              
-              ruleNew.classList.remove("d-none");
-              ruleNewIf1.classList.add("d-none");
-              ruleNewOutput.classList.add("d-none");
-              ruleNewIf2.classList.add("d-none");
-              rulePreviewArea.classList.add("d-none");
-              rulePreview.innerHTML = "";
-
-              ruleCancel.classList.add("d-none");
-
-              inputType1.selectedIndex = 0;
-              inputType2.selectedIndex = 0;
-              inputRegister1.value = "";
-              inputRegister2.value = "";
-              op1.selectedIndex = 0;
-              op2.selectedIndex = 0;
-              compareValue1.value = "";
-              compareValue2.value = "";
-              outputType.selectedIndex = 0;
-              outputRegister.value = "";
-              outputValue.value = "";
-              ruleJoin.selectedIndex = 0;
-
-              ruleStatus.innerHTML = "";
-              
-              joinActive = false;
-              ruleAddJoin.innerText = "Add Join";
-              ruleAddJoin.classList.add("btn-primary");
-              ruleAddJoin.classList.remove("btn-danger");
-
-              ruleJoinDiv.classList.add("d-none");
-
-              ruleSubmit.classList.add("d-none");
-            }
-
-            ruleCancel.addEventListener('click', () => {
-              ruleCleanup();
-            });
-
-            async function ruleCountUpdate() {
-              if (isConnected) {
-                let url = "/getrulecount";
-                const response = await fetch(url);
-                const data = await response.json();
-                ruleCountNum = parseInt(data.data);
-                let ruleText = "rule is";
-                if (ruleCountNum > 1 || ruleCountNum == 0) ruleText = "rules are";
-                ruleCount.innerText = `${ruleCountNum} ${ruleText} active.`;
-              } else {
-                ruleCount.innerText = "Please initiate a serial connection to view device status.";
+              function getJoinStringFromIndex(joinIndex) {
+                switch (joinIndex) {
+                  case 2: return "LOGIC_AND";
+                  case 3: return "LOGIC_OR";
+                  default: return "LOGIC_NONE";
+                }
               }
-            }
 
-            async function ruleListUpdate() {
-              // Pause status polling as this repeated modbus TX and RX can take some time
-              await statusPolling(false);
+              function getTypeIndex(typeString) {
+                switch (typeString.toLowerCase()) {
+                  case "coil": return 1;
+                  case "discrete input": return 2;
+                  case "holding register": return 3;
+                  case "input register": return 4;
+                  default: return 0;
+                }
+              }
 
-              ruleToDelete = null;
-              ruleListDelete.classList.add("d-none");
-              
-              ruleListRefresh.classList.add("d-none");
-              ruleListRefreshBusy.classList.remove("d-none");
+              function getTypeStringFromIndex(typeIndex) {
+                switch (typeIndex) {
+                  case 1: return "COIL";
+                  case 2: return "DISCRETE";
+                  case 3: return "HOLDING";
+                  case 4: return "INPUT";
+                  default: return "NULL";
+                }
+              }
 
-              let ruleListStatusBuffer = "";
-              ruleList.innerHTML = "";
-              ruleListArray.length = 0;
+              function getOperationIndex(operationString) {
+                switch (operationString.toLowerCase()) {
+                  case "==": return 1;
+                  case "!=": return 2;
+                  case ">": return 3;
+                  case "<": return 4;
+                  case ">=": return 5;
+                  case "<=": return 6;
+                  default: return 0;
+                }
+              }
 
-              if (isConnected) {
-                await ruleCountUpdate();
-                ruleListStatus.innerHTML = '';
-                for (let i = 0; i < ruleCountNum; i++) {
-                  // Actually store the rule data
-                  let url = `/getrule?index=${i}`;
-                  const response = await fetch(url);
-                  const data = await response.json();
+              function getOperationStringFromIndex(operationIndex) {
+                switch (operationIndex) {
+                  case 1: return "CMP_EQ";
+                  case 2: return "CMP_NEQ";
+                  case 3: return "CMP_GT";
+                  case 4: return "CMP_LT";
+                  case 5: return "CMP_GTET";
+                  case 6: return "CMP_LTET";
+                  default: return "NULL";
+                }
+              }
 
-                  if (!response.ok) {
-                    ruleListStatusBuffer = ruleListStatusBuffer + `Error: ${data.error || 'Unknown error'}<br>`;
-                    continue;
+              ruleSubmit.addEventListener('click', async () => {
+                try {
+                  ruleStatus.textContent = 'Sending request...';
+
+                  let url;
+                  if (joinActive) {
+                    url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2.value}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+                  } else {
+                    url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
                   }
-
-                  ruleListArray.push(data);
                   
-                  // Update the ruleList
-                  const item = document.createElement("button");
-                  item.className = "list-group-item list-group-item-action";
-                  item.textContent = `Rule ${i}`;
-                  item.addEventListener("click", () => viewRule(i));
-                  ruleList.appendChild(item);
-                }
-              }
-
-              if (ruleListArray.length != ruleCountNum) {
-                ruleListStatusBuffer = ruleListStatusBuffer + `Error: The number of successfully read rules does not equal the reported number of rules.<br><br><b>If graph polling is active, try stopping it temporarily. If another instance (browser tab) of the web panel is open, it's status update requests (and if active, graph polling requests) will likely interfere.</b><br>`;
-              }
-
-              if (ruleListStatusBuffer != "") {
-                ruleListStatus.innerHTML = `<div class="alert alert-danger">${ruleListStatusBuffer}</div>`;
-                ruleList.innerHTML = "";
-              }
-
-              await statusPolling(true);
-
-              ruleListRefresh.classList.remove("d-none");
-              ruleListRefreshBusy.classList.add("d-none");
-            }
-
-            function viewRule(index) {
-              if (index >= ruleListArray.length) {
-                ruleToDelete = null;
-                return;
-              }
-
-              ruleToDelete = index;
-              ruleListDelete.classList.remove("d-none");
-              
-              ruleListViewAreaLabel.innerHTML = `<b>Viewing Rule ${index}:</b>`;
-              ruleListViewArea.classList.remove("d-none");
-
-              const ruleData = ruleListArray[index].data;
-
-              let preview;
-              if (parseInt(ruleData.joinRaw) != 1) {
-                preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.input_type2Raw)}, ${ruleData.input_reg2}, ${getOperationStringFromIndex(ruleData.op2Raw)}, ${ruleData.compare_value2},\n\tLOGIC_${getJoinStringFromIndex(ruleData.joinRaw)},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
-              } else {
-                preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
-              }
-              ruleListViewAreaContent.innerHTML = preview;
-            }
-
-            confirmDeleteRuleButton.addEventListener('click', () => {
-              if (ruleToDelete !== null) {
-                deleteRule(ruleToDelete);
-
-                ruleToDelete = null;
-                bootstrap.Modal.getInstance(document.getElementById('confirmDeleteRuleModal')).hide();
-              }
-            });
-
-            async function deleteRule(index) {
-              try{
-                if (isConnected) {
-                  let url = `/deleterule?index=${index}`;
                   const response = await fetch(url);
                   const data = await response.json();
 
                   if (response.ok) {
-                    await ruleListUpdate();
-                    ruleListStatus.innerHTML = `<div class="alert alert-success">Successfully deleted the rule with ID=${index}.</div>`;
-                    ruleListViewArea.classList.add("d-none");
+                    ruleStatus.innerHTML = newStatus("alert-success", `Successfully added the rule.`);
+
+                    ruleCleanup();
+                    ruleListUpdate();
                   } else {
-                    ruleListStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                    ruleStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
                   }
-                } else {
-                  ruleListStatus.innerText = "No serial connection is currently active.";
+                } catch (err) {
+                    ruleStatus.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
                 }
-              } catch (err) {
-                  ruleStatus.innerHTML = `<div class="alert alert-danger">Server error: ${err.message}</div>`;
+              });
+
+              function ruleCleanup() {
+                // Clean up
+                
+                ruleNew.classList.remove("d-none");
+                ruleNewIf1.classList.add("d-none");
+                ruleNewOutput.classList.add("d-none");
+                ruleNewIf2.classList.add("d-none");
+                rulePreviewArea.classList.add("d-none");
+                rulePreview.innerHTML = "";
+
+                ruleCancel.classList.add("d-none");
+
+                inputType1.selectedIndex = 0;
+                inputType2.selectedIndex = 0;
+                inputRegister1.value = "";
+                inputRegister2.value = "";
+                op1.selectedIndex = 0;
+                op2.selectedIndex = 0;
+                compareValue1.value = "";
+                compareValue2.value = "";
+                outputType.selectedIndex = 0;
+                outputRegister.value = "";
+                outputValue.value = "";
+                ruleJoin.selectedIndex = 0;
+
+                ruleStatus.innerHTML = "";
+                
+                joinActive = false;
+                ruleAddJoin.innerText = "Add Join";
+                ruleAddJoin.classList.add("btn-primary");
+                ruleAddJoin.classList.remove("btn-danger");
+
+                ruleJoinDiv.classList.add("d-none");
+
+                ruleSubmit.classList.add("d-none");
               }
-            }
 
-            inputType1.addEventListener('change', () => newRuleProcessInput());
-            inputType2.addEventListener('change', () => newRuleProcessInput());
-            inputRegister1.addEventListener('input', () => newRuleProcessInput());
-            inputRegister2.addEventListener('input', () => newRuleProcessInput());
-            op1.addEventListener('change', () => newRuleProcessInput());
-            op2.addEventListener('change', () => newRuleProcessInput());
-            compareValue1.addEventListener('input', () => newRuleProcessInput());
-            compareValue2.addEventListener('input', () => newRuleProcessInput());
-            outputType.addEventListener('change', () => newRuleProcessInput());
-            outputRegister.addEventListener('input', () => newRuleProcessInput());
-            outputValue.addEventListener('input', () => newRuleProcessInput());
-            ruleJoin.addEventListener('change', () => newRuleProcessInput());
+              ruleCancel.addEventListener('click', () => {
+                ruleCleanup();
+              });
 
-            ruleListDelete.addEventListener('click', () => modalRTD.show());
+              async function ruleCountUpdate() {
+                if (isConnected) {
+                  let url = "/getrulecount";
+                  const response = await fetch(url);
+                  const data = await response.json();
+                  ruleCountNum = parseInt(data.data);
+                  let ruleText = "rule is";
+                  if (ruleCountNum > 1 || ruleCountNum == 0) ruleText = "rules are";
+                  ruleCount.innerText = `${ruleCountNum} ${ruleText} active.`;
+                } else {
+                  ruleCount.innerText = "Please initiate a serial connection to view device status.";
+                }
+              }
 
-            ruleListRefresh.addEventListener('click', () => {
-              ruleListUpdate();
-              ruleListViewAreaContent.innerHTML = "";
-              ruleListViewArea.classList.add("d-none");
-            });
-          </script>
+              async function ruleListUpdate() {
+                // Pause status polling as this repeated modbus TX and RX can take some time
+                await statusPolling(false);
+
+                ruleToDelete = null;
+                ruleListDelete.classList.add("d-none");
+                
+                ruleListRefresh.classList.add("d-none");
+                ruleListRefreshBusy.classList.remove("d-none");
+
+                let ruleListStatusBuffer = "";
+                ruleList.innerHTML = "";
+                ruleListArray.length = 0;
+
+                if (isConnected) {
+                  await ruleCountUpdate();
+                  ruleListStatus.innerHTML = '';
+                  for (let i = 0; i < ruleCountNum; i++) {
+                    // Actually store the rule data
+                    let url = `/getrule?index=${i}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                      ruleListStatusBuffer = ruleListStatusBuffer + `Error: ${data.error || 'Unknown error'}<br>`;
+                      continue;
+                    }
+
+                    ruleListArray.push(data);
+                    
+                    // Update the ruleList
+                    const item = document.createElement("button");
+                    item.className = "list-group-item list-group-item-action";
+                    item.textContent = `Rule ${i}`;
+                    item.addEventListener("click", () => viewRule(i));
+                    ruleList.appendChild(item);
+                  }
+                }
+
+                if (ruleListArray.length != ruleCountNum) {
+                  ruleListStatusBuffer = ruleListStatusBuffer + `Error: The number of successfully read rules does not equal the reported number of rules.<br><br><b>If graph polling is active, try stopping it temporarily. If another instance (browser tab) of the web panel is open, it's status update requests (and if active, graph polling requests) will likely interfere.</b><br>`;
+                }
+
+                if (ruleListStatusBuffer != "") {
+                  ruleListStatus.innerHTML = newStatus("alert-danger", `${ruleListStatusBuffer}`);
+                  ruleList.innerHTML = "";
+                }
+
+                await statusPolling(true);
+
+                ruleListRefresh.classList.remove("d-none");
+                ruleListRefreshBusy.classList.add("d-none");
+              }
+
+              function viewRule(index) {
+                if (index >= ruleListArray.length) {
+                  ruleToDelete = null;
+                  return;
+                }
+
+                ruleToDelete = index;
+                ruleListDelete.classList.remove("d-none");
+                
+                ruleListViewAreaLabel.innerHTML = `<b>Viewing Rule ${index}:</b>`;
+                ruleListViewArea.classList.remove("d-none");
+
+                const ruleData = ruleListArray[index].data;
+
+                let preview;
+                if (parseInt(ruleData.joinRaw) != 1) {
+                  preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.input_type2Raw)}, ${ruleData.input_reg2}, ${getOperationStringFromIndex(ruleData.op2Raw)}, ${ruleData.compare_value2},\n\tLOGIC_${getJoinStringFromIndex(ruleData.joinRaw)},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
+                } else {
+                  preview = `rule = (LogicRule){\n\tREG_${getTypeStringFromIndex(ruleData.input_type1Raw)}, ${ruleData.input_reg1}, ${getOperationStringFromIndex(ruleData.op1Raw)}, ${ruleData.compare_value1},\n\tREG_${getTypeStringFromIndex(ruleData.output_typeRaw)}, ${ruleData.output_reg}, ${ruleData.output_value}\n};`;
+                }
+                ruleListViewAreaContent.innerHTML = preview;
+              }
+
+              confirmDeleteRuleButton.addEventListener('click', () => {
+                if (ruleToDelete !== null) {
+                  deleteRule(ruleToDelete);
+
+                  ruleToDelete = null;
+                  bootstrap.Modal.getInstance(document.getElementById('confirmDeleteRuleModal')).hide();
+                }
+              });
+
+              async function deleteRule(index) {
+                try{
+                  if (isConnected) {
+                    let url = `/deleterule?index=${index}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (response.ok) {
+                      await ruleListUpdate();
+                      ruleListStatus.innerHTML = newStatus("alert-success", `Successfully deleted the rule with ID=${index}`);
+                      ruleListViewArea.classList.add("d-none");
+                    } else {
+                      ruleListStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
+                    }
+                  } else {
+                    ruleListStatus.innerText = "No serial connection is currently active.";
+                  }
+                } catch (err) {
+                    ruleStatus.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
+                }
+              }
+
+              inputType1.addEventListener('change', () => newRuleProcessInput());
+              inputType2.addEventListener('change', () => newRuleProcessInput());
+              inputRegister1.addEventListener('input', () => newRuleProcessInput());
+              inputRegister2.addEventListener('input', () => newRuleProcessInput());
+              op1.addEventListener('change', () => newRuleProcessInput());
+              op2.addEventListener('change', () => newRuleProcessInput());
+              compareValue1.addEventListener('input', () => newRuleProcessInput());
+              compareValue2.addEventListener('input', () => newRuleProcessInput());
+              outputType.addEventListener('change', () => newRuleProcessInput());
+              outputRegister.addEventListener('input', () => newRuleProcessInput());
+              outputValue.addEventListener('input', () => newRuleProcessInput());
+              ruleJoin.addEventListener('change', () => newRuleProcessInput());
+
+              ruleListDelete.addEventListener('click', () => modalRTD.show());
+
+              ruleListRefresh.addEventListener('click', () => {
+                ruleListUpdate();
+                ruleListViewAreaContent.innerHTML = "";
+                ruleListViewArea.classList.add("d-none");
+              });
+            </script>
+          </div>
         </div>
       </div>
       <div class="tab-pane fade" id="tab-virtual" role="tabpanel">
@@ -2041,27 +2051,110 @@
         <div class="card mb-4">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5>Virtual Registers</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#virualBody">Toggle</a>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#virtualBody">Toggle</a>
           </div>
-          <div class="card m-3">
-            <div class="card-body">
-              <div class="mb-3">
-                <h6>Statistics</h6>
-                <span id="ruleCount">Unknown Rules</span>
+          <div id="virtualBody" class="collapse show">
+            <div class="card m-3">
+              <div class="card-body">
+                <div class="mb-3">
+                  <h6>Statistics</h6>
+                  <span id="ruleCount">Unknown number</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="card m-3">
-            <div class="card-body">
-              <div id="rulesBody" class="collapse show">
-                <div class="mb-3">
-                  <h6>Rule Designer</h6>
+            <div class="card m-3">
+              <div class="card-body">
+                <div id="vrManagerBody" class="collapse show">
+                  <div class="mb-3">
+                    <h6>Virtual Register Manager</h6>
+                  </div>
+                  <button id="vrNew" class="btn btn-primary d-inline-block">New</button>
+
+                  <!-- New Rule If 1 -->
+                  <div id="vrNewControls" class="mb-3 d-none">
+
+                    <span>Type:</span>
+
+                    <div class="d-inline-block me-2" style="width: 150px;">
+                      <select id="vrNewType" class="form-select form-select-sm">
+                        <option>Select</option>
+                        <option>Coil</option>
+                        <!--<option>Discrete Input</option>-->
+                        <option>Holding Register</option>
+                        <!--<option>Input Register</option>-->
+                      </select>
+                    </div>
+
+                    <button id="vrNewSubmit" class="btn btn-secondary d-inline-block">Add</button>&nbsp;&nbsp;
+                  </div>
+
+                  <div id="vrNewStatus" class="mt-3"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <script>
+        const vrNew = document.getElementById('vrNew');
+        const vrNewSubmit = document.getElementById('vrNewSubmit');
+        const vrNewType = document.getElementById('vrNewType');
+        const vrNewControls = document.getElementById('vrNewControls');
+        const vrNewStatus = document.getElementById('vrNewStatus');
+
+        vrNew.addEventListener('click', () => {
+          vrNew.classList.add("d-none");
+          vrNewControls.classList.remove("d-none");
+        });
+
+        vrNewType.addEventListener('change', () => {
+          vrNewStatus.innerHTML = "";
+          if (vrNewType.selectedIndex != 0) {
+            vrNewSubmit.classList.remove("btn-secondary");
+            vrNewSubmit.classList.add("btn-primary");
+          } else {
+            vrNewSubmit.classList.add("btn-secondary");
+            vrNewSubmit.classList.remove("btn-primary");
+          }
+        });
+
+        vrNewSubmit.addEventListener('click', async () => {
+          vrNewStatus.innerHTML = "";
+          if (vrNewSubmit.classList.contains("btn-secondary")) {
+            vrNewStatus.innerHTML = newStatus("alert-warning", `Please select a register type.`);
+          }
+          const registerType = getTypeIndex(vrNewType.value);
+          await vrNewRequest(registerType);
+        });
+
+        async function vrNewRequest(registerType) {
+          try {
+            const url = `/addvr?type=${encodeURIComponent(registerType)}`;
+            
+            const response = await fetch(url);
+            vrNewStatus.innerHTML = "";
+            if (response.ok) {
+              const data = await response.json();
+
+              const virtualIndex = data.virtualIndex;
+
+              const statusmsg = `A virtual register of type ${vrNewType.value} was successfully created with a ${vrNewType.value} index of ${virtualIndex}.`;
+              vrNewStatus.innerHTML = newStatus("alert-success", statusmsg);
+
+              // cleanup
+              vrNewSubmit.classList.remove("btn-primary");
+              vrNewSubmit.classList.add("btn-secondary");
+              vrNewControls.classList.add("d-none");
+              vrNewType.selectedIndex = 0;
+              vrNew.classList.remove("d-none");
+            } else {
+              vrNewStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error || 'Unknown error'}`);
+            }
+          } catch (err) {
+              vrNewStatus.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
+          }
+        }
+      </script>
     </div>
   </div>
 </div>

@@ -112,7 +112,6 @@ app.get("/write", async (req, res) => {
 });
 
 // -----
-
 async function sendRule(slave, rule) {
     // Custom function
     const func = 0x65; // Function code 101
@@ -294,6 +293,45 @@ app.get("/deleterule", async (req, res) => {
 
         res.json({
             success: true,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ------
+// Add a virtual register
+app.get("/addvr", async (req, res) => { 
+    try {
+        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+        const func = 0x75;
+        const type = parseInt(req.query.type);
+        console.log(type);
+
+        if (isNaN(type) || type < 0 || type > 0xFFFF) {
+            return res.status(400).json({ error: "Invalid or missing rule index" });
+        }
+
+        const request = Buffer.alloc(2);
+        request.writeUInt8(type, 0);
+        request.writeUInt8(0, 1);
+
+        const result = await modbus.sendRequest(func, request);
+
+        if (result.length < 7) {
+            throw new Error(`Response too short: expected 7, got ${result.length}`);
+        }
+
+        // Decode result
+        const virtualIndex = (result[3] << 8) | result[4];
+
+        // Send parsed data
+        res.json({
+            success: true,
+            virtualIndex,
             raw: result.toString("hex") 
         });
     } catch (err) {
