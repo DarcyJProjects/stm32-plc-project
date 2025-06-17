@@ -149,10 +149,14 @@ int main(void)
   	automation_Init();
 
   	// Setup Coils [HARDWARE]
-  	io_coil_add_channel(GPIOC, DOUT1_Pin);
-  	io_coil_add_channel(GPIOB, DOUT2_Pin);
-  	io_coil_add_channel(GPIOB, DOUT3_Pin);
-  	io_coil_add_channel(GPIOB, DOUT4_Pin);
+  	gpio_config coil_0 = {GPIOC, DOUT1_Pin};
+	gpio_config coil_1 = {GPIOB, DOUT2_Pin};
+	gpio_config coil_2 = {GPIOB, DOUT3_Pin};
+	gpio_config coil_3 = {GPIOB, DOUT4_Pin};
+  	io_coil_add_channel(hardware_coil_write_func, &coil_0);
+  	io_coil_add_channel(hardware_coil_write_func, &coil_1);
+  	io_coil_add_channel(hardware_coil_write_func, &coil_2);
+  	io_coil_add_channel(hardware_coil_write_func, &coil_3);
 
   	// Setup Discrete Inputs [HARDWARE]
   	gpio_config discrete_in_0 = {GPIOA, GPIO_PIN_2}; // PA2
@@ -165,8 +169,8 @@ int main(void)
   	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_3);
 
   	// Setup Holding Registers [HARDWARE]
-  	io_holding_reg_add_channel(&hdac1, DAC_CHANNEL_1);
-  	io_holding_reg_add_channel(&hdac1, DAC_CHANNEL_2);
+  	io_holding_reg_add_channel(dac_write_func, DAC_CHANNEL_1);
+  	io_holding_reg_add_channel(dac_write_func, DAC_CHANNEL_2);
 
 
   	// Setup Input register

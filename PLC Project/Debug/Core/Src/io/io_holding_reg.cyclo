@@ -1,3 +1,4 @@
-../Core/Src/io/io_holding_reg.c:16:6:io_holding_reg_add_channel	2
-../Core/Src/io/io_holding_reg.c:34:10:io_holding_reg_read	2
-../Core/Src/io/io_holding_reg.c:49:6:io_holding_reg_write	2
+../Core/Src/io/io_holding_reg.c:11:6:io_holding_reg_add_channel	3
+../Core/Src/io/io_holding_reg.c:30:10:io_holding_reg_read	2
+../Core/Src/io/io_holding_reg.c:39:6:io_holding_reg_write	2
+../Core/Src/io/io_holding_reg.c:47:6:dac_write_func	1
