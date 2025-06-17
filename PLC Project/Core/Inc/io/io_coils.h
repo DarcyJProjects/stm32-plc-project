@@ -7,7 +7,7 @@
 
 #include "stm32g4xx_hal.h"
 #include <stdbool.h> // Lets us use boolean logic
-#include "io_discrete_in.h" // for the gpio_config struct
+#include "io/io_discrete_in.h" // for the gpio_config struct
 
 extern uint16_t io_coil_channel_count; // extern so modbus.c can check this
 extern uint16_t io_hardware_coil_channel_count;
@@ -21,10 +21,11 @@ typedef struct {
 } IO_Coil_Channel;
 
 
-#define MAX_IO_COILS 4
+#define MAX_IO_COILS 32 // max total
+#define MAX_IO_COILS_PHYSICAL 4
 
 // Adds a new channel to the list
-void io_coil_add_channel(void (*write_func)(void*, uint16_t), void* context);
+bool io_coil_add_channel(void (*write_func)(void*, uint16_t), void* context);
 
 // Reads the coil
 GPIO_PinState io_coil_read(uint16_t index);

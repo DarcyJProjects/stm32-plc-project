@@ -28,11 +28,11 @@ typedef struct {
 	uint16_t storedValue; // Last output value
 } IO_Holding_Reg_Channel;
 
-
-#define MAX_IO_HOLDING_REG 2
+#define MAX_IO_HOLDING_REG 32 // max total
+#define MAX_IO_HOLDING_REG_PHYSICAL 2
 
 // Adds a new channel to the list
-void io_holding_reg_add_channel(void (*write_func)(void*, uint16_t), void* context);
+bool io_holding_reg_add_channel(void (*write_func)(void*, uint16_t), void* context);
 
 
 uint16_t io_holding_reg_read(uint16_t index);

@@ -13,6 +13,7 @@
 "./Core/Src/io/io_discrete_in.o"
 "./Core/Src/io/io_holding_reg.o"
 "./Core/Src/io/io_input_reg.o"
+"./Core/Src/io/io_virtual.o"
 "./Core/Src/main.o"
 "./Core/Src/stm32g4xx_hal_msp.o"
 "./Core/Src/stm32g4xx_it.o"

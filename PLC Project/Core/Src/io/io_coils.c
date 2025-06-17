@@ -6,11 +6,15 @@ uint16_t io_coil_channel_count = 0;
 uint16_t io_hardware_coil_channel_count = 0;
 
 
-void io_coil_add_channel(void (*write_func)(void*, uint16_t), void* context) {
+bool io_coil_add_channel(void (*write_func)(void*, uint16_t), void* context) {
+	if (io_coil_channel_count == MAX_IO_COILS) {
+		return false;
+	}
+
 	if (write_func == hardware_coil_write_func) {
 		// Enforce limit only for physical coil outputs
-		if (io_hardware_coil_channel_count >= MAX_IO_COILS) {
-			return;
+		if (io_hardware_coil_channel_count >= MAX_IO_COILS_PHYSICAL) {
+			return false;
 		} else {
 			io_hardware_coil_channel_count++; // increase physical coil channel count
 		}
@@ -20,6 +24,7 @@ void io_coil_add_channel(void (*write_func)(void*, uint16_t), void* context) {
 	io_coil_channels[io_coil_channel_count].context = context;
 	io_coil_channels[io_coil_channel_count].storedState = 0;
 	io_coil_channel_count++; // increase overall channel count
+	return true;
 }
 
 
@@ -33,7 +38,9 @@ GPIO_PinState io_coil_read(uint16_t index) {
 
 void io_coil_write(uint16_t index, GPIO_PinState state) {
 	if (index < io_coil_channel_count) {
-		io_coil_channels[index].write_func(io_coil_channels[index].context, state);
+		if (io_coil_channels[index].write_func) {
+			io_coil_channels[index].write_func(io_coil_channels[index].context, state);
+		}
 		io_coil_channels[index].storedState = state;
 	}
 }

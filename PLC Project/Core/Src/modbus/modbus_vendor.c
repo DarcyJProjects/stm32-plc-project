@@ -1,6 +1,7 @@
 #include "modbus/modbus_vendor.h"
 #include "modbus/modbus.h"
 #include "automation/automation.h"
+#include "io/io_virtual.h"
 
 // Handle a full received modbus frame
 void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
@@ -210,6 +211,47 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			responseData[2] = 0x01; // 1 byte to indicate success --> no failure byte at this point
 
 			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_ADD_VIRTUAL_REG: {
+			// Check request length (Slave Address, Function Code, Register Type, 0x00, CRC Low, CRC High)
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			if (frame[2] == 0 || frame[2] > 4) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			RegisterType registerType = frame[2] - 1; // register type should start at 1 when sent over modbus
+
+
+			uint16_t virtualIndex;
+
+			bool status = io_virtual_add(registerType, &virtualIndex);
+			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			char msg[32];
+			sprintf(msg, "%d", virtualIndex);
+			usb_serial_println(msg);
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_ADD_VIRTUAL_REG;
+			responseData[2] = 0x02; // byte count, 2 bytes follow (16 bits -> uint16_t)
+			responseData[3] = virtualIndex >> 8; // high byte
+			responseData[4] = virtualIndex & 0x00FF; // low byte
+
+			uint16_t responseLen = 5;
 
 			modbus_send_response(responseData, responseLen);
 			break;

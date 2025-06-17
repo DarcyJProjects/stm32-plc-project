@@ -8,12 +8,16 @@ uint16_t io_holding_adc_reg_channel_count = 0;
 extern DAC_HandleTypeDef hdac1; // Declare external handle for DAC1
 
 
-void io_holding_reg_add_channel(void (*write_func)(void*, uint16_t), void* context) {
+bool io_holding_reg_add_channel(void (*write_func)(void*, uint16_t), void* context) {
+	if (io_holding_reg_channel_count == MAX_IO_HOLDING_REG) {
+		return false;
+	}
+
 	// Check is a physical ADC output channel is being added
 	if (write_func == (void*)dac_write_func) {
 		// Enforce limit only for physical ADC outputs
-		if (io_holding_adc_reg_channel_count >= MAX_IO_HOLDING_REG) {
-			return;
+		if (io_holding_adc_reg_channel_count >= MAX_IO_HOLDING_REG_PHYSICAL) {
+			return false;
 		} else {
 			io_holding_adc_reg_channel_count++; // increase physical ADC channel count
 		}
@@ -23,6 +27,7 @@ void io_holding_reg_add_channel(void (*write_func)(void*, uint16_t), void* conte
 	io_holding_reg_channels[io_holding_reg_channel_count].context = context;
 	io_holding_reg_channels[io_holding_reg_channel_count].storedValue = 0;
 	io_holding_reg_channel_count++; // increase overall channel count
+	return true;
 }
 
 
@@ -38,7 +43,9 @@ uint16_t io_holding_reg_read(uint16_t index) {
 
 void io_holding_reg_write(uint16_t index, uint16_t value) {
 	if (index < io_holding_reg_channel_count) {
-		io_holding_reg_channels[index].write_func(io_holding_reg_channels[index].context, value);
+		if (io_holding_reg_channels[index].write_func) {
+			io_holding_reg_channels[index].write_func(io_holding_reg_channels[index].context, value);
+		}
 		io_holding_reg_channels[index].storedValue = value;
 	}
 }

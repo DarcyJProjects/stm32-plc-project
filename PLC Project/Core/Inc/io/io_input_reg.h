@@ -24,8 +24,8 @@ typedef struct {
 } IO_Input_Reg_Channel;
 
 
-
-#define MAX_IO_ADC_INPUT_REG 4 // Limit only applies to physically exposed MCU ADC inputs
+#define MAX_IO_INPUT_REG 32
+#define MAX_IO_INPUT_REG_PHYSICAL 4 // Limit only applies to physically exposed MCU ADC inputs
 
 // Adds a new channel to the list
 void io_input_reg_add_channel(uint16_t (*read_func)(void*), void* context);

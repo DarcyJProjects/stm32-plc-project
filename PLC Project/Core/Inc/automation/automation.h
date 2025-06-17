@@ -1,5 +1,5 @@
 #ifndef AUTOMATION_H
-#define AUTOMAT_H
+#define AUTOMATION_H
 
 #include <stdint.h>
 #include <stdbool.h>

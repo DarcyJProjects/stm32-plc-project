@@ -1,7 +1,7 @@
 #include <io/io_input_reg.h>
 
 // Allocates storage for all the channels.
-IO_Input_Reg_Channel io_input_reg_channels[256]; // Array of type channel (struct created in header)
+IO_Input_Reg_Channel io_input_reg_channels[MAX_IO_INPUT_REG]; // Array of type channel (struct created in header)
 uint16_t io_input_reg_channel_count = 0;
 uint16_t io_input_adc_reg_channel_count = 0;
 uint8_t is_calibrated = 0;
@@ -21,7 +21,7 @@ void io_input_reg_add_channel(uint16_t (*read_func)(void*), void* context) {
 	// Check is a physical ADC input channel is being added
 	if (read_func == (void*)adc_read_func) {
 		// Enforce limit only for physical ADC inputs
-		if (io_input_adc_reg_channel_count >= MAX_IO_ADC_INPUT_REG) {
+		if (io_input_adc_reg_channel_count >= MAX_IO_INPUT_REG_PHYSICAL) {
 			return;
 		} else {
 			io_input_adc_reg_channel_count++; // increase physical ADC channel count
