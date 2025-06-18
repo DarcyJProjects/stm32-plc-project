@@ -412,3 +412,11 @@ process.on("SIGINT", async () => {
     }
     process.exit();
 });
+
+// Listen for serial disconnects
+modbus.on("disconnect", () => {
+    console.warn("Modbus device disconnected!");
+    isConnected = false;
+    currentPort = null;
+    currentSlave = null;
+});

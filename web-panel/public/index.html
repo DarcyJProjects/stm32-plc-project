@@ -13,6 +13,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Font Awesome -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="bg-light py-4">
   
@@ -83,10 +85,15 @@
             <div id="serialConnectionBody" class="collapse show">
               <div class="mb-3">
                 <label for="portSelect" class="form-label">Select COM Port</label>
-                <select id="portSelect" class="form-select">
-                  <option>Loading...</option>
-                </select>
-              </div> 
+                <div class="d-flex">
+                  <select id="portSelect" class="form-select me-2">
+                    <option>Loading...</option>
+                  </select>
+                  <button id="refreshPortsBtn" class="btn btn-outline-secondary" title="Refresh ports">
+                    <i class="fas fa-sync-alt"></i>
+                  </button>
+                </div>
+              </div>
               <div class="mb-3">
                 <label for="baudSelect" class="form-label">Select Baud Rate</label>
                 <select id="baudSelect" class="form-select">
@@ -109,6 +116,7 @@
         const slaveSelect = document.getElementById("slaveAddress");
         const connectionStatus = document.getElementById("connectionStatus");
         const connectBtn = document.getElementById("connectBtn");
+        const refreshPortsBtn = document.getElementById("refreshPortsBtn");
 
         const connectionStatusDefaultText = 'Select a port and click connect.';
         const noPortsText = "No ports found";
@@ -116,6 +124,9 @@
         let isConnected;
         let currentPort; // only required for window.onload
         let currentSlave; // only required for window.onload
+
+        let connectionStatusTimer;
+        const connectionStatusTimerInterval = 1000;
 
         async function getStatus() {
           try {
@@ -157,6 +168,12 @@
             connectionStatus.textContent = 'Failed to fetch ports.';
           }
         }
+
+        refreshPortsBtn.addEventListener('click', () => {
+          if (!isConnected) {
+            fetchPorts();
+          }
+        });
 
         function updateUI(connected, port, slave) {
           connectionStatus.classList.remove("text-muted", "text-danger", "text-success");
@@ -203,6 +220,7 @@
               updateUI(true, selectedPort);
               statusPolling(true);
               ruleListUpdate();
+              connectionStatusTimer = setInterval(connectionStatus, connectionStatusTimerInterval);
             } else {
               statusPolling(false);
               connectionStatus.textContent = `Failed: ${data.error}`;
@@ -223,12 +241,26 @@
             if (data.success) {
               updateUI(false, selectedPort);
               ruleListUpdate();
+              connectionStatusTimer = clearInterval();
             } else {
               connectionStatus.textContent = `Failed to disconnect: ${data.error}`;
               connectionStatus.classList.remove("text-success");
               connectionStatus.classList.add("text-danger");
             }
           }
+
+          // Status polling regularly to check for serial port disconnect
+          async function connectionStatus() {
+            const isConnectedBuffer = isConnected;
+            const portBuffer = currentPort;
+            await getStatus();
+            if (isConnectedBuffer != isConnected) {
+              currentPort = portBuffer; // for disconnect text to be correct
+              updateUI(isConnected, currentPort, currentSlave);
+              statusPolling(isConnected);
+            }
+          }
+
         });
         </script>
 
@@ -1951,21 +1983,22 @@
                     item.addEventListener("click", () => viewRule(i));
                     ruleList.appendChild(item);
                   }
+                
+
+                  if (ruleListArray.length != ruleCountNum) {
+                    ruleListStatusBuffer = ruleListStatusBuffer + `Error: The number of successfully read rules does not equal the reported number of rules.<br><br><b>If graph polling is active, try stopping it temporarily. If another instance (browser tab) of the web panel is open, it's status update requests (and if active, graph polling requests) will likely interfere.</b><br>`;
+                  }
+
+                  if (ruleListStatusBuffer != "") {
+                    ruleListStatus.innerHTML = newStatus("alert-danger", `${ruleListStatusBuffer}`);
+                    ruleList.innerHTML = "";
+                  }
+
+                  await statusPolling(true);
+
+                  ruleListRefresh.classList.remove("d-none");
+                  ruleListRefreshBusy.classList.add("d-none");
                 }
-
-                if (ruleListArray.length != ruleCountNum) {
-                  ruleListStatusBuffer = ruleListStatusBuffer + `Error: The number of successfully read rules does not equal the reported number of rules.<br><br><b>If graph polling is active, try stopping it temporarily. If another instance (browser tab) of the web panel is open, it's status update requests (and if active, graph polling requests) will likely interfere.</b><br>`;
-                }
-
-                if (ruleListStatusBuffer != "") {
-                  ruleListStatus.innerHTML = newStatus("alert-danger", `${ruleListStatusBuffer}`);
-                  ruleList.innerHTML = "";
-                }
-
-                await statusPolling(true);
-
-                ruleListRefresh.classList.remove("d-none");
-                ruleListRefreshBusy.classList.add("d-none");
               }
 
               function viewRule(index) {

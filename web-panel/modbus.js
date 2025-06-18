@@ -1,7 +1,9 @@
 const { SerialPort } = require("serialport");
+const EventEmitter = require("events");
 
-class ModbusRTU {
+class ModbusRTU extends EventEmitter {
     constructor(path, baudRate = 9600) {
+        super();
         this.port = null;
         this.slaveId = null;
     }
@@ -17,6 +19,10 @@ class ModbusRTU {
             baudRate,
             parity,
             autoOpen: false,
+        });
+
+        this.port.on("close", () => {
+            this.emit("disconnect");
         });
 
         return new Promise((resolve, reject) => {
