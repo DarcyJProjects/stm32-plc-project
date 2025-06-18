@@ -1,0 +1,4 @@
+../Core/Src/i2c/eeprom.c:5:6:EEPROM_Write	56	static
+../Core/Src/i2c/eeprom.c:31:6:EEPROM_Read	24	static
+../Core/Src/i2c/eeprom.c:46:6:EEPROM_WriteBlock	16	static
+../Core/Src/i2c/eeprom.c:52:6:EEPROM_LoadBlock	16	static

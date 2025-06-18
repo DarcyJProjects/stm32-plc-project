@@ -41,4 +41,6 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len);
 
 uint8_t modbusGetSlaveAddress(void);
 
+uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
+
 #endif

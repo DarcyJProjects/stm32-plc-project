@@ -69,24 +69,7 @@ static void apply_rule(const LogicRule* rule) {
 }
 
 void automation_Init(void) {
-	// Hard coded test rules TODO: THIS IS ONLY FOR TESTING
-
-	/*rules[0] = (LogicRule){
-		REG_INPUT, 0, CMP_GT, 30000, // If Input Register 0 > 30000
-		REG_HOLDING, 0, CMP_EQ, 4096, // If Holding Register 0 == 4096
-		LOGIC_AND, // Condition 1 AND Condition 2
-		REG_COIL, 0, 1 // Then, set Coil 0 to 1.
-	};
-
-	// Inverse of rules[0] to reset the coil state:
-	rules[1] = (LogicRule){
-		REG_INPUT, 0, CMP_LT, 30001, // If Input Register 0 !> 30000
-		REG_HOLDING, 0, CMP_NEQ, 4096, // If Holding Register 0 != 4096
-		LOGIC_OR, // Condition 1 OR Condition 2
-		REG_COIL, 0, 0 // Then, set Coil 0 to 0.
-	};
-
-	rule_count = 2;*/
+	automation_load_rules();
 }
 
 void automation_Tick(void) {
@@ -99,6 +82,13 @@ bool automation_add_rule(LogicRule newRule) {
 	if (rule_count < MAX_RULES) {
 		rules[rule_count] = newRule;
 		rule_count++;
+
+		// Save to EEPROM
+		bool status = automation_save_rules();
+		if (status == false) {
+			return false;
+		}
+
 		return true;
 	} else {
 		return false;
@@ -133,5 +123,107 @@ bool automation_delete_rule(uint16_t index) {
 
 	// Decrement the count
 	rule_count--;
+
+	// Save to EEPROM
+	bool status = automation_save_rules();
+	if (status == false) {
+		return false;
+	}
+
+	return true;
+}
+
+bool automation_save_rules(void) {
+	if (rule_count > MAX_RULES) return false;
+
+	uint16_t addr = 0x0000;
+
+	// Write the rule count first
+	if (!EEPROM_WriteBlock(addr, &rule_count, sizeof(rule_count))) {
+		return false;
+	}
+	addr += sizeof(rule_count);
+
+	// Write rules
+	for (uint16_t i = 0; i < rule_count; i++) {
+		if (!EEPROM_WriteBlock(addr, &rules[i], sizeof(LogicRule))) {
+			return false;
+		}
+		addr += sizeof(LogicRule);
+	}
+
+	// Compute CRC16 over rule_count + rules
+	uint16_t crc_input_len = sizeof(rule_count) + rule_count * sizeof(LogicRule);
+	uint8_t crc_buffer[sizeof(rule_count) + MAX_RULES * sizeof(LogicRule)];
+	memcpy(crc_buffer, &rule_count, sizeof(rule_count));
+	memcpy(crc_buffer + sizeof(rule_count), rules, rule_count * sizeof(LogicRule));
+
+	uint16_t crc = modbus_crc16(crc_buffer, crc_input_len);
+
+	if (!EEPROM_WriteBlock(addr, (uint8_t*)&crc, sizeof(crc))) {
+		return false;
+	}
+
+	return true;
+}
+
+bool automation_load_rules(void) {
+	uint16_t addr = 0x0000;
+	uint16_t saved_count = 0;
+
+	if (!EEPROM_LoadBlock(addr, &saved_count, sizeof(saved_count))) {
+		return false;
+	}
+	if (saved_count > MAX_RULES) {
+		return false;
+	}
+
+	addr += sizeof(saved_count);
+
+	if (saved_count == 0) {
+		// Still need to validate CRC16 of just the rule count (2 bytes)
+		uint16_t stored_crc = 0;
+		if (!EEPROM_LoadBlock(addr, &stored_crc, sizeof(stored_crc))) {
+			return false;
+		}
+
+		uint16_t computed_crc = modbus_crc16((uint8_t*)&saved_count, sizeof(saved_count));
+		if (computed_crc != stored_crc) {
+			return false;
+		}
+
+		rule_count = 0;
+		return true;
+	}
+	// Otherwise load as usual:
+
+	// Temporarily load the data into a buffer
+	LogicRule temp_rules[MAX_RULES];
+	if (!EEPROM_LoadBlock(addr, temp_rules, saved_count * sizeof(LogicRule))) {
+		return false;
+	}
+	addr += saved_count * sizeof(LogicRule);
+
+	// Read stored CRC16
+	uint16_t stored_crc = 0;
+	if (!EEPROM_LoadBlock(addr, &stored_crc, sizeof(stored_crc))) {
+		return false;
+	}
+
+	// Compute CRC16
+	uint8_t crc_buffer[sizeof(saved_count) + MAX_RULES * sizeof(LogicRule)];
+	memcpy(crc_buffer, &saved_count, sizeof(saved_count));
+	memcpy(crc_buffer + sizeof(saved_count), temp_rules, saved_count * sizeof(LogicRule));
+
+	uint16_t computed_crc = modbus_crc16(crc_buffer, sizeof(saved_count) + saved_count * sizeof(LogicRule));
+
+	if (computed_crc != stored_crc) {
+		return false;
+	}
+
+
+	// All valid, so use these rules
+	memcpy(rules, temp_rules, saved_count * sizeof(LogicRule));
+	rule_count = saved_count;
 	return true;
 }

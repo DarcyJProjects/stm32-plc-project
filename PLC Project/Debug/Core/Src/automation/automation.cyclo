@@ -4,8 +4,10 @@
 ../Core/Src/automation/automation.c:43:13:evaluate_rule	8
 ../Core/Src/automation/automation.c:65:13:apply_rule	2
 ../Core/Src/automation/automation.c:71:6:automation_Init	1
-../Core/Src/automation/automation.c:92:6:automation_Tick	2
-../Core/Src/automation/automation.c:98:6:automation_add_rule	2
-../Core/Src/automation/automation.c:108:10:automation_get_rule_count	1
-../Core/Src/automation/automation.c:112:6:automation_get_rule	2
-../Core/Src/automation/automation.c:121:6:automation_delete_rule	3
+../Core/Src/automation/automation.c:75:6:automation_Tick	2
+../Core/Src/automation/automation.c:81:6:automation_add_rule	3
+../Core/Src/automation/automation.c:98:10:automation_get_rule_count	1
+../Core/Src/automation/automation.c:102:6:automation_get_rule	2
+../Core/Src/automation/automation.c:111:6:automation_delete_rule	4
+../Core/Src/automation/automation.c:136:6:automation_save_rules	6
+../Core/Src/automation/automation.c:170:6:automation_load_rules	9

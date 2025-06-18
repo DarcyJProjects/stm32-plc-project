@@ -9,6 +9,9 @@
 #include "io/io_holding_reg.h"
 #include "io/io_input_reg.h"
 
+#include "i2c/eeprom.h"
+#include "modbus/modbus.h" // for modbus_crc()
+
 typedef enum {
 	REG_COIL,
 	REG_DISCRETE,
@@ -65,5 +68,9 @@ uint16_t automation_get_rule_count(void);
 bool automation_get_rule(uint16_t index, LogicRule* rule);
 
 bool automation_delete_rule(uint16_t index);
+
+bool automation_save_rules(void);
+
+bool automation_load_rules(void);
 
 #endif

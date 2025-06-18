@@ -7,9 +7,6 @@
 #include "modbus/modbus.h"
 #include "modbus/modbus_vendor.h"
 
-// FUNCTIONS
-static uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
-
 // SLAVE ADDRESS
 static uint8_t slave_address;
 
@@ -354,7 +351,7 @@ void modbus_handle_frame(uint8_t* frame, uint16_t len) {
 
 // Calculate CRC16
 // Source: https://stackoverflow.com/questions/19347685/calculating-modbus-rtu-crc-16
-static uint16_t modbus_crc16(uint8_t* frame, uint16_t len) {
+uint16_t modbus_crc16(uint8_t* frame, uint16_t len) {
 	uint16_t crc = 0xFFFF;
 
 	for (uint16_t pos = 0; pos < len; pos++) {
