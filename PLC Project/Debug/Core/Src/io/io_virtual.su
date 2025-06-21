@@ -1,1 +1,4 @@
-../Core/Src/io/io_virtual.c:6:6:io_virtual_add	24	static
+../Core/Src/io/io_virtual.c:10:6:io_virtual_add	16	static
+../Core/Src/io/io_virtual.c:35:6:io_virtual_get_count	16	static
+../Core/Src/io/io_virtual.c:53:6:io_virtual_read	16	static
+../Core/Src/io/io_virtual.c:78:6:io_virtual_write	16	static

@@ -2,6 +2,10 @@
 #include "modbus/modbus.h"
 #include "automation/automation.h"
 #include "io/io_virtual.h"
+#include "rtc/rtc_ds3231.h"
+
+#include "io/io_coils.h"
+#include "io/io_holding_reg.h"
 
 // Handle a full received modbus frame
 void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
@@ -140,7 +144,7 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 
 			bool status = automation_get_rule(ruleIndex, &rule);
 			if (status == false) {
-				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
 				return;
 			}
 
@@ -199,7 +203,7 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 
 			bool status = automation_delete_rule(ruleIndex);
 			if (status == false) {
-				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
 				return;
 			}
 
@@ -222,36 +226,193 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 				return;
 			}
 
-			if (frame[2] == 0 || frame[2] > 4) {
+			if (frame[2] == 0 || frame[2] > 2) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
-			RegisterType registerType = frame[2] - 1; // register type should start at 1 when sent over modbus
+			VirtualRegisterType registerType = frame[2] - 1; // register type should start at 1 when sent over modbus
 
-
-			uint16_t virtualIndex;
-
-			bool status = io_virtual_add(registerType, &virtualIndex);
+			bool status = io_virtual_add(registerType);
 			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[3];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_ADD_VIRTUAL_REG;
+			responseData[2] = 0x01; // status
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_READ_VIRTUAL_REG: {
+			// Check request length (Slave Address, Function Code, Register Type, Address High, Address Low, CRC Low, CRC High)
+			if (len != 7) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
-			char msg[32];
-			sprintf(msg, "%d", virtualIndex);
-			usb_serial_println(msg);
+			// Verify type
+			if (frame[2] == 0 || frame[2] > 2) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			VirtualRegisterType registerType = frame[2] - 1; // register type should start at 1 when sent over modbus
+
+			// Get Address
+			uint16_t address = frame[3] << 8 | frame[4];
+
+			uint16_t value;
+			bool status = io_virtual_read(registerType, address, &value);
+			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+
+			// Create the response frame
+			uint8_t byteCount;
+			switch (registerType) {
+				case VIR_COIL:
+					byteCount = 1;
+					break;
+				case VIR_HOLDING:
+					byteCount = 2;
+					break;
+			}
+
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_READ_VIRTUAL_REG;
+			responseData[2] = byteCount;
+
+			switch (registerType) {
+				case VIR_COIL:
+					responseData[3] = (value != 0) ? 1 : 0;
+					break;
+				case VIR_HOLDING:
+					responseData[3] = value >> 8; // high byte
+					responseData[4] = value & 0xFF; // low byte
+					break;
+			}
+
+			uint16_t responseLen = 3 + byteCount; // slave address, function, byte count, (byte count bytes)
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_WRITE_VIRTUAL_REG: {
+			// Check request length (Slave Address, Function Code, Register Type, Address High, Address Low, Value High, Value Low, CRC Low, CRC High)
+			if (len != 9) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Verify type
+			if (frame[2] == 0 || frame[2] > 2) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			VirtualRegisterType registerType = frame[2] - 1; // register type should start at 1 when sent over modbus
+
+			// Get Address and value
+			uint16_t address = (frame[3] << 8) | frame[4];
+			uint16_t value = (frame[5] << 8) | frame[6];
+
+
+			bool status = io_virtual_write(registerType, address, value);
+			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint16_t responseLen = 3; // slave address, function, status byte
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_WRITE_VIRTUAL_REG;
+			responseData[2] = 0x01; // 0x01 = success
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_GET_VIRTUAL_REG_COUNT: {
+			// Check request length (Slave Address, Function Code, Register Type, 0x00, CRC Low, CRC High)
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Verify type
+			if (frame[2] == 0 || frame[2] > 2) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			VirtualRegisterType registerType = frame[2] - 1; // register type should start at 1 when sent over modbus
+
+			uint16_t count;
+			bool status = io_virtual_get_count(registerType, &count);
+			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
 
 			// Create the response frame
 			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
 
 			responseData[0] = slave_address; // the address of us
-			responseData[1] = MODBUS_VENDOR_FUNC_ADD_VIRTUAL_REG;
-			responseData[2] = 0x02; // byte count, 2 bytes follow (16 bits -> uint16_t)
-			responseData[3] = virtualIndex >> 8; // high byte
-			responseData[4] = virtualIndex & 0x00FF; // low byte
+			responseData[1] = MODBUS_VENDOR_FUNC_GET_VIRTUAL_REG_COUNT;
+			responseData[2] = 0x02; // byte count
+			responseData[3] = count >> 8; // high byte
+			responseData[4] = count & 0xFF; // low byte
 
 			uint16_t responseLen = 5;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_SET_RTC: {
+			// Check request length (Slave Address, Function Code, 7x data, CRC Low, CRC High)
+			if (len != 11) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			RTC_Time setTime;
+			setTime.seconds 	= frame[2];
+			setTime.minutes		= frame[3];
+			setTime.hours		= frame[4];
+			setTime.day_of_week	= frame[5];
+			setTime.day			= frame[6];
+			setTime.month		= frame[7];
+			setTime.year		= frame[8];
+
+			// Set time on DS3231
+			HAL_StatusTypeDef status = DS3231_SetTime(&setTime);
+			if (status != HAL_OK) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_SET_RTC;
+			responseData[2] = 0x01; // status byte (0x01 = success)
+
+			uint16_t responseLen = 3;
 
 			modbus_send_response(responseData, responseLen);
 			break;

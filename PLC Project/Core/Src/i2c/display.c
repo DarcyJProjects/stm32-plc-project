@@ -5,10 +5,11 @@
 #include "i2c/ssd1306/ssd1306_icons.h"
 #include "modbus/modbus.h"
 #include "io/io_coils.h"
+#include "rtc/rtc_ds3231.h"
 
 // Variables
 uint16_t currentPage = 0;
-uint16_t endPage = 4;
+uint16_t endPage = 5;
 
 void display_Setup() {
 	// Initialise SSD1306
@@ -128,6 +129,22 @@ void display_StatusPage(void) {
 
 			ssd1306_SetCursor(60, 40);
 			sprintf(buf, "3: %d", io_input_reg_read(3));
+			ssd1306_WriteString(buf, Font_6x8, White);
+			break;
+		case 5:
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(50, 0);
+			ssd1306_WriteString("RTC", Font_11x18, White);
+
+			RTC_Time current;
+			DS3231_ReadTime(&current);
+
+			ssd1306_SetCursor(2, 25);
+			sprintf(buf, "%02d:%02d:%02d", current.hours, current.minutes, current.seconds);
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			sprintf(buf, "%02d/%02d/20%02d", current.day, current.month, current.year);
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
 	}

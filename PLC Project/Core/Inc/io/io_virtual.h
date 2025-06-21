@@ -5,11 +5,28 @@
 #include <stdbool.h> // Lets us use boolean logic
 #include "automation/automation.h" // to use the RegisterType enumeration
 
-#include "io/io_coils.h"
-#include "io/io_discrete_in.h"
-#include "io/io_holding_reg.h"
-#include "io/io_input_reg.h"
+#define MAX_VIRTUAL_COILS 128
+#define MAX_VIRTUAL_HOLDING_REG 128
 
-bool io_virtual_add(RegisterType type, uint16_t* index);
+typedef enum {
+	VIR_COIL, // digital virtual registers
+	VIR_HOLDING // analogue virtual registers (16 bit)
+} VirtualRegisterType;
+
+typedef struct {
+	uint8_t storedValue; // 0 or 1
+} Virtual_Coil_Channel;
+
+typedef struct {
+	uint16_t storedValue; // 16 bit
+} Virtual_Holding_Reg_Channel;
+
+bool io_virtual_add(VirtualRegisterType type);
+
+bool io_virtual_get_count(VirtualRegisterType type, uint16_t* count);
+
+bool io_virtual_read(VirtualRegisterType type, uint16_t index, uint16_t* value);
+
+bool io_virtual_write(VirtualRegisterType type, uint16_t index, uint16_t value);
 
 #endif
