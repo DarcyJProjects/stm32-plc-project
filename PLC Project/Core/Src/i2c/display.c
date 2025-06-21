@@ -6,10 +6,11 @@
 #include "modbus/modbus.h"
 #include "io/io_coils.h"
 #include "rtc/rtc_ds3231.h"
+#include "io/io_virtual.h"
 
 // Variables
 uint16_t currentPage = 0;
-uint16_t endPage = 5;
+uint16_t endPage = 6;
 
 void display_Setup() {
 	// Initialise SSD1306
@@ -132,6 +133,28 @@ void display_StatusPage(void) {
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
 		case 5:
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(7, 0);
+			ssd1306_WriteString("Automation", Font_11x18, White);
+
+			ssd1306_SetCursor(2, 25);
+			sprintf(buf, "%d rules", automation_get_rule_count());
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			uint16_t virtCoils = 0;
+			uint16_t virtHolding = 0;
+			io_virtual_get_count(VIR_COIL, &virtCoils);
+			io_virtual_get_count(VIR_HOLDING, &virtHolding);
+
+			ssd1306_SetCursor(2, 40);
+			sprintf(buf, "%d virt. coils", virtCoils);
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 55);
+			sprintf(buf, "%d virt. holding", virtHolding);
+			ssd1306_WriteString(buf, Font_6x8, White);
+			break;
+		case 6:
 			ssd1306_Fill(Black);
 			ssd1306_SetCursor(50, 0);
 			ssd1306_WriteString("RTC", Font_11x18, White);

@@ -1,5 +1,5 @@
-../Core/Src/i2c/display.c:14:6:display_Setup	8	static
-../Core/Src/i2c/display.c:19:6:display_Boot	16	static
-../Core/Src/i2c/display.c:28:6:display_StatusPage	64	static
-../Core/Src/i2c/display.c:159:6:display_BtnPress	8	static
-../Core/Src/i2c/display.c:170:6:display_setPage	16	static
+../Core/Src/i2c/display.c:15:6:display_Setup	8	static
+../Core/Src/i2c/display.c:20:6:display_Boot	16	static
+../Core/Src/i2c/display.c:29:6:display_StatusPage	64	static
+../Core/Src/i2c/display.c:182:6:display_BtnPress	8	static
+../Core/Src/i2c/display.c:193:6:display_setPage	16	static
