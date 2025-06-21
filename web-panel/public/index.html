@@ -1538,6 +1538,8 @@
                         <option>Discrete Input</option>
                         <option>Holding Register</option>
                         <option>Input Register</option>
+                        <option>Virtual Coil</option>
+                        <option>Virtual Holding Register</option>
                       </select>
                     </div>
 
@@ -1584,6 +1586,8 @@
                         <option>Discrete Input</option>
                         <option>Holding Register</option>
                         <option>Input Register</option>
+                        <option>Virtual Coil</option>
+                        <option>Virtual Holding Register</option>
                       </select>
                     </div>
 
@@ -1617,6 +1621,8 @@
                         <option>Select</option>
                         <option>Coil</option>
                         <option>Holding Register</option>
+                        <option>Virtual Coil</option>
+                        <option>Virtual Holding Register</option>
                       </select>
                     </div>
 
@@ -1728,6 +1734,8 @@
                   case "Discrete Input": return "discrete";
                   case "Holding Register": return "holding";
                   case "Input Register": return "input";
+                  case "Virtual Coil": return "vir_coil";
+                  case "Virtual Holding Register": return "vir_holding";
                   default: return "null";
                 }
               }
@@ -1826,6 +1834,8 @@
                   case "discrete input": return 2;
                   case "holding register": return 3;
                   case "input register": return 4;
+                  case "virtual coil": return 5;
+                  case "virtual holding register": return 6;
                   default: return 0;
                 }
               }
@@ -1836,6 +1846,8 @@
                   case 2: return "DISCRETE";
                   case 3: return "HOLDING";
                   case 4: return "INPUT";
+                  case 5: return "VIR_COIL";
+                  case 6: return "VIR_HOLDING";
                   default: return "NULL";
                 }
               }
