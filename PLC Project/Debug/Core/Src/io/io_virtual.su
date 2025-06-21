@@ -4,3 +4,4 @@
 ../Core/Src/io/io_virtual.c:85:6:io_virtual_write	16	static
 ../Core/Src/io/io_virtual.c:109:6:io_virtual_save	416	static
 ../Core/Src/io/io_virtual.c:150:6:io_virtual_load	808	static
+../Core/Src/io/io_virtual.c:207:6:io_virtual_clear	8	static

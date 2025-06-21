@@ -202,3 +202,19 @@ bool io_virtual_load(uint16_t baseAddress) {
 
 	return true;
 }
+
+// WARNING. Deletes all virtual registers in memory and on EEPROM
+bool io_virtual_clear(void) {
+	virtual_coil_channel_count = 0;
+	virtual_holding_reg_channel_count = 0;
+
+	memset(virtual_coil_channels, 0, sizeof(virtual_coil_channels));
+	memset(virtual_holding_reg_channels, 0, sizeof(virtual_holding_reg_channels));
+
+	// Save virtual registers to EEPROM (managed by automation as virtual registers are written after rules at dynamic address)
+	if (!automation_save_rules()) {
+		return false;
+	}
+
+	return true;
+}

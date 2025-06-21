@@ -33,4 +33,6 @@ bool io_virtual_save(uint16_t baseAddress);
 
 bool io_virtual_load(uint16_t baseAddress);
 
+bool io_virtual_clear(void);
+
 #endif

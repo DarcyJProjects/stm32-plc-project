@@ -382,6 +382,38 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			modbus_send_response(responseData, responseLen);
 			break;
 		}
+		case MODBUS_VENDOR_FUNC_CLEAR_VIRTUAL_REG: {
+			// Check request length (Slave Address, Function Code, 0x01, 0x01, CRC Low, CRC High)
+			// must send two 0x01 bytes to confirm
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			if (frame[2] != 1 || frame[3] != 1) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+
+			bool status = io_virtual_clear();
+			if (status == false) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[3];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_CLEAR_VIRTUAL_REG;
+			responseData[2] = 0x01; // status
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
 		case MODBUS_VENDOR_FUNC_SET_RTC: {
 			// Check request length (Slave Address, Function Code, 7x data, CRC Low, CRC High)
 			if (len != 11) {
