@@ -11,6 +11,16 @@ static uint16_t read_register_value(RegisterType type, uint16_t addr) {
 		case REG_DISCRETE:	return io_discrete_in_read(addr);
 		case REG_HOLDING:	return io_holding_reg_read(addr);
 		case REG_INPUT:		return io_input_reg_read(addr);
+		case REG_VIR_COIL: {
+			uint16_t value = 0;
+			io_virtual_read(VIR_COIL, addr, &value);
+			return value;
+		}
+		case REG_VIR_HOLDING: {
+			uint16_t value = 0;
+			io_virtual_read(VIR_HOLDING, addr, &value);
+			return value;
+		}
 		default:			return 0;
 	}
 }
@@ -22,6 +32,12 @@ static void write_register_value(RegisterType type, uint16_t addr, uint16_t writ
 			break;
 		case REG_HOLDING:
 			io_holding_reg_write(addr, write_value);
+			break;
+		case REG_VIR_COIL:
+			io_virtual_write(VIR_COIL, addr, write_value);
+			break;
+		case REG_VIR_HOLDING:
+			io_virtual_write(VIR_HOLDING, addr, write_value);
 			break;
 		default:
 			break;

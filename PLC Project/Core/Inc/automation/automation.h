@@ -8,6 +8,7 @@
 #include "io/io_discrete_in.h"
 #include "io/io_holding_reg.h"
 #include "io/io_input_reg.h"
+#include "io/io_virtual.h"
 
 #include "i2c/eeprom.h"
 #include "modbus/modbus.h" // for modbus_crc()
@@ -16,10 +17,12 @@ typedef enum {
 	REG_COIL,
 	REG_DISCRETE,
 	REG_HOLDING,
-	REG_INPUT
+	REG_INPUT,
+	REG_VIR_COIL,
+	REG_VIR_HOLDING
 } RegisterType;
 
-#define AUTOMATION_TYPE_COUNT 4 // required for modbus frame validation
+#define AUTOMATION_TYPE_COUNT 6 // required for modbus frame validation
 
 typedef enum {
 	CMP_EQ, 	// ==
