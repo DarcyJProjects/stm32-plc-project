@@ -219,7 +219,8 @@
               isConnected = true;
               updateUI(true, selectedPort);
               statusPolling(true);
-              ruleListUpdate();
+              await ruleListUpdate();
+              await vrListUpdate();
               connectionStatusTimer = setInterval(connectionStatus, connectionStatusTimerInterval);
             } else {
               statusPolling(false);

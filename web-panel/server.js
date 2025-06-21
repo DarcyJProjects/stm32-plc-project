@@ -307,7 +307,7 @@ app.get("/addvr", async (req, res) => {
     try {
         if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
 
-        const func = 0x75;
+        const func = 0x69;
         const type = parseInt(req.query.type);
 
         if (isNaN(type) || type < 0 || type > 0xFFFF) {
@@ -340,7 +340,7 @@ app.get("/readvr", async (req, res) => {
     try {
         if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
 
-        const func = 0x76;
+        const func = 0x6A;
         const type = parseInt(req.query.type);
         const address = parseInt(req.query.address);
 
@@ -389,7 +389,7 @@ app.get("/writevr", async (req, res) => {
     try {
         if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
 
-        const func = 0x77;
+        const func = 0x6B;
         const type = parseInt(req.query.type);
         const address = parseInt(req.query.address);
         const value = parseInt(req.query.value);
@@ -431,7 +431,7 @@ app.get("/countvr", async (req, res) => {
     try {
         if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
 
-        const func = 0x78;
+        const func = 0x6C;
         const type = parseInt(req.query.type);
 
         if (![1, 2].includes(type)) {
@@ -462,6 +462,36 @@ app.get("/countvr", async (req, res) => {
     }
 });
 
+// Delete a virtual register [BackEnd only at the moment]
+app.get("/clearvr", async (req, res) => { 
+    try {
+        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+        const func = 0x6D;
+        const confirm = req.query.confirmation; // boolean
+        if (confirm !== '1' && confirm !== 'true') return res.status(400).json({ error: "Confirmation is required." }); 
+
+        const request = Buffer.alloc(2);
+        request.writeUInt8(1, 0); // confirm byte 1
+        request.writeUInt8(1, 1); // confirm byte 2
+
+        const result = await modbus.sendRequest(func, request);
+
+        if (result.length != 5 || result[2] != 1) {
+            throw new Error(`Invalid response.`);
+        }
+
+        // Send parsed data
+        res.json({
+            success: true,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ------
 // Set RTC time
 app.get("/setrtc", async (req, res) => { 
@@ -481,7 +511,7 @@ app.get("/setrtc", async (req, res) => {
             return res.status(400).json({ error: "Invalid timezone" });
         }
 
-        const func = 0x79;
+        const func = 0x6E;
 
         const request = Buffer.from([
             now.second,
