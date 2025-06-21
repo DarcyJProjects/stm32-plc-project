@@ -180,6 +180,11 @@ bool automation_save_rules(void) {
 		return false;
 	}
 
+	addr += sizeof(crc);
+
+	// Now save virtual registers
+	if (!io_virtual_save(addr)) return false;
+
 	return true;
 }
 
@@ -237,9 +242,18 @@ bool automation_load_rules(void) {
 		return false;
 	}
 
+	addr += sizeof(stored_crc);
+
 
 	// All valid, so use these rules
 	memcpy(rules, temp_rules, saved_count * sizeof(LogicRule));
 	rule_count = saved_count;
+
+
+	// Now load virtual registers
+	if (!io_virtual_load(addr)) {
+		return false;
+	}
+
 	return true;
 }

@@ -11,6 +11,11 @@
 #define EEPROM_SIZE_BYTES	4096
 
 
+/*
+ * RULES ADDRESS IS 0x0000
+ * VIRTUAL REGISTERS START IMMEDIATELY AFTER RULES CRC16 (DYNAMIC ADDRESS)
+ */
+
 bool EEPROM_Write(uint16_t memAddr, uint8_t* data, uint16_t len);
 
 bool EEPROM_Read(uint16_t memAddr, uint8_t* data, uint16_t len);

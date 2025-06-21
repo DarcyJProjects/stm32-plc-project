@@ -29,4 +29,8 @@ bool io_virtual_read(VirtualRegisterType type, uint16_t index, uint16_t* value);
 
 bool io_virtual_write(VirtualRegisterType type, uint16_t index, uint16_t value);
 
+bool io_virtual_save(uint16_t baseAddress);
+
+bool io_virtual_load(uint16_t baseAddress);
+
 #endif
