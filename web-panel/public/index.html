@@ -2091,7 +2091,7 @@
               <div class="card-body">
                 <div class="mb-3">
                   <h6>Statistics</h6>
-                  <span id="ruleCount">Unknown number</span>
+                  <span id="vrCount">Unknown number</span>
                 </div>
               </div>
             </div>
@@ -2112,9 +2112,7 @@
                       <select id="vrNewType" class="form-select form-select-sm">
                         <option>Select</option>
                         <option>Coil</option>
-                        <!--<option>Discrete Input</option>-->
                         <option>Holding Register</option>
-                        <!--<option>Input Register</option>-->
                       </select>
                     </div>
 
@@ -2122,6 +2120,45 @@
                   </div>
 
                   <div id="vrNewStatus" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card m-3">
+              <div class="card-body">
+                <div id="activevrBody" class="collapse show">
+                  <div class="mb-3">
+                    <h6>Virtual Registers</h6>
+                  </div>
+
+                  <div class="list-group mb-3" id="vrList">
+                    <!-- dynamically updated-->
+                  </div>
+
+                  <div id="vrListViewArea" class="card mb-3 d-none">
+                    <div class="card-body">
+                      <span id="vrListViewAreaLabel" class="mb-3">Virtual Register</span><br><br>
+                      <div class="d-flex mb-2">
+                        <!-- Read Section -->
+                        <div class="d-flex align-items-center me-3">
+                          <input type="number" class="form-control form-control-sm" id="vrListViewAreaValueRead" placeholder="value" min="0" readonly />
+                          <button id="vrListViewAreaBtnRead" class="btn btn-primary ms-2">Read</button>
+                        </div>
+                        <!-- Write Section -->
+                        <div class="d-flex align-items-center">
+                          <input type="number" class="form-control form-control-sm" id="vrListViewAreaValueWrite" placeholder="value" min="0" />
+                          <button id="vrListViewAreaBtnWrite" class="btn btn-primary ms-2">Write</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button id="vrListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
+                  <button id="vrListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
+
+                  <div id="vrListStatus" class="mt-3"></div>
+                  <br>
+                  <div class="alert alert-info" role="alert"><i class="fas fa-circle-info"></i>&nbsp;&nbsp;Virtual registers current cannot be deleted as rules may reference them. This functionality is planned.</div>
                 </div>
               </div>
             </div>
@@ -2134,6 +2171,25 @@
         const vrNewType = document.getElementById('vrNewType');
         const vrNewControls = document.getElementById('vrNewControls');
         const vrNewStatus = document.getElementById('vrNewStatus');
+
+        const vrCount = document.getElementById('vrCount');
+        const vrList = document.getElementById('vrList');
+        const vrListRefresh = document.getElementById('vrListRefresh');
+        const vrListRefreshBusy = document.getElementById('vrListRefreshBusy');
+        const vrListStatus = document.getElementById('vrListStatus');
+
+        const vrListViewArea = document.getElementById('vrListViewArea');
+        const vrListViewAreaLabel = document.getElementById('vrListViewAreaLabel');
+        const vrListViewAreaValueRead = document.getElementById('vrListViewAreaValueRead');
+        const vrListViewAreaBtnRead = document.getElementById('vrListViewAreaBtnRead');
+        const vrListViewAreaValueWrite = document.getElementById('vrListViewAreaValueWrite');
+        const vrListViewAreaBtnWrite = document.getElementById('vrListViewAreaBtnWrite');
+
+        let vrCountCoils = 0;
+        let vrCountHolding = 0;
+
+        let selectedvr = null;
+        let selectedvrtype = null;
 
         vrNew.addEventListener('click', () => {
           vrNew.classList.add("d-none");
@@ -2155,9 +2211,12 @@
           vrNewStatus.innerHTML = "";
           if (vrNewSubmit.classList.contains("btn-secondary")) {
             vrNewStatus.innerHTML = newStatus("alert-warning", `Please select a register type.`);
+            return;
           }
-          const registerType = getTypeIndex(vrNewType.value);
+          const registerType = vrNewType.selectedIndex; // ensure index 0 is a placeholder, e.g., "select"
           await vrNewRequest(registerType);
+
+          vrListUpdate();
         });
 
         async function vrNewRequest(registerType) {
@@ -2169,9 +2228,7 @@
             if (response.ok) {
               const data = await response.json();
 
-              const virtualIndex = data.virtualIndex;
-
-              const statusmsg = `A virtual register of type ${vrNewType.value} was successfully created with a ${vrNewType.value} index of ${virtualIndex}.`;
+              const statusmsg = `A virtual register of type ${vrNewType.value} was successfully created.`;
               vrNewStatus.innerHTML = newStatus("alert-success", statusmsg);
 
               // cleanup
@@ -2187,6 +2244,132 @@
               vrNewStatus.innerHTML = newStatus("alert-danger", `Server error: ${err.message}`);
           }
         }
+
+        async function vrCountUpdate() {
+          if (isConnected) {
+            let url = `/countvr?type=1`; // coils count
+            let url2 = `/countvr?type=2`; // holding count
+
+            let response = await fetch(url);
+            let data = await response.json();
+            vrCountCoils = parseInt(data.count);
+
+            response = await fetch(url2);
+            data = await response.json();
+            vrCountHolding = parseInt(data.count);
+
+            let coilsText = (vrCountCoils == 1 ?  "virtual coil." : "virtual coils."); // non plural / plural
+            let holdingText = (vrCountHolding == 1 ?  "virtual holding register." : "virtual holding registers."); // non plural / plural
+            vrCount.innerHTML = `${vrCountCoils} ${coilsText}<br>${vrCountHolding} ${holdingText}`;
+          } else {
+            ruleCount.innerText = "Please initiate a serial connection to view device status.";
+          }
+        }
+
+        async function vrListUpdate() {
+          // Pause status polling as this repeated modbus TX and RX can take some time
+          await statusPolling(false);
+
+          selectedvr = null;
+          selectedvrtype = null;
+          
+          vrListRefresh.classList.add("d-none");
+          vrListRefreshBusy.classList.remove("d-none");
+
+          vrList.innerHTML = "";
+
+          if (isConnected) {
+            await vrCountUpdate();
+            ruleListStatus.innerHTML = '';
+            for (let i = 0; i < vrCountCoils; i++) {
+              // Update the ruleList
+              const item = document.createElement("button");
+              item.className = "list-group-item list-group-item-action";
+              item.textContent = `Virtual Coil ${i}`;
+              item.addEventListener("click", () => viewvr(i, 1));
+              vrList.appendChild(item);
+            }
+            for (let i = 0; i < vrCountHolding; i++) {
+              // Update the ruleList
+              const item = document.createElement("button");
+              item.className = "list-group-item list-group-item-action";
+              item.textContent = `Virtual Holding Register ${i}`;
+              item.addEventListener("click", () => viewvr(i, 2));
+              vrList.appendChild(item);
+            }
+
+            vrListViewArea.classList.add("d-none");
+            
+            await statusPolling(true);
+
+            vrListRefresh.classList.remove("d-none");
+            vrListRefreshBusy.classList.add("d-none");
+          }
+        }
+
+        async function viewvr(i, type) {
+          if (isNaN(i) || i < 0 ) {
+            vrListStatus.innerHTML = newStatus("alert-danger", `Invalid stored virtual register address ${selectedvr}`);
+          } else if (isNaN(type) || type < 1 || type > 2) {
+            vrListStatus.innerHTML = newStatus("alert-danger", `Invalid stored virtual register type ${selectedvrtype}. Should only be 1 or 2.`);
+            return;
+          }
+
+          selectedvr = i;
+          selectedvrtype = type;
+
+          vrListViewAreaValueRead.value = "";
+          vrListViewAreaValueWrite.value = "";
+
+          vrListViewArea.classList.remove("d-none");
+          let typeText = (type == 1) ? "Coil" : "Holding Register";
+          vrListViewAreaLabel.innerText = `Virtual ${typeText} ${i}:`;
+        }
+
+        vrListViewAreaBtnWrite.addEventListener('click', async () => {
+          if (selectedvr == null || selectedvrtype == null) {
+            return;
+          }
+
+          const value = parseInt(vrListViewAreaValueWrite.value);
+
+          if (isNaN(value) || value < 0) {
+            vrListStatus.innerHTML = newStatus("alert-danger", "Please provide a valid write value (for coils, 0 or 1; for holding registers, 0-65535).");
+            return;
+          }
+
+          const url = `/writevr?type=${selectedvrtype}&address=${selectedvr}&value=${value}`;
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.success == true) {
+            vrListStatus.innerHTML = newStatus("alert-success", "Write successful.");
+          } else {
+            vrListStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error}`);
+          }
+        });
+
+        vrListViewAreaBtnRead.addEventListener('click', async () => {
+          if (selectedvr == null || selectedvrtype == null) {
+            return;
+          }
+
+          const url = `/readvr?type=${selectedvrtype}&address=${selectedvr}`;
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.success == false) {
+            vrListStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error}`);
+            return;
+          }
+
+          vrListViewAreaValueRead.value = data.value;
+        });
+
+        vrListRefresh.addEventListener('click', async () => {
+          vrListUpdate();
+          vrListViewArea.classList.add("d-none");
+        });
       </script>
     </div>
   </div>
@@ -2202,6 +2385,7 @@
       statusPolling(true);
     }
     await ruleListUpdate();
+    await vrListUpdate();
   };
 </script>
   

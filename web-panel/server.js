@@ -309,10 +309,9 @@ app.get("/addvr", async (req, res) => {
 
         const func = 0x75;
         const type = parseInt(req.query.type);
-        console.log(type);
 
         if (isNaN(type) || type < 0 || type > 0xFFFF) {
-            return res.status(400).json({ error: "Invalid or missing rule index" });
+            return res.status(400).json({ error: "Invalid or missing register type" });
         }
 
         const request = Buffer.alloc(2);
@@ -321,21 +320,192 @@ app.get("/addvr", async (req, res) => {
 
         const result = await modbus.sendRequest(func, request);
 
-        if (result.length < 7) {
-            throw new Error(`Response too short: expected 7, got ${result.length}`);
+        if (result.length != 5 || result[2] != 1) {
+            throw new Error(`Invalid response.`);
         }
-
-        // Decode result
-        const virtualIndex = (result[3] << 8) | result[4];
 
         // Send parsed data
         res.json({
             success: true,
-            virtualIndex,
             raw: result.toString("hex") 
         });
     } catch (err) {
         console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Read a virtual register
+app.get("/readvr", async (req, res) => { 
+    try {
+        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+        const func = 0x76;
+        const type = parseInt(req.query.type);
+        const address = parseInt(req.query.address);
+
+        if (![1, 2].includes(type)) {
+            return res.status(400).json({ error: "Invalid register type (must be 1 or 2)" });
+        }
+        if (isNaN(address) || address < 0 || address > 0xFFFF) {
+            return res.status(400).json({ error: "Invalid or missing register address" });
+        }
+
+        const request = Buffer.alloc(3);
+        request.writeUInt8(type, 0);
+        request.writeUInt16BE(address, 1);
+
+        const result = await modbus.sendRequest(func, request);
+
+        if ((type == 1 && result.length < 4) || (type == 2 && result.length < 5)) { // type 1 = VIR_COIL, type 2 = VIR_HOLDING
+            throw new Error(`Response too short: expected ${(type == 2) ? "5" : "4"}, got ${result.length}`);
+        }
+
+        // Decode result
+        let value;
+        if (type == 1) {
+            value = result[3]; // 1 byte
+            if (![0,1].includes(value)) {
+                throw new Error(`Invalid response value: expected 0 or 1, got ${value}`);
+            }
+        } else {
+            value = (result[3] << 8) | result[4]; // 2 bytes
+        }
+
+        // Send parsed data
+        res.json({
+            success: true,
+            value,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Write a virtual register
+app.get("/writevr", async (req, res) => { 
+    try {
+        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+        const func = 0x77;
+        const type = parseInt(req.query.type);
+        const address = parseInt(req.query.address);
+        const value = parseInt(req.query.value);
+
+        if (![1, 2].includes(type)) {
+            return res.status(400).json({ error: "Invalid register type (must be 1 or 2)" });
+        }
+        if (isNaN(address) || address < 0 || address > 0xFFFF) {
+            return res.status(400).json({ error: "Invalid or missing register address" });
+        }
+        if (isNaN(value) || value < 0 || value > 0xFFFF) {
+            return res.status(400).json({ error: "Invalid or missing write value" });
+        }
+
+        const request = Buffer.alloc(5);
+        request.writeUInt8(type, 0);
+        request.writeUInt16BE(address, 1);
+        request.writeUInt16BE(value, 3);
+
+        const result = await modbus.sendRequest(func, request);
+
+        if (result.length != 5 || result[2] != 1) {
+            throw new Error(`Invalid response.`);
+        }
+
+        // Send parsed data
+        res.json({
+            success: true,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Get virtual register count
+app.get("/countvr", async (req, res) => {
+    try {
+        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+        const func = 0x78;
+        const type = parseInt(req.query.type);
+
+        if (![1, 2].includes(type)) {
+            return res.status(400).json({ error: "Invalid register type (must be 1 or 2)" });
+        }
+
+        const request = Buffer.alloc(2);
+        request.writeUInt8(type, 0);
+        request.writeUInt8(0, 1);
+
+        const result = await modbus.sendRequest(func, request);
+
+        const count = (result[3] << 8) | result[4];
+
+        if (result.length != 7 || result[2] != 2) { // if length is wrong or byte count != 2
+            throw new Error(`Invalid response.`);
+        }
+
+        // Send parsed data
+        res.json({
+            success: true,
+            count,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ------
+// Set RTC time
+app.get("/setrtc", async (req, res) => { 
+    try {
+        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+        const timezone = req.query.tz;
+        if (!timezone) {
+            return res.status(400).json({ error: "Missing timezone (tz) query parameter" });
+        }
+
+        // Use luxon to get the time in the specified timezone
+        const { DateTime } = require("luxon");
+        const now = DateTime.now().setZone(timezone);
+
+        if (!now.isValid) {
+            return res.status(400).json({ error: "Invalid timezone" });
+        }
+
+        const func = 0x79;
+
+        const request = Buffer.from([
+            now.second,
+            now.minute,
+            now.hour,
+            now.weekday % 7 + 1, // 1 = monday, 7 = sunday
+            now.day,
+            now.month,
+            now.year % 100 // last two digits
+        ]);
+
+        const result = await modbus.sendRequest(func, request);
+
+        if (!result || result.length < 3 || result[2] !== 0x01) {
+            throw new Error("Failed to set RTC on device");
+        }
+
+        res.json({
+            success: true,
+            timeSent: now.toFormat("yyyy-LL-dd HH:mm:ss"),
+            rawResponse: result.toString("hex")
+        });
+    } catch (err) {
+        console.error("RTC Set error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
