@@ -31,6 +31,8 @@
 #include "i2c/display.h"
 #include "i2c/i2c.h"
 #include "i2c/ina226.h"
+
+#include "sensors/dht11.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -182,6 +184,10 @@ int main(void)
   	// Hardcoded Status input registers (do not remove)
   	io_input_reg_add_channel(INA226_ReadBusVoltageRaw, &hi2c1);
   	io_input_reg_add_channel(INA226_ReadCurrentRaw, &hi2c1);
+
+  	// TODO: DEMO ONLY
+	DHT11_Setup(GPIOB, GPIO_PIN_15);
+	io_input_reg_add_channel(DHT11_read_func, 1234);
 
 
   	// Flash on-board LED
@@ -651,10 +657,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(BTN1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : DIN1_Pin DIN2_Pin BTN2_Pin */
-  GPIO_InitStruct.Pin = DIN1_Pin|DIN2_Pin|BTN2_Pin;
+  /*Configure GPIO pins : DIN1_Pin DIN2_Pin */
+  GPIO_InitStruct.Pin = DIN1_Pin|DIN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : DOUT1_Pin LED_Pin */
@@ -674,8 +680,14 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : DIN3_Pin DIN4_Pin */
   GPIO_InitStruct.Pin = DIN3_Pin|DIN4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : DHT11_DEMO_Pin */
+  GPIO_InitStruct.Pin = DHT11_DEMO_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(DHT11_DEMO_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RS485_DIR_Pin SD_CS_Pin */
   GPIO_InitStruct.Pin = RS485_DIR_Pin|SD_CS_Pin;
@@ -683,6 +695,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : BTN2_Pin */
+  GPIO_InitStruct.Pin = BTN2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(BTN2_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

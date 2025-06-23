@@ -87,6 +87,8 @@ void Error_Handler(void);
 #define DIN3_GPIO_Port GPIOB
 #define DIN4_Pin GPIO_PIN_14
 #define DIN4_GPIO_Port GPIOB
+#define DHT11_DEMO_Pin GPIO_PIN_15
+#define DHT11_DEMO_GPIO_Port GPIOB
 #define LED_Pin GPIO_PIN_6
 #define LED_GPIO_Port GPIOC
 #define RS485_DIR_Pin GPIO_PIN_8

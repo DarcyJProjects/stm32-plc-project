@@ -6,3 +6,4 @@
 ../Core/Src/sensors/dht11.c:59:13:DHT11_Init	8	static
 ../Core/Src/sensors/dht11.c:76:6:DHT11_Setup	32	static
 ../Core/Src/sensors/dht11.c:110:16:DHT11_Read	48	static
+../Core/Src/sensors/dht11.c:167:10:DHT11_read_func	24	static

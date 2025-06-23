@@ -162,3 +162,15 @@ DHT11_Response DHT11_Read(uint8_t* temperature_int, uint8_t* temperature_dec, ui
 
     return DHT11_OK; // Successfully read the DHT11
 }
+
+// Demo only, only does temperature integer
+uint16_t DHT11_read_func(uint16_t temp) {
+	uint8_t temperature_int;
+	uint8_t b;
+	uint8_t c;
+	uint8_t d;
+	DHT11_Response status = DHT11_Read(&temperature_int, &b, &c, &d);
+	if (status != DHT11_OK) return (uint16_t)status;
+
+	return (uint16_t)temperature_int;
+}

@@ -18,4 +18,6 @@ void DHT11_Setup(GPIO_TypeDef* port, uint16_t pin);
 // Initiates and reads a response from the DHT11
 DHT11_Response DHT11_Read(uint8_t* temperature_int, uint8_t* temperature_dec, uint8_t* humidity_int, uint8_t* humidity_dec);
 
+uint16_t DHT11_read_func(uint16_t temp); // for io
+
 #endif
