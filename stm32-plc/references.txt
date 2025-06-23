@@ -1,0 +1,4 @@
+https://www.snapeda.com/parts/STM32G431CBU6/STMicroelectronics/view-part/?welcome=home
+https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard/blob/master/Hardware/WeAct-STM32G431CoreBoard_V10_SchDoc.pdf
+https://www.snapeda.com/parts/C3E-8.000-10-1020-M/Aker%20Technology%20Corp/view-part/?ref=aker_in&t=3225%208mhz%2010pf%2010ppm&con_ref=None&auction_id=111111&ad_ab_version=right&ab_test_case=b
+https://www.snapeda.com/parts/DX07S016JA1R1500/JAE%20Electronics/view-part/?ref=search&t=usb%20c
