@@ -6,3 +6,5 @@ https://www.snapeda.com/parts/2S7BE_0505S3U/Gaptec/view-part/?ref=gaptec_rel&p=B
 
 https://octopart.com/15edgrc-3.81-02p-14-00ah-degson-78006572
 AGM403A1-M1 from easyeda, converted to Kicad, and then into Altium
+
+https://www.snapeda.com/parts/MAX485CSA%2B/Analog%20Devices/view-part/?ref=search&t=max485csa&ab_test_case=b
