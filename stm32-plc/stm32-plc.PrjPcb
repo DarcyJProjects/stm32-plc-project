@@ -406,6 +406,23 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=KOAKKDMK
 
+[Document22]
+DocumentPath=..\..\..\..\..\..\Public\Documents\Altium\3x4x2.5_TACTILE_BUTTON.PcbLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=JWXCLWIT
+
 [Configuration1]
 Name=Sources
 ParameterCount=0
