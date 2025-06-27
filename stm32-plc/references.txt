@@ -8,3 +8,9 @@ https://octopart.com/15edgrc-3.81-02p-14-00ah-degson-78006572
 AGM403A1-M1 from easyeda, converted to Kicad, and then into Altium
 
 https://www.snapeda.com/parts/MAX485CSA%2B/Analog%20Devices/view-part/?ref=search&t=max485csa&ab_test_case=b
+
+---
+lost additions here, will need to go back and check later
+---
+
+https://www.snapeda.com/parts/SS34LH/Taiwan%20Semiconductor/view-part/?welcome=home&ref=search&t=ss34&ab_test_case=b
