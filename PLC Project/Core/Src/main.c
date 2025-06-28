@@ -31,6 +31,7 @@
 #include "i2c/display.h"
 #include "i2c/i2c.h"
 #include "i2c/ina226.h"
+#include "i2c/bmp280.h"
 
 #include "sensors/dht11.h"
 /* USER CODE END Includes */
@@ -186,8 +187,8 @@ int main(void)
   	io_input_reg_add_channel(INA226_ReadCurrentRaw, &hi2c1);
 
   	// TODO: DEMO ONLY
-	DHT11_Setup(GPIOB, GPIO_PIN_15);
-	io_input_reg_add_channel(DHT11_read_func, 1234);
+	//BMP280_Init();
+	//io_input_reg_add_channel(BMP280_Read_Temp_Func, NULL);
 
 
   	// Flash on-board LED
@@ -262,7 +263,6 @@ int main(void)
 	  }
 
 	  /* SCHEDULE END*/
-
 
     /* USER CODE END WHILE */
 

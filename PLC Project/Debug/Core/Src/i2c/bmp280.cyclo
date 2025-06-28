@@ -1,3 +1,4 @@
-../Core/Src/i2c/bmp280.c:13:6:BMP280_Init	1
-../Core/Src/i2c/bmp280.c:32:6:BMP280_ReadRaw	1
-../Core/Src/i2c/bmp280.c:40:6:BMP280_ReadCompensated	2
+../Core/Src/i2c/bmp280.c:21:6:BMP280_Init	1
+../Core/Src/i2c/bmp280.c:71:6:BMP280_ReadRaw	1
+../Core/Src/i2c/bmp280.c:87:6:BMP280_ReadCompensated	2
+../Core/Src/i2c/bmp280.c:121:10:BMP280_Read_Temp_Func	2

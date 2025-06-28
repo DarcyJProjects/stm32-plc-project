@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "usb_serial.h"
 
-//#define PRINT_DEBUG
+#define PRINT_DEBUG
 
 static I2C_HandleTypeDef* hi2c;
 
