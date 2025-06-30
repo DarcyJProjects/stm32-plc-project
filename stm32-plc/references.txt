@@ -15,3 +15,4 @@ lost additions here, will need to go back and check later
 
 https://www.snapeda.com/parts/SS34LH/Taiwan%20Semiconductor/view-part/?welcome=home&ref=search&t=ss34&ab_test_case=b
 https://www.snapeda.com/parts/MTSW10407TS235/Samtec/view-part/?ref=search&t=pin%20header%204p%202.54&ab_test_case=b
+https://www.snapeda.com/parts/SRD-05VDC-SL-C/Songle%20Relay/view-part/?welcome=home&ref=search&t=SRD-05VDC-SL&ab_test_case=b
