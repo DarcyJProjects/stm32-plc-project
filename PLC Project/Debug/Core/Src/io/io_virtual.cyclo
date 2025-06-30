@@ -5,3 +5,4 @@
 ../Core/Src/io/io_virtual.c:109:6:io_virtual_save	3
 ../Core/Src/io/io_virtual.c:150:6:io_virtual_load	6
 ../Core/Src/io/io_virtual.c:207:6:io_virtual_clear	2
+../Core/Src/io/io_virtual.c:222:6:io_virtual_factory_reset	2

@@ -188,6 +188,20 @@ bool automation_save_rules(void) {
 	return true;
 }
 
+bool automation_factory_reset(void) {
+	memset(rules, 0, sizeof(rules));
+	rule_count = 0;
+
+	if (!automation_save_rules()) return false;
+
+	uint16_t baseAddress = sizeof(rule_count) + sizeof(uint16_t);
+
+	// Now save virtual registers
+	if (!io_virtual_factory_reset(baseAddress)) return false;
+
+	return true;
+}
+
 bool automation_load_rules(void) {
 	uint16_t addr = 0x0000;
 	uint16_t saved_count = 0;

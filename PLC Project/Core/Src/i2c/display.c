@@ -179,6 +179,45 @@ void display_StatusPage(void) {
 	ssd1306_UpdateScreen();
 }
 
+void display_FactoryResetPage(uint8_t page) {
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(25, 0);
+	ssd1306_WriteString("RESET", Font_11x18, White);
+
+	switch (page) {
+		case 0:
+			ssd1306_SetCursor(2, 25);
+			ssd1306_WriteString("Continue holding", Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			ssd1306_WriteString("for 5 seconds.", Font_6x8, White);
+			break;
+		case 1:
+			ssd1306_SetCursor(2, 25);
+			ssd1306_WriteString("Reset successful.", Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			ssd1306_WriteString("Booting...", Font_6x8, White);
+			break;
+		case 2:
+			ssd1306_SetCursor(2, 25);
+			ssd1306_WriteString("Reset unsuccessful!", Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			ssd1306_WriteString("Booting...", Font_6x8, White);
+			break;
+		case 3:
+			ssd1306_SetCursor(2, 25);
+			ssd1306_WriteString("Reset cancelled.", Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			ssd1306_WriteString("Booting...", Font_6x8, White);
+			break;
+	}
+
+	ssd1306_UpdateScreen();
+}
+
 void display_BtnPress() {
 	if (currentPage == endPage) {
 		currentPage = 0;

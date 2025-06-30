@@ -74,6 +74,8 @@ bool automation_delete_rule(uint16_t index);
 
 bool automation_save_rules(void);
 
+bool automation_factory_reset(void);
+
 bool automation_load_rules(void);
 
 #endif

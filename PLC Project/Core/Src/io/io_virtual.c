@@ -218,3 +218,18 @@ bool io_virtual_clear(void) {
 
 	return true;
 }
+
+bool io_virtual_factory_reset(uint16_t baseAddress) {
+	virtual_coil_channel_count = 0;
+	virtual_holding_reg_channel_count = 0;
+
+	memset(virtual_coil_channels, 0, sizeof(virtual_coil_channels));
+	memset(virtual_holding_reg_channels, 0, sizeof(virtual_holding_reg_channels));
+
+	// Save virtual registers to EEPROM
+	if (!io_virtual_save(baseAddress)) {
+		return false;
+	}
+
+	return true;
+}

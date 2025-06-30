@@ -141,13 +141,59 @@ int main(void)
 
 	// Config
 	#define DEBOUNCE_DELAY 50 // milliseconds
+	#define FACTORY_RESET_HOLD_TIME 5000 // milliseconds
+	#define FACTORY_RESET_CHECK_INTERVAL 50 // milliseconds
+
+	// Initialise I2C in case of factory reset
+	I2C_Setup(&hi2c1);
+
+	// Check for Factory Reset
+	GPIO_PinState factoryResetBtn = HAL_GPIO_ReadPin(GPIOA, BTN2_Pin);
+	if (factoryResetBtn == GPIO_PIN_SET) {
+		uint32_t heldTime = 0;
+
+		display_FactoryResetPage(0); // main
+
+		while (1) { // TODO: SET TO GPIOA, BTN2_PIN
+			if (HAL_GPIO_ReadPin(GPIOA, BTN2_Pin) == GPIO_PIN_SET) {
+				HAL_Delay(FACTORY_RESET_CHECK_INTERVAL);
+				heldTime += FACTORY_RESET_CHECK_INTERVAL;
+
+				if (heldTime >= FACTORY_RESET_HOLD_TIME) {
+					// Button held for x ms, perform factory reset, and then continue as usual with boot
+					if(!automation_factory_reset()) {
+						// Reset Failed, display fail screen
+						display_FactoryResetPage(2); // failure
+						HAL_Delay(4000);
+
+						// Continue with boot...
+						break;
+					} else {
+						// Display success screen
+						display_FactoryResetPage(1); // successful
+						HAL_Delay(4000);
+
+						// Continue with boot
+						break;
+					}
+				}
+			} else {
+				display_FactoryResetPage(3); // cancelled
+				HAL_Delay(4000);
+				// Continue with boot
+				break;
+			}
+
+		}
+
+		display_Boot();
+	}
 
   	// Communication
     modbus_Setup(0x01); // Set modbus slave address
   	RS485_Setup(GPIOA, RS485_DIR_Pin); // changed from PA4 to PA8 to not interfere with DAC1
 
   	// Initialise Devices
-  	I2C_Setup(&hi2c1);
   	INA226_Init(&hi2c1);
   	automation_Init();
 
@@ -200,7 +246,7 @@ int main(void)
   	HAL_Delay(60);
 	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_RESET);
 
-	HAL_Delay(1000);
+	HAL_Delay(2500);
 
 	// TEMP: ->> needs to be in a timer to update every few seconds for eg TODO
 	display_StatusPage();
@@ -677,17 +723,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : DIN3_Pin DIN4_Pin */
-  GPIO_InitStruct.Pin = DIN3_Pin|DIN4_Pin;
+  /*Configure GPIO pins : DIN3_Pin DIN4_Pin TEST_BTN_Pin */
+  GPIO_InitStruct.Pin = DIN3_Pin|DIN4_Pin|TEST_BTN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : DHT11_DEMO_Pin */
-  GPIO_InitStruct.Pin = DHT11_DEMO_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(DHT11_DEMO_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RS485_DIR_Pin SD_CS_Pin */
   GPIO_InitStruct.Pin = RS485_DIR_Pin|SD_CS_Pin;
