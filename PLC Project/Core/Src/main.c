@@ -148,14 +148,14 @@ int main(void)
 	I2C_Setup(&hi2c1);
 
 	// Check for Factory Reset
-	GPIO_PinState factoryResetBtn = HAL_GPIO_ReadPin(GPIOA, BTN2_Pin);
+	GPIO_PinState factoryResetBtn = HAL_GPIO_ReadPin(GPIOB, BTN2_Pin);
 	if (factoryResetBtn == GPIO_PIN_SET) {
 		uint32_t heldTime = 0;
 
 		display_FactoryResetPage(0); // main
 
-		while (1) { // TODO: SET TO GPIOA, BTN2_PIN
-			if (HAL_GPIO_ReadPin(GPIOA, BTN2_Pin) == GPIO_PIN_SET) {
+		while (1) {
+			if (HAL_GPIO_ReadPin(GPIOB, BTN2_Pin) == GPIO_PIN_SET) {
 				HAL_Delay(FACTORY_RESET_CHECK_INTERVAL);
 				heldTime += FACTORY_RESET_CHECK_INTERVAL;
 
