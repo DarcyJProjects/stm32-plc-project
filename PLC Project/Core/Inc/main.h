@@ -95,12 +95,10 @@ void Error_Handler(void);
 #define RS485_TX_GPIO_Port GPIOA
 #define RS485_RX_Pin GPIO_PIN_10
 #define RS485_RX_GPIO_Port GPIOA
-#define BTN2_Pin GPIO_PIN_13
-#define BTN2_GPIO_Port GPIOA
 #define SD_CS_Pin GPIO_PIN_14
 #define SD_CS_GPIO_Port GPIOA
-#define TEST_BTN_Pin GPIO_PIN_9
-#define TEST_BTN_GPIO_Port GPIOB
+#define BTN2_Pin GPIO_PIN_9
+#define BTN2_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
