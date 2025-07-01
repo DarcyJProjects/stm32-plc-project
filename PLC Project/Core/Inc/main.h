@@ -97,6 +97,8 @@ void Error_Handler(void);
 #define RS485_RX_GPIO_Port GPIOA
 #define SD_CS_Pin GPIO_PIN_14
 #define SD_CS_GPIO_Port GPIOA
+#define SD_CARD_Pin GPIO_PIN_10
+#define SD_CARD_GPIO_Port GPIOC
 #define BTN2_Pin GPIO_PIN_9
 #define BTN2_GPIO_Port GPIOB
 
