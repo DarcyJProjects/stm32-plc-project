@@ -5,12 +5,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Core/Src/sd/sd.c \
 ../Core/Src/sd/user_diskio_spi.c 
 
 OBJS += \
+./Core/Src/sd/sd.o \
 ./Core/Src/sd/user_diskio_spi.o 
 
 C_DEPS += \
+./Core/Src/sd/sd.d \
 ./Core/Src/sd/user_diskio_spi.d 
 
 
@@ -21,7 +24,7 @@ Core/Src/sd/%.o Core/Src/sd/%.su Core/Src/sd/%.cyclo: ../Core/Src/sd/%.c Core/Sr
 clean: clean-Core-2f-Src-2f-sd
 
 clean-Core-2f-Src-2f-sd:
-	-$(RM) ./Core/Src/sd/user_diskio_spi.cyclo ./Core/Src/sd/user_diskio_spi.d ./Core/Src/sd/user_diskio_spi.o ./Core/Src/sd/user_diskio_spi.su
+	-$(RM) ./Core/Src/sd/sd.cyclo ./Core/Src/sd/sd.d ./Core/Src/sd/sd.o ./Core/Src/sd/sd.su ./Core/Src/sd/user_diskio_spi.cyclo ./Core/Src/sd/user_diskio_spi.d ./Core/Src/sd/user_diskio_spi.o ./Core/Src/sd/user_diskio_spi.su
 
 .PHONY: clean-Core-2f-Src-2f-sd
 

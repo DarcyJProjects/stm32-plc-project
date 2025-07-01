@@ -32,8 +32,9 @@
 #include "i2c/i2c.h"
 #include "i2c/ina226.h"
 #include "i2c/bmp280.h"
+#include "sd/sd.h"
 
-#include "sensors/dht11.h"
+//#include "sensors/dht11.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,7 +44,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -94,7 +94,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -147,11 +146,17 @@ int main(void)
 	// Initialise I2C in case of factory reset
 	I2C_Setup(&hi2c1);
 
+	// Initialise SD if installed
+	HAL_Delay(2000);
+	SD_Detect();
+	SD_Log("System booting");
+
 	// Check for Factory Reset
 	GPIO_PinState factoryResetBtn = HAL_GPIO_ReadPin(GPIOB, BTN2_Pin);
 	if (factoryResetBtn == GPIO_PIN_SET) {
 		uint32_t heldTime = 0;
 
+		SD_Log("Factory reset initiated by user");
 		display_FactoryResetPage(0); // main
 
 		while (1) {
@@ -164,6 +169,7 @@ int main(void)
 					if(!automation_factory_reset()) {
 						// Reset Failed, display fail screen
 						display_FactoryResetPage(2); // failure
+						SD_Log("Factory reset failed");
 						HAL_Delay(4000);
 
 						// Continue with boot...
@@ -171,6 +177,7 @@ int main(void)
 					} else {
 						// Display success screen
 						display_FactoryResetPage(1); // successful
+						SD_Log("Factory reset successful");
 						HAL_Delay(4000);
 
 						// Continue with boot
@@ -179,6 +186,7 @@ int main(void)
 				}
 			} else {
 				display_FactoryResetPage(3); // cancelled
+				SD_Log("Factory reset aborted by user");
 				HAL_Delay(4000);
 				// Continue with boot
 				break;
@@ -247,6 +255,8 @@ int main(void)
 	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_RESET);
 
 	HAL_Delay(2500);
+
+	SD_Log("System boot complete");
 
 	// TEMP: ->> needs to be in a timer to update every few seconds for eg TODO
 	display_StatusPage();
@@ -582,11 +592,11 @@ static void MX_SPI1_Init(void)
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_4BIT;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -689,13 +699,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, DOUT1_Pin|LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, DOUT1_Pin|LED_Pin|SD_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, DOUT2_Pin|DOUT3_Pin|DOUT4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, RS485_DIR_Pin|SD_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(RS485_DIR_GPIO_Port, RS485_DIR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : BTN1_Pin */
   GPIO_InitStruct.Pin = BTN1_Pin;
@@ -709,8 +719,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : DOUT1_Pin LED_Pin */
-  GPIO_InitStruct.Pin = DOUT1_Pin|LED_Pin;
+  /*Configure GPIO pins : DOUT1_Pin LED_Pin SD_CS_Pin */
+  GPIO_InitStruct.Pin = DOUT1_Pin|LED_Pin|SD_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -729,12 +739,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RS485_DIR_Pin SD_CS_Pin */
-  GPIO_InitStruct.Pin = RS485_DIR_Pin|SD_CS_Pin;
+  /*Configure GPIO pin : RS485_DIR_Pin */
+  GPIO_InitStruct.Pin = RS485_DIR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(RS485_DIR_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : SD_CARD_Pin */
   GPIO_InitStruct.Pin = SD_CARD_Pin;
