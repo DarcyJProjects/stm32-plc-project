@@ -37,6 +37,8 @@ static volatile uint8_t rs485_tx_frame_head = 0;
 static volatile uint8_t rs485_tx_frame_tail = 0;
 int txBusy = 0;
 
+static uint8_t our_address;
+
 void RS485_SetTransmitMode(void) {
 	// Set direction pin to HIGH (transmit)
 	HAL_GPIO_WritePin(RS485_DIR_PORT, RS485_DIR_PIN, GPIO_PIN_SET);
@@ -61,6 +63,9 @@ void RS485_Setup(GPIO_TypeDef* dir_port, uint16_t dir_pin) {
 
 	RS485_DIR_PORT = dir_port;
 	RS485_DIR_PIN = dir_pin;
+
+	// Get our slave address
+	our_address = modbusGetSlaveAddress();
 
 	RS485_SetReceiveMode();
 
@@ -131,7 +136,13 @@ void RS485_ProcessPendingFrames(void) {
 		uint8_t* frame_data = (uint8_t*)rs485_rx_frame_queue[rs485_rx_frame_tail].data;
 		uint16_t frame_len = rs485_rx_frame_queue[rs485_rx_frame_tail].len;
 
-		modbus_handle_frame(frame_data, frame_len); // Pass the frames over to modbus to handle
+		// Check whether this is a request to us (us as a slave), or a response for us (us as a master)
+		uint8_t address = frame_data[0];
+		if (address == our_address) {
+			modbus_slave_handle_frame(frame_data, frame_len); // Pass the frames over to modbus to handle
+		} else {
+			modbus_master_handle_frame(frame_data, frame_len);
+		}
 
 		rs485_rx_frame_tail = (rs485_rx_frame_tail + 1) % RS485_FRAME_QUEUE_LEN;
 	}

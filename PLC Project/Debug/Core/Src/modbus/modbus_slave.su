@@ -1,0 +1,3 @@
+../Core/Src/modbus/modbus_slave.c:15:6:modbus_Setup	16	static
+../Core/Src/modbus/modbus_slave.c:20:6:modbus_slave_handle_frame	392	static
+../Core/Src/modbus/modbus_slave.c:353:9:modbusGetSlaveAddress	4	static

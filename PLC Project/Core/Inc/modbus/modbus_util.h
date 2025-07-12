@@ -1,13 +1,10 @@
-#ifndef MODBUS_H
-#define MODBUS_H
+#ifndef MODBUS_UTIL_H
+#define MODBUS_UTIL_H
 
 #include <stdint.h>
 #include "rs485/rs485.h"
 #include "usb_serial.h"
-#include "io/io_coils.h" // required for controlling coils
-#include "io/io_discrete_in.h" // required for reading discrete inputs
-#include "io/io_holding_reg.h" // required for controlling holding registers
-#include "io/io_input_reg.h" // required for reading input registers
+#include "stm32g4xx_hal.h"
 
 #define MODBUS_MAX_FRAME_SIZE 256
 
@@ -33,21 +30,12 @@
 #define MODBUS_EXCEPTION_GATEWAY_PATH_UNAVAIL		0x0A
 #define MODBUS_EXCEPTION_GATEWAY_TAR_DEV_RESP_FAIL	0x0B
 
-
-// FUNCTIONS
-
-// Setup slave address
-void modbus_Setup(uint8_t slaveAddress);
+uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
 
 // Communication
 void modbus_send_response(uint8_t* frame, uint16_t len);
 void modbus_send_exception(uint8_t address, uint8_t function, uint8_t exception);
 
-// Handle a full received modbus frame
-void modbus_handle_frame(uint8_t* frame, uint16_t len);
-
-uint8_t modbusGetSlaveAddress(void);
-
-uint16_t modbus_crc16(uint8_t* frame, uint16_t len);
+uint32_t get_ms(void);
 
 #endif

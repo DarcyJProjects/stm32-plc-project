@@ -1,0 +1,5 @@
+../Core/Src/modbus/modbus_master.c:7:16:get_function_code	16	static
+../Core/Src/modbus/modbus_master.c:18:6:modbus_master_handle_frame	24	static
+../Core/Src/modbus/modbus_master.c:50:6:modbus_master_request_read	32	static
+../Core/Src/modbus/modbus_master.c:76:6:modbus_master_poll_timeout	16	static
+../Core/Src/modbus/modbus_master.c:84:6:modbus_master_is_busy	4	static

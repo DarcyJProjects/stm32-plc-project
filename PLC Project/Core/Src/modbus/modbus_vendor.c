@@ -1,5 +1,6 @@
+#include <modbus/modbus_slave.h>
 #include "modbus/modbus_vendor.h"
-#include "modbus/modbus.h"
+#include "modbus/modbus_util.h"
 #include "automation/automation.h"
 #include "io/io_virtual.h"
 #include "rtc/rtc_ds3231.h"

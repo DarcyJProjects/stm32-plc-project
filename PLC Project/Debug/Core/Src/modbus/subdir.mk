@@ -5,15 +5,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/Src/modbus/modbus.c \
+../Core/Src/modbus/modbus_master.c \
+../Core/Src/modbus/modbus_slave.c \
+../Core/Src/modbus/modbus_util.c \
 ../Core/Src/modbus/modbus_vendor.c 
 
 OBJS += \
-./Core/Src/modbus/modbus.o \
+./Core/Src/modbus/modbus_master.o \
+./Core/Src/modbus/modbus_slave.o \
+./Core/Src/modbus/modbus_util.o \
 ./Core/Src/modbus/modbus_vendor.o 
 
 C_DEPS += \
-./Core/Src/modbus/modbus.d \
+./Core/Src/modbus/modbus_master.d \
+./Core/Src/modbus/modbus_slave.d \
+./Core/Src/modbus/modbus_util.d \
 ./Core/Src/modbus/modbus_vendor.d 
 
 
@@ -24,7 +30,7 @@ Core/Src/modbus/%.o Core/Src/modbus/%.su Core/Src/modbus/%.cyclo: ../Core/Src/mo
 clean: clean-Core-2f-Src-2f-modbus
 
 clean-Core-2f-Src-2f-modbus:
-	-$(RM) ./Core/Src/modbus/modbus.cyclo ./Core/Src/modbus/modbus.d ./Core/Src/modbus/modbus.o ./Core/Src/modbus/modbus.su ./Core/Src/modbus/modbus_vendor.cyclo ./Core/Src/modbus/modbus_vendor.d ./Core/Src/modbus/modbus_vendor.o ./Core/Src/modbus/modbus_vendor.su
+	-$(RM) ./Core/Src/modbus/modbus_master.cyclo ./Core/Src/modbus/modbus_master.d ./Core/Src/modbus/modbus_master.o ./Core/Src/modbus/modbus_master.su ./Core/Src/modbus/modbus_slave.cyclo ./Core/Src/modbus/modbus_slave.d ./Core/Src/modbus/modbus_slave.o ./Core/Src/modbus/modbus_slave.su ./Core/Src/modbus/modbus_util.cyclo ./Core/Src/modbus/modbus_util.d ./Core/Src/modbus/modbus_util.o ./Core/Src/modbus/modbus_util.su ./Core/Src/modbus/modbus_vendor.cyclo ./Core/Src/modbus/modbus_vendor.d ./Core/Src/modbus/modbus_vendor.o ./Core/Src/modbus/modbus_vendor.su
 
 .PHONY: clean-Core-2f-Src-2f-modbus
 

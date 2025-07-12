@@ -1,6 +1,7 @@
 #ifndef AUTOMATION_H
 #define AUTOMATION_H
 
+#include <modbus/modbus_slave.h> // for modbus_crc()
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -11,7 +12,6 @@
 #include "io/io_virtual.h"
 
 #include "i2c/eeprom.h"
-#include "modbus/modbus.h" // for modbus_crc()
 
 typedef enum {
 	REG_COIL,

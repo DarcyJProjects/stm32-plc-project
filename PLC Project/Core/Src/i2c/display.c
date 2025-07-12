@@ -1,9 +1,9 @@
 #include <i2c/ina226.h>
+#include <modbus/modbus_slave.h>
 #include "i2c/display.h"
 #include "i2c/ssd1306/ssd1306.h"
 #include "i2c/ssd1306/ssd1306_fonts.h"
 #include "i2c/ssd1306/ssd1306_icons.h"
-#include "modbus/modbus.h"
 #include "io/io_coils.h"
 #include "rtc/rtc_ds3231.h"
 #include "io/io_virtual.h"

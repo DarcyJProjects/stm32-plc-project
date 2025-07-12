@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <modbus/modbus_slave.h>
 #include "main.h"
 #include "app_fatfs.h"
 #include "usb_device.h"
@@ -26,14 +27,13 @@
 #include <stdio.h>
 #include "rtc/rtc_ds3231.h"
 #include "automation/automation.h"
-#include "modbus/modbus.h"
 #include "rs485/rs485.h"
 #include "i2c/display.h"
 #include "i2c/i2c.h"
 #include "i2c/ina226.h"
 #include "i2c/bmp280.h"
 #include "sd/sd.h"
-
+#include "io/io_modbus_slaves.h"
 //#include "sensors/dht11.h"
 /* USER CODE END Includes */
 
@@ -199,7 +199,7 @@ int main(void)
 
   	// Communication
     modbus_Setup(0x01); // Set modbus slave address
-  	RS485_Setup(GPIOA, RS485_DIR_Pin); // changed from PA4 to PA8 to not interfere with DAC1
+  	RS485_Setup(GPIOA, RS485_DIR_Pin); // changed from PA4 to PA8 to not interfere with DAC1 [RS485_Setup must be called AFTER modbus_setup]
 
   	// Initialise Devices
   	INA226_Init(&hi2c1);
@@ -244,6 +244,15 @@ int main(void)
 	//BMP280_Init();
 	//io_input_reg_add_channel(BMP280_Read_Temp_Func, NULL);
 
+  	// TODO: DEMO ONLY
+  	// Setup the SHT30 as a Modbus slave
+  	io_modbus_slave_add_channel(0x1E, MODBUS_REGISTER_INPUT, 0); // SHT30 slave, humidity
+  	io_modbus_slave_add_channel(0x1E, MODBUS_REGISTER_INPUT, 1); // SHT30 slave, temperature
+  	// Add these input register (buffers) as input registers
+  	io_input_reg_add_channel(io_modbus_slave_read, 0); // modbus slave channel 0 = humidity
+  	io_input_reg_add_channel(io_modbus_slave_read, 1); // modbus slave channel 1 = temperature
+  	// Note, these values need to be / 10 to get actual value.
+
 
   	// Flash on-board LED
   	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_SET);
@@ -281,6 +290,11 @@ int main(void)
 	  RS485_ProcessPendingFrames();
 	  RS485_TransmitPendingFrames();
 	  /* RS485 Circular Frame Handling END*/
+
+	  /* MODBUS SLAVE POLLING (US AS MASTER) BEGIN*/
+	  io_modbus_slave_poll_all();
+	  modbus_master_poll_timeout();
+	  /* MODBUS SLAVE POLLING (US AS MASTER) END*/
 
 	  /* AUTOMATION BEGIN*/
 	  automation_Tick();

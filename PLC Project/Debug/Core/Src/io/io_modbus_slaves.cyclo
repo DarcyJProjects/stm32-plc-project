@@ -1,0 +1,4 @@
+../Core/Src/io/io_modbus_slaves.c:13:6:io_modbus_slave_add_channel	2
+../Core/Src/io/io_modbus_slaves.c:26:10:io_modbus_slave_read	2
+../Core/Src/io/io_modbus_slaves.c:32:6:io_modbus_slave_poll_all	6
+../Core/Src/io/io_modbus_slaves.c:61:6:io_modbus_slave_write	4
