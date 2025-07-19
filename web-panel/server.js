@@ -152,7 +152,59 @@ app.get("/setmode", async (req, res) => {
         console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
-})
+});
+
+// Get mode (current or voltage for holding regs, input regs)
+app.get("/getmode", async (req, res) => {
+    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+    const func = 0x6F;
+
+    const type = req.query.type;
+    const address = parseInt(req.query.address);
+
+    if (isNaN(address) || address < 0 || address > 0xFFFF) {
+        return res.status(400).json({ error: "Invalid or missing register address" });
+    }
+
+    if (!type || (type != "holding" && type != "input")) {
+        return res.status(400).json({ error: "Invalid or missing type. Type must be 'holding' or 'input'." });
+    }
+
+    let typeInt;
+    switch (type) {
+        case "holding": {
+            typeInt = 3;
+            break;
+        }
+        case "input": {
+            typeInt = 4;
+            break;
+        }
+    }
+
+    const request = Buffer.alloc(3);
+    request.writeUInt16BE(index, 0);
+    request.writeUInt16BE(typeInt, 2);
+
+    try {
+        const result = await modbus.sendRequest(func, request);
+
+        // Check response
+        if (result.length < 3) throw new Error("Invalid response length");
+        
+        mode = result[2] - 1;
+
+        res.json({
+            success: true,
+            mode: mode,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // -----
 async function sendRule(slave, rule) {
