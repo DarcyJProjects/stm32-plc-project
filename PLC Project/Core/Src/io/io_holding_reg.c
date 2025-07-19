@@ -96,6 +96,14 @@ bool io_holding_reg_set_mode(uint16_t index, IO_Holding_Reg_Mode mode) {
 	return false;
 }
 
+bool io_holding_reg_get_mode(uint16_t index, IO_Holding_Reg_Mode* mode) {
+	if (index < io_holding_reg_channel_count) {
+		*mode = io_holding_reg_channels[index].mode;
+		return true;
+	}
+	return false;
+}
+
 bool io_holding_reg_type_save(uint16_t baseAddress) {
 	// Count physical DAC holding regs
 	uint16_t count = 0;

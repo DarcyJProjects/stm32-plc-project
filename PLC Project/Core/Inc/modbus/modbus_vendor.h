@@ -31,6 +31,7 @@ Range		Hexadecimal		Notes
 
 #define MODBUS_VENDOR_FUNC_SET_HOLDING_REG_MODE		0x6F
 #define MODBUS_VENDOR_FUNC_SET_INPUT_REG_MODE		0x70
+#define MODBUS_VENDOR_FUNC_GET_REG_MODE				0x71
 
 
 // Handle a full received modbus frame

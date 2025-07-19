@@ -57,6 +57,8 @@ void dac_write_func(uint32_t channel, uint16_t value, IO_Holding_Reg_Mode mode);
 
 bool io_holding_reg_set_mode(uint16_t index, IO_Holding_Reg_Mode mode);
 
+bool io_holding_reg_get_mode(uint16_t index, IO_Holding_Reg_Mode* mode);
+
 bool io_holding_reg_type_save(uint16_t baseAddress);
 
 bool io_holding_reg_type_clear(bool factoryResetMode);

@@ -484,6 +484,49 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			modbus_send_response(responseData, responseLen);
 			break;
 		}
+		case MODBUS_VENDOR_FUNC_SET_INPUT_REG_MODE: {
+			// TODO
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_GET_REG_MODE: {
+			uint16_t index = (frame[2] << 8) | frame[3];
+			uint8_t type = frame[4]; // 3 = holding, 4 = input (1, 2 for coil & discrete are irrelevant)
+
+			// Check request length (Slave Address, Function Code, Index High, Index Low, type integer, CRC Low, CRC High)
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Get the mode of the holding register
+			uint8_t mode;
+			if (type == 3) {
+				IO_Holding_Reg_Mode regMode;
+				if (!io_holding_reg_get_mode(index, &regMode)) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+					return;
+				}
+			} /*else if (type == 4) {
+				if (!io_input_reg_get_mode(index, &mode)) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+					return;
+				}
+			}*/
+			// TODO ^^^
+			mode = (uint8_t)(regMode);
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_GET_REG_MODE;
+			responseData[2] = mode + 1; // mode
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
 		default: {
 			modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
 			break;
