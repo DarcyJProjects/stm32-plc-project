@@ -450,6 +450,40 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			modbus_send_response(responseData, responseLen);
 			break;
 		}
+		case MODBUS_VENDOR_FUNC_SET_HOLDING_REG_MODE: {
+			uint16_t index = (frame[2] << 8) | frame[3];
+			IO_Holding_Reg_Mode mode = frame[4] - 1;
+
+			// Check request length (Slave Address, Function Code, Index High, Index Low, Mode [1 = voltage, 2 = current], CRC Low, CRC High)
+			if (len != 7) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Check mode
+			if (frame[4] < 1 || frame[4] > IO_HOLDING_REG_CURRENT) {
+			    modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+			    return;
+			}
+
+			// Set the mode of the holding register
+			if (!io_holding_reg_set_mode(index, mode)) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_SET_HOLDING_REG_MODE;
+			responseData[2] = 0x01; // status byte (0x01 = success)
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
 		default: {
 			modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
 			break;

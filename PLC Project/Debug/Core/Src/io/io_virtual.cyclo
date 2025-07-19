@@ -3,6 +3,6 @@
 ../Core/Src/io/io_virtual.c:60:6:io_virtual_read	6
 ../Core/Src/io/io_virtual.c:85:6:io_virtual_write	5
 ../Core/Src/io/io_virtual.c:109:6:io_virtual_save	3
-../Core/Src/io/io_virtual.c:150:6:io_virtual_load	6
-../Core/Src/io/io_virtual.c:207:6:io_virtual_clear	2
-../Core/Src/io/io_virtual.c:222:6:io_virtual_factory_reset	2
+../Core/Src/io/io_virtual.c:153:6:io_virtual_load	6
+../Core/Src/io/io_virtual.c:210:6:io_virtual_clear	1
+../Core/Src/io/io_virtual.c:221:6:io_virtual_factory_reset	1

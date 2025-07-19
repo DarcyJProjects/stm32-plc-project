@@ -226,8 +226,8 @@ int main(void)
   	io_discrete_in_add_channel(hardware_discrete_in_read_func, &discrete_in_3);
 
   	// Setup Holding Registers [HARDWARE]
-  	io_holding_reg_add_channel(dac_write_func, DAC_CHANNEL_1);
-  	io_holding_reg_add_channel(dac_write_func, DAC_CHANNEL_2);
+  	io_holding_reg_add_channel(dac_write_func, DAC_CHANNEL_1, IO_HOLDING_REG_VOLTAGE);
+  	io_holding_reg_add_channel(dac_write_func, DAC_CHANNEL_2, IO_HOLDING_REG_VOLTAGE);
 
 
   	// Setup Input register

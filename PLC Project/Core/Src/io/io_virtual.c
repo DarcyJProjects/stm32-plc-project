@@ -144,7 +144,10 @@ bool io_virtual_save(uint16_t baseAddress) {
 	uint16_t crc = modbus_crc16(buffer, offset);
 	if (!EEPROM_WriteBlock(baseAddress, &crc, sizeof(crc))) return false;
 
-	return true;
+	baseAddress += sizeof(crc);
+
+	// Now save physical holding register modes
+	return io_holding_reg_type_save(baseAddress);
 }
 
 bool io_virtual_load(uint16_t baseAddress) {
@@ -212,11 +215,7 @@ bool io_virtual_clear(void) {
 	memset(virtual_holding_reg_channels, 0, sizeof(virtual_holding_reg_channels));
 
 	// Save virtual registers to EEPROM (managed by automation as virtual registers are written after rules at dynamic address)
-	if (!automation_save_rules()) {
-		return false;
-	}
-
-	return true;
+	return automation_save_rules();
 }
 
 bool io_virtual_factory_reset(uint16_t baseAddress) {
@@ -227,9 +226,5 @@ bool io_virtual_factory_reset(uint16_t baseAddress) {
 	memset(virtual_holding_reg_channels, 0, sizeof(virtual_holding_reg_channels));
 
 	// Save virtual registers to EEPROM
-	if (!io_virtual_save(baseAddress)) {
-		return false;
-	}
-
-	return true;
+	io_virtual_save(baseAddress);
 }

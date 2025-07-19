@@ -1,4 +1,8 @@
-../Core/Src/io/io_holding_reg.c:11:6:io_holding_reg_add_channel	4
-../Core/Src/io/io_holding_reg.c:35:10:io_holding_reg_read	2
-../Core/Src/io/io_holding_reg.c:44:6:io_holding_reg_write	3
-../Core/Src/io/io_holding_reg.c:54:6:dac_write_func	1
+../Core/Src/io/io_holding_reg.c:13:6:io_holding_reg_add_channel	4
+../Core/Src/io/io_holding_reg.c:39:10:io_holding_reg_read	2
+../Core/Src/io/io_holding_reg.c:48:6:io_holding_reg_write	3
+../Core/Src/io/io_holding_reg.c:58:6:dac_write_func	3
+../Core/Src/io/io_holding_reg.c:91:6:io_holding_reg_set_mode	2
+../Core/Src/io/io_holding_reg.c:99:6:io_holding_reg_type_save	8
+../Core/Src/io/io_holding_reg.c:149:6:io_holding_reg_type_load	7
+../Core/Src/io/io_holding_reg.c:188:6:io_holding_reg_type_clear	4

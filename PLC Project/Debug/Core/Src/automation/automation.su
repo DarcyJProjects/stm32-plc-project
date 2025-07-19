@@ -10,5 +10,5 @@
 ../Core/Src/automation/automation.c:118:6:automation_get_rule	24	static
 ../Core/Src/automation/automation.c:127:6:automation_delete_rule	24	static
 ../Core/Src/automation/automation.c:152:6:automation_save_rules	728	static
-../Core/Src/automation/automation.c:191:6:automation_factory_reset	16	static
-../Core/Src/automation/automation.c:205:6:automation_load_rules	1432	static
+../Core/Src/automation/automation.c:189:6:automation_factory_reset	16	static
+../Core/Src/automation/automation.c:206:6:automation_load_rules	1432	static

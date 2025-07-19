@@ -29,6 +29,9 @@ Range		Hexadecimal		Notes
 
 #define MODBUS_VENDOR_FUNC_SET_RTC					0x6E
 
+#define MODBUS_VENDOR_FUNC_SET_HOLDING_REG_MODE		0x6F
+#define MODBUS_VENDOR_FUNC_SET_INPUT_REG_MODE		0x70
+
 
 // Handle a full received modbus frame
 void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len);

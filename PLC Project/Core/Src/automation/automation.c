@@ -183,12 +183,13 @@ bool automation_save_rules(void) {
 	addr += sizeof(crc);
 
 	// Now save virtual registers
-	if (!io_virtual_save(addr)) return false;
-
-	return true;
+	return io_virtual_save(addr);
 }
 
 bool automation_factory_reset(void) {
+	// factory reset io_holding_reg_types
+	io_holding_reg_type_clear(true); // true for factory reset mode
+
 	memset(rules, 0, sizeof(rules));
 	rule_count = 0;
 
