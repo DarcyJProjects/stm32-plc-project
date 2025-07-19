@@ -111,6 +111,49 @@ app.get("/write", async (req, res) => {
     }
 });
 
+// Set mode (current or voltage for holding regs, input regs)
+app.get("/setmode", async (req, res) => {
+    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+    const func = 0x6F;
+
+    const type = req.query.type;
+    const address = parseInt(req.query.address);
+    const mode = parseInt(req.query.mode);
+
+    if (isNaN(address) || address < 0 || address > 0xFFFF) {
+        return res.status(400).json({ error: "Invalid or missing register address" });
+    }
+
+    if (isNaN(mode) || mode < 0 || mode > 1) {
+        return res.status(400).json({ error: "Invalid or missing mode. 0 is voltage mode, 1 is current mode" });
+    }
+
+    if (!type || (type != "holding" && type != "input")) {
+        return res.status(400).json({ error: "Invalid or missing type. Type must be 'holding' or 'input'." });
+    }
+
+    const request = Buffer.alloc(3);
+    request.writeUInt16BE(index, 0);
+    request.writeUInt8(mode + 1, 2); // add 1
+
+    try {
+        const result = await modbus.sendRequest(func, request);
+
+        // Check response
+        if (result.length < 3) throw new Error("Invalid response length");
+        if (result[2] !== 0x01) throw new Error("Invalid status byte");
+
+        res.json({
+            success: true,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+})
+
 // -----
 async function sendRule(slave, rule) {
     // Custom function
