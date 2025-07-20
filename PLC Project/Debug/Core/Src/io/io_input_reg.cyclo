@@ -1,8 +1,8 @@
 ../Core/Src/io/io_input_reg.c:25:6:io_input_reg_add_channel	3
 ../Core/Src/io/io_input_reg.c:52:10:io_input_reg_read	2
-../Core/Src/io/io_input_reg.c:61:10:adc_read_func	2
-../Core/Src/io/io_input_reg.c:93:6:io_input_reg_set_mode	2
-../Core/Src/io/io_input_reg.c:103:6:io_input_reg_get_mode	2
-../Core/Src/io/io_input_reg.c:111:6:io_input_reg_type_save	8
-../Core/Src/io/io_input_reg.c:166:6:io_input_reg_type_clear	4
-../Core/Src/io/io_input_reg.c:181:6:io_input_reg_type_load	7
+../Core/Src/io/io_input_reg.c:61:10:adc_read_func	6
+../Core/Src/io/io_input_reg.c:115:6:io_input_reg_set_mode	2
+../Core/Src/io/io_input_reg.c:125:6:io_input_reg_get_mode	2
+../Core/Src/io/io_input_reg.c:133:6:io_input_reg_type_save	8
+../Core/Src/io/io_input_reg.c:184:6:io_input_reg_type_clear	4
+../Core/Src/io/io_input_reg.c:199:6:io_input_reg_type_load	7

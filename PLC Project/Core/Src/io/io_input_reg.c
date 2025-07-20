@@ -81,9 +81,31 @@ uint16_t adc_read_func(uint32_t channel, IO_Input_Reg_Mode mode) {
 
 		// Wait until the ADC conversion is done (or a timeout of 100 ms occurs)
 		if (HAL_ADC_PollForConversion(hadc, 100) == HAL_OK) {
-			//HAL_ADC_Stop(hadc);
-			// Return the ADC value
-			return (HAL_ADC_GetValue(hadc) * 65535) / 4095; // scale 12 bit value to 16 bit value as expected by modbus specifications
+			uint16_t adcValue = HAL_ADC_GetValue(hadc); // 12 bit 0-4095
+			HAL_ADC_Stop(hadc);
+
+			switch (mode) {
+				case IO_INPUT_REG_VOLTAGE: {
+					// direct linear mapping to 16 bit
+					return (adcValue * 65535U) / 4095U;
+				}
+
+				case IO_INPUT_REG_CURRENT: {
+					// define the calibrated ADC range
+					const uint16_t adc_min_current = 497; // 4mA through 10R = 40mV -> 10x nsi1200 gain -> 0.4V = 497
+					const uint16_t adc_max_current = 2481; // 20mA through 10R = 200mV -> 10x nsi1200 gain -> 2V = 2481
+
+					if (adcValue <= adc_min_current) return 0;
+					if (adcValue >= adc_max_current) return 65535; // round to max 16 bit val
+
+					uint16_t range = adc_max_current - adc_min_current;
+					return ((adcValue - adc_min_current) * 65535U) / range;
+				}
+
+				default:
+					return 0;
+			}
+
 		}
 		HAL_ADC_Stop(hadc);
 #endif
