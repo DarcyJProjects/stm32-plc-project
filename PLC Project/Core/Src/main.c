@@ -230,14 +230,14 @@ int main(void)
 
 
   	// Setup Input register
-  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_1);
-  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_2);
-  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_11);
-  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_14);
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_1, IO_INPUT_REG_VOLTAGE);
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_2, IO_INPUT_REG_VOLTAGE);
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_11, IO_INPUT_REG_VOLTAGE);
+  	io_input_reg_add_channel(adc_read_func, ADC_CHANNEL_14, IO_INPUT_REG_VOLTAGE);
 
   	// Hardcoded Status input registers (do not remove)
-  	io_input_reg_add_channel(INA226_ReadBusVoltageRaw, &hi2c1);
-  	io_input_reg_add_channel(INA226_ReadCurrentRaw, &hi2c1);
+  	io_input_reg_add_channel(INA226_ReadBusVoltageRaw, &hi2c1, IO_INPUT_REG_VOLTAGE);
+  	io_input_reg_add_channel(INA226_ReadCurrentRaw, &hi2c1, IO_INPUT_REG_VOLTAGE);
 
   	// Initialise Automation
   	// This MUST be done AFTER the physical channels have been added ^^ or else the stored analogue modes (voltage/current) cannot be set

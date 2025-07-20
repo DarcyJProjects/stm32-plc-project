@@ -4,6 +4,7 @@
 #include "automation/automation.h"
 #include "modbus/modbus_util.h"
 #include "usb_serial.h"
+#include "io/io_input_reg.h"
 
 // Allocates storage for all the channels.
 IO_Holding_Reg_Channel io_holding_reg_channels[MAX_IO_HOLDING_REG]; // Array of type channel (struct created in header)
@@ -110,10 +111,6 @@ bool io_holding_reg_get_mode(uint16_t index, IO_Holding_Reg_Mode* mode) {
 }
 
 bool io_holding_reg_type_save(uint16_t baseAddress) {
-	char msg[64];
-	sprintf(msg, "saving to base address %d", baseAddress);
-	usb_serial_println(msg);
-
 	// Count physical DAC holding regs
 	uint16_t count = 0;
 	for (uint16_t i = 0; i < io_holding_reg_channel_count; i++) {
@@ -124,6 +121,7 @@ bool io_holding_reg_type_save(uint16_t baseAddress) {
 	}
 
 	if (count == 0) return true; // nothing to save
+	// TODO: ^^^ WILL NOT PASS ONTO NEXT SAVE!!!
 
 
 	// Buffer to hold all data for CRC16
@@ -160,14 +158,13 @@ bool io_holding_reg_type_save(uint16_t baseAddress) {
 	uint16_t crc = modbus_crc16(buffer, offset);
 	if (!EEPROM_WriteBlock(baseAddress, &crc, sizeof(crc))) return false;
 
-	return true;
+	// Pass onto input reg to save
+	baseAddress += sizeof(crc);
+
+	return io_input_reg_type_save(baseAddress);
 }
 
 bool io_holding_reg_type_load(uint16_t baseAddress) {
-	char msg[64];
-	sprintf(msg, "loading from base address %d", baseAddress);
-	usb_serial_println(msg);
-
 	// Buffer for reading max possible amount
 	uint16_t dataLen = sizeof(uint16_t) + sizeof(IO_Holding_Reg_Type_Record) * MAX_IO_HOLDING_REG_PHYSICAL + sizeof(uint16_t);
 	uint8_t buffer[dataLen];
@@ -176,7 +173,6 @@ bool io_holding_reg_type_load(uint16_t baseAddress) {
 
 	// read max data (up to just before CRC)
 	if (!EEPROM_LoadBlock(baseAddress, buffer, dataLen)) {
-		usb_serial_println("error1");
 		return false;
 	}
 
@@ -184,9 +180,6 @@ bool io_holding_reg_type_load(uint16_t baseAddress) {
 	uint16_t temp_reg_count;
 	memcpy(&temp_reg_count, &buffer[offset], sizeof(temp_reg_count));
 	if (temp_reg_count > MAX_IO_HOLDING_REG_PHYSICAL) {
-		char errormsg[64];
-		sprintf(errormsg, "error2 - temp reg count = %d", temp_reg_count);
-		usb_serial_println(errormsg);
 		return false;
 	}
 	offset += sizeof(temp_reg_count);
@@ -198,14 +191,12 @@ bool io_holding_reg_type_load(uint16_t baseAddress) {
 	// Read CRC16
 	uint16_t stored_crc;
 	if (!EEPROM_LoadBlock(baseAddress + offset, &stored_crc, sizeof(stored_crc))) {
-		usb_serial_println("error3");
 		return false;
 	}
 
 	// Check CRC16
 	uint16_t computed_crc = modbus_crc16(buffer, offset);
 	if (computed_crc != stored_crc) {
-		usb_serial_println("error4");
 		return false;
 	}
 
@@ -217,9 +208,11 @@ bool io_holding_reg_type_load(uint16_t baseAddress) {
 		}
 	}
 
-	usb_serial_println("load finished mode");
+	// Pass onto input reg to load
+	baseAddress += offset;
+	baseAddress += sizeof(stored_crc);
 
-	return true;
+	return io_input_reg_type_load(baseAddress);
 }
 
 bool io_holding_reg_type_clear(bool factoryResetMode) {

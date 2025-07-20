@@ -485,7 +485,37 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			break;
 		}
 		case MODBUS_VENDOR_FUNC_SET_INPUT_REG_MODE: {
-			// TODO
+			uint16_t index = (frame[2] << 8) | frame[3];
+			IO_Input_Reg_Mode mode = frame[4] - 1;
+
+			// Check request length (Slave Address, Function Code, Index High, Index Low, Mode [1 = voltage, 2 = current], CRC Low, CRC High)
+			if (len != 7) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Check mode
+			if (frame[4] < 1 || frame[4] > 2) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Set the mode of the input register
+			if (!io_input_reg_set_mode(index, mode)) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_SET_INPUT_REG_MODE;
+			responseData[2] = 0x01; // status byte (0x01 = success)
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
 			break;
 		}
 		case MODBUS_VENDOR_FUNC_GET_REG_MODE: {
@@ -507,14 +537,14 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 					return;
 				}
 				mode = (uint8_t)(regMode);
-			} /*else if (type == 4) {
-				if (!io_input_reg_get_mode(index, &mode)) {
+			} else if (type == 4) {
+				IO_Input_Reg_Mode regMode;
+				if (!io_input_reg_get_mode(index, &regMode)) {
 					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
 					return;
 				}
-			}*/
-			// TODO ^^^
-
+				mode = (uint8_t)(regMode);
+			}
 
 			// Create the response frame
 			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
