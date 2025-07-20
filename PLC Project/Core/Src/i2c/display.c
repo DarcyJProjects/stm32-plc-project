@@ -10,7 +10,7 @@
 
 // Variables
 uint16_t currentPage = 0;
-uint16_t endPage = 6;
+uint16_t endPage = 7;
 
 void display_Setup() {
 	// Initialise SSD1306
@@ -113,6 +113,24 @@ void display_StatusPage(void) {
 			break;
 		case 4:
 			ssd1306_Fill(Black);
+			ssd1306_SetCursor(2, 0);
+			ssd1306_WriteString("Holding Reg", Font_11x18, White);
+
+			ssd1306_SetCursor(2, 25);
+			IO_Holding_Reg_Mode mode0;
+			io_holding_reg_get_mode(0, &mode0);
+			sprintf(buf, "0: %s", mode0 == IO_HOLDING_REG_VOLTAGE ? "0-5V" : "4-20mA");
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			IO_Holding_Reg_Mode mode1;
+			io_holding_reg_get_mode(1, &mode1);
+			sprintf(buf, "1: %s", mode1 == IO_HOLDING_REG_VOLTAGE ? "0-5V" : "4-20mA");
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			break;
+		case 5:
+			ssd1306_Fill(Black);
 			ssd1306_SetCursor(12, 0);
 			ssd1306_WriteString("Input Reg", Font_11x18, White);
 
@@ -132,7 +150,7 @@ void display_StatusPage(void) {
 			sprintf(buf, "3: %d", io_input_reg_read(3));
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
-		case 5:
+		case 6:
 			ssd1306_Fill(Black);
 			ssd1306_SetCursor(7, 0);
 			ssd1306_WriteString("Automation", Font_11x18, White);
@@ -154,7 +172,7 @@ void display_StatusPage(void) {
 			sprintf(buf, "%d virt. holding", virtHolding);
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
-		case 6:
+		case 7:
 			ssd1306_Fill(Black);
 			ssd1306_SetCursor(50, 0);
 			ssd1306_WriteString("RTC", Font_11x18, White);
