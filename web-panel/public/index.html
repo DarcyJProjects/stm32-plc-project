@@ -224,6 +224,7 @@
               statusPolling(true);
               await ruleListUpdate();
               await vrListUpdate();
+              await hwGetModes();
               connectionStatusTimer = setInterval(connectionStatus, connectionStatusTimerInterval);
             } else {
               statusPolling(false);

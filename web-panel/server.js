@@ -119,13 +119,13 @@ app.get("/setmode", async (req, res) => {
 
     const type = req.query.type;
     const address = parseInt(req.query.address);
-    const mode = parseInt(req.query.mode);
+    const mode = parseInt(req.query.mode) + 1;
 
     if (isNaN(address) || address < 0 || address > 0xFFFF) {
         return res.status(400).json({ error: "Invalid or missing register address" });
     }
 
-    if (isNaN(mode) || mode < 0 || mode > 1) {
+    if (isNaN(mode) || mode < 1 || mode > 2) { // add one to checks
         return res.status(400).json({ error: "Invalid or missing mode. 0 is voltage mode, 1 is current mode" });
     }
 
@@ -134,8 +134,8 @@ app.get("/setmode", async (req, res) => {
     }
 
     const request = Buffer.alloc(3);
-    request.writeUInt16BE(index, 0);
-    request.writeUInt8(mode + 1, 2); // add 1
+    request.writeUInt16BE(address, 0);
+    request.writeUInt8(mode, 2);
 
     try {
         const result = await modbus.sendRequest(func, request);
@@ -158,7 +158,7 @@ app.get("/setmode", async (req, res) => {
 app.get("/getmode", async (req, res) => {
     if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
 
-    const func = 0x6F;
+    const func = 0x71;
 
     const type = req.query.type;
     const address = parseInt(req.query.address);
@@ -184,8 +184,8 @@ app.get("/getmode", async (req, res) => {
     }
 
     const request = Buffer.alloc(3);
-    request.writeUInt16BE(index, 0);
-    request.writeUInt16BE(typeInt, 2);
+    request.writeUInt16BE(address, 0);
+    request.writeUInt8(typeInt, 2);
 
     try {
         const result = await modbus.sendRequest(func, request);
