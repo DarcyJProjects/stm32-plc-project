@@ -115,8 +115,6 @@ app.get("/write", async (req, res) => {
 app.get("/setmode", async (req, res) => {
     if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
 
-    const func = 0x6F;
-
     const type = req.query.type;
     const address = parseInt(req.query.address);
     const mode = parseInt(req.query.mode) + 1;
@@ -131,6 +129,16 @@ app.get("/setmode", async (req, res) => {
 
     if (!type || (type != "holding" && type != "input")) {
         return res.status(400).json({ error: "Invalid or missing type. Type must be 'holding' or 'input'." });
+    }
+
+    let func;
+    switch (type) {
+        case "holding":
+            func = 0x6F;
+            break;
+        case "input":
+            func = 0x70;
+            break;
     }
 
     const request = Buffer.alloc(3);
