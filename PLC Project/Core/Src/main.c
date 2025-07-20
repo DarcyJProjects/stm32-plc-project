@@ -203,7 +203,6 @@ int main(void)
 
   	// Initialise Devices
   	INA226_Init(&hi2c1);
-  	automation_Init();
 
   	// Setup Coils [HARDWARE]
   	gpio_config coil_0 = {GPIOC, DOUT1_Pin};
@@ -240,11 +239,16 @@ int main(void)
   	io_input_reg_add_channel(INA226_ReadBusVoltageRaw, &hi2c1);
   	io_input_reg_add_channel(INA226_ReadCurrentRaw, &hi2c1);
 
-  	// TODO: DEMO ONLY
+  	// Initialise Automation
+  	// This MUST be done AFTER the physical channels have been added ^^ or else the stored analogue modes (voltage/current) cannot be set
+  	automation_Init();
+
+  	// TODO: DEMO ONLY - BMP280
 	//BMP280_Init();
 	//io_input_reg_add_channel(BMP280_Read_Temp_Func, NULL);
 
-  	// TODO: DEMO ONLY
+  	// TODO: DEMO ONLY - MODBUS SLAVE
+  	/*
   	// Setup the SHT30 as a Modbus slave
   	io_modbus_slave_add_channel(0x1E, MODBUS_REGISTER_INPUT, 0); // SHT30 slave, humidity
   	io_modbus_slave_add_channel(0x1E, MODBUS_REGISTER_INPUT, 1); // SHT30 slave, temperature
@@ -252,7 +256,7 @@ int main(void)
   	io_input_reg_add_channel(io_modbus_slave_read, 0); // modbus slave channel 0 = humidity
   	io_input_reg_add_channel(io_modbus_slave_read, 1); // modbus slave channel 1 = temperature
   	// Note, these values need to be / 10 to get actual value.
-
+	*/
 
   	// Flash on-board LED
   	HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_SET);

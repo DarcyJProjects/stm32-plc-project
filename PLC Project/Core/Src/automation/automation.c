@@ -1,4 +1,5 @@
 #include "automation/automation.h"
+#include "modbus/modbus_util.h"
 
 #define MAX_RULES 32 // max rules due to EEPROM size TODO: Find actual max size
 
@@ -229,40 +230,42 @@ bool automation_load_rules(void) {
 		}
 
 		rule_count = 0;
-		return true;
+
+		addr += sizeof(stored_crc);
+	} else {
+		// Otherwise load as usual:
+
+		// Temporarily load the data into a buffer
+		LogicRule temp_rules[MAX_RULES];
+		if (!EEPROM_LoadBlock(addr, temp_rules, saved_count * sizeof(LogicRule))) {
+			return false;
+		}
+		addr += saved_count * sizeof(LogicRule);
+
+		// Read stored CRC16
+		uint16_t stored_crc = 0;
+		if (!EEPROM_LoadBlock(addr, &stored_crc, sizeof(stored_crc))) {
+			return false;
+		}
+
+		// Compute CRC16
+		uint8_t crc_buffer[sizeof(saved_count) + MAX_RULES * sizeof(LogicRule)];
+		memcpy(crc_buffer, &saved_count, sizeof(saved_count));
+		memcpy(crc_buffer + sizeof(saved_count), temp_rules, saved_count * sizeof(LogicRule));
+
+		uint16_t computed_crc = modbus_crc16(crc_buffer, sizeof(saved_count) + saved_count * sizeof(LogicRule));
+
+		if (computed_crc != stored_crc) {
+			return false;
+		}
+
+		addr += sizeof(stored_crc);
+
+
+		// All valid, so use these rules
+		memcpy(rules, temp_rules, saved_count * sizeof(LogicRule));
+		rule_count = saved_count;
 	}
-	// Otherwise load as usual:
-
-	// Temporarily load the data into a buffer
-	LogicRule temp_rules[MAX_RULES];
-	if (!EEPROM_LoadBlock(addr, temp_rules, saved_count * sizeof(LogicRule))) {
-		return false;
-	}
-	addr += saved_count * sizeof(LogicRule);
-
-	// Read stored CRC16
-	uint16_t stored_crc = 0;
-	if (!EEPROM_LoadBlock(addr, &stored_crc, sizeof(stored_crc))) {
-		return false;
-	}
-
-	// Compute CRC16
-	uint8_t crc_buffer[sizeof(saved_count) + MAX_RULES * sizeof(LogicRule)];
-	memcpy(crc_buffer, &saved_count, sizeof(saved_count));
-	memcpy(crc_buffer + sizeof(saved_count), temp_rules, saved_count * sizeof(LogicRule));
-
-	uint16_t computed_crc = modbus_crc16(crc_buffer, sizeof(saved_count) + saved_count * sizeof(LogicRule));
-
-	if (computed_crc != stored_crc) {
-		return false;
-	}
-
-	addr += sizeof(stored_crc);
-
-
-	// All valid, so use these rules
-	memcpy(rules, temp_rules, saved_count * sizeof(LogicRule));
-	rule_count = saved_count;
 
 
 	// Now load virtual registers

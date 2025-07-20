@@ -63,4 +63,6 @@ bool io_holding_reg_type_save(uint16_t baseAddress);
 
 bool io_holding_reg_type_clear(bool factoryResetMode);
 
+bool io_holding_reg_type_load(uint16_t baseAddress);
+
 #endif

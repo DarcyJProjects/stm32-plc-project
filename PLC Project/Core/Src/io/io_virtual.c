@@ -1,4 +1,6 @@
 #include "io/io_virtual.h"
+#include "io/io_holding_reg.h"
+#include "modbus/modbus_util.h"
 
 Virtual_Coil_Channel virtual_coil_channels[MAX_VIRTUAL_COILS];
 uint16_t virtual_coil_channel_count = 0;
@@ -203,7 +205,10 @@ bool io_virtual_load(uint16_t baseAddress) {
 	virtual_holding_reg_channel_count = temp_holding_count;
 	memcpy(virtual_holding_reg_channels, temp_holding, temp_holding_count * sizeof(Virtual_Holding_Reg_Channel));
 
-	return true;
+	baseAddress += offset;
+	baseAddress += sizeof(stored_crc);
+
+	return io_holding_reg_type_load(baseAddress);
 }
 
 // WARNING. Deletes all virtual registers in memory and on EEPROM
