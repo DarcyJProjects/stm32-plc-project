@@ -21,9 +21,9 @@ void display_Setup() {
 
 void display_Boot(void) {
 	ssd1306_Fill(Black);
-	ssd1306_SetCursor(10, 20);
+	ssd1306_SetCursor(10, 10);
 	ssd1306_WriteString("PLC by DJ", Font_11x18, White);
-	ssd1306_SetCursor(25, 45);
+	ssd1306_SetCursor(25, 35);
 	ssd1306_WriteString("Booting...", Font_7x10, White);
 	ssd1306_UpdateScreen();
 }

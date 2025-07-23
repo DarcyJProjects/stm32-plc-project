@@ -2399,8 +2399,8 @@ void display_Boot(void) {
 	ssd1306_Fill(Black);
  800172e:	2000      	movs	r0, #0
  8001730:	f001 f8fc 	bl	800292c <ssd1306_Fill>
-	ssd1306_SetCursor(10, 20);
- 8001734:	2114      	movs	r1, #20
+	ssd1306_SetCursor(10, 10);
+ 8001734:	210a      	movs	r1, #10
  8001736:	200a      	movs	r0, #10
  8001738:	f001 fa44 	bl	8002bc4 <ssd1306_SetCursor>
 	ssd1306_WriteString("PLC by DJ", Font_11x18, White);
@@ -2410,8 +2410,8 @@ void display_Boot(void) {
  8001742:	cb0e      	ldmia	r3, {r1, r2, r3}
  8001744:	480a      	ldr	r0, [pc, #40]	@ (8001770 <display_Boot+0x48>)
  8001746:	f001 fa17 	bl	8002b78 <ssd1306_WriteString>
-	ssd1306_SetCursor(25, 45);
- 800174a:	212d      	movs	r1, #45	@ 0x2d
+	ssd1306_SetCursor(25, 35);
+ 800174a:	2123      	movs	r1, #35	@ 0x23
  800174c:	2019      	movs	r0, #25
  800174e:	f001 fa39 	bl	8002bc4 <ssd1306_SetCursor>
 	ssd1306_WriteString("Booting...", Font_7x10, White);
