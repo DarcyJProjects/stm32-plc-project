@@ -10,6 +10,7 @@
 #include "io/io_holding_reg.h"
 #include "io/io_input_reg.h"
 #include "io/io_virtual.h"
+#include "io/io_emergency.h"
 
 #include "i2c/eeprom.h"
 

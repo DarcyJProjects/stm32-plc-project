@@ -190,6 +190,8 @@ bool automation_save_rules(void) {
 bool automation_factory_reset(void) {
 	// factory reset io_holding_reg_types
 	io_holding_reg_type_clear(true); // true for factory reset mode
+	io_input_reg_type_clear(true); // true for factory reset mode
+	emergencyStop_clear(true); // true for factory reset mode
 
 	memset(rules, 0, sizeof(rules));
 	rule_count = 0;

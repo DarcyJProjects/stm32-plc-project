@@ -593,6 +593,39 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			modbus_send_response(responseData, responseLen);
 			break;
 		}
+		case MODBUS_VENDOR_FUNC_FACTORY_RESET: {
+			uint8_t confirmation = frame[2];
+
+			// Check request length (Slave Address, Function Code, Confirmation, Padding, CRC Low, CRC High)
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Check confirmation
+			if (confirmation != 1) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Factory Reset
+			if (!automation_factory_reset()) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_FACTORY_RESET;
+			responseData[2] = 0x01; // status byte (0x01 = success)
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
 		default: {
 			modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_FUNCTION);
 			break;

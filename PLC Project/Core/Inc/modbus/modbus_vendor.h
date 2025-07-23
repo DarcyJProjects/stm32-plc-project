@@ -35,6 +35,8 @@ Range		Hexadecimal		Notes
 
 #define MODBUS_VENDOR_FUNC_SET_EMERGENCY_STOP		0x72
 
+#define MODBUS_VENDOR_FUNC_FACTORY_RESET			0x73
+
 
 // Handle a full received modbus frame
 void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len);

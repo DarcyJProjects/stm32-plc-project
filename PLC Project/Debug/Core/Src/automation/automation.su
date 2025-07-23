@@ -11,4 +11,4 @@
 ../Core/Src/automation/automation.c:128:6:automation_delete_rule	24	static
 ../Core/Src/automation/automation.c:153:6:automation_save_rules	728	static
 ../Core/Src/automation/automation.c:190:6:automation_factory_reset	16	static
-../Core/Src/automation/automation.c:207:6:automation_load_rules	1432	static
+../Core/Src/automation/automation.c:209:6:automation_load_rules	1432	static
