@@ -682,6 +682,41 @@ app.get("/setemergencystop", async (req, res) => {
     }
 });
 
+
+
+// Factory Reset
+app.get("/factoryreset", async (req, res) => {
+    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+    const func = 0x73;
+
+    const confirmation = req.query.confirmation;
+
+    if (confirmation != "true") {
+        return res.status(400).json({ error: "Must confirm with confirmation = true" });
+    }
+
+    const request = Buffer.alloc(2);
+    request.writeUInt8(1, 0); // confirmation
+    request.writeUInt8(0, 1); // padding
+
+    try {
+        const result = await modbus.sendRequest(func, request);
+
+        // Check response
+        if (result.length < 3) throw new Error("Invalid response length");
+        if (result[2] !== 0x01) throw new Error("Invalid status byte");
+
+        res.json({
+            success: true,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ------
 // List serial ports
 app.get("/ports", async (req, res) => {
