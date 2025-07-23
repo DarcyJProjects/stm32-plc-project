@@ -7,10 +7,12 @@
 #include "io/io_coils.h"
 #include "rtc/rtc_ds3231.h"
 #include "io/io_virtual.h"
+#include "sd/sd.h"
+
 
 // Variables
 uint16_t currentPage = 0;
-uint16_t endPage = 9;
+uint16_t endPage = 10;
 
 void display_Setup() {
 	// Initialise SSD1306
@@ -241,9 +243,43 @@ void display_StatusPage(void) {
 			sprintf(buf, "Input Mode: %s", defined ? (emergencyStop_getInputMode() == EMERGENCY_STOP_NO ? "NO" : "NC") : "-");
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
+		case 10:
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(5, 0);
+			ssd1306_WriteString("SD Logging", Font_11x18, White);
+
+			bool isMounted = SD_IsMounted();
+
+			SD_Stats stats = SD_GetStats();
+
+			ssd1306_SetCursor(2, 25);
+			sprintf(buf, "Mounted: %s", isMounted ? "true" : "false");
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			if (stats.success) {
+				sprintf(buf, "Size: %luMB", stats.totalMB);
+			} else {
+				sprintf(buf, "Size: -");
+			}
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 55);
+			if (stats.success) {
+				sprintf(buf, "Free: %luMB", stats.freeMB);
+			} else {
+				sprintf(buf, "Free: -");
+			}
+			ssd1306_WriteString(buf, Font_6x8, White);
+			break;
 	}
 
-	ssd1306_SetCursor(110, 56);
+
+	if (currentPage >= 10) {
+		ssd1306_SetCursor(95, 56);
+	} else {
+		ssd1306_SetCursor(100, 56);
+	}
 	sprintf(buf, "%d/%d", currentPage, endPage);
 	ssd1306_WriteString(buf, Font_6x8, White);
 

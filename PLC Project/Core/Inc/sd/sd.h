@@ -19,7 +19,16 @@
 #define SD_CARD_PORT GPIOC
 #define SD_CARD_PIN GPIO_PIN_10
 
+// TODO: ENABLE ON FINAL PCB
 #define SD_CARD_DETECT_ENABLE false
+
+
+typedef struct {
+	uint32_t totalMB;
+	uint32_t freeMB;
+	bool success;
+} SD_Stats;
+
 
 bool SD_Detect(void);
 
@@ -28,5 +37,7 @@ bool SD_IsMounted(void);
 bool SD_Log(const char* message);
 
 void SD_Unmount(void);
+
+SD_Stats SD_GetStats(void);
 
 #endif

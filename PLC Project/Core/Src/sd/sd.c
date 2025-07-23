@@ -96,3 +96,35 @@ void SD_Unmount(void) {
 	f_mount(NULL, "", 0);
 	isMounted = false;
 }
+
+SD_Stats SD_GetStats(void) {
+	SD_Stats stats = {0};
+
+	if (!isMounted) {
+		stats.success = false;
+		return stats;
+	}
+
+	DWORD free_clusters, total_sectors, free_sectors;
+	FATFS *fs_ptr = &fatFs;
+
+	FRESULT res = f_getfree("", &free_clusters, &fs_ptr);
+	if (res != FR_OK) {
+		stats.success = false;
+		return stats;
+	}
+
+	// From Chan's FatFs documentation:
+	// total_sectors = (fs->n_fatent - 2) * fs->csize;
+	// free_sectors  = free_clusters * fs->csize;
+	total_sectors = (fs_ptr->n_fatent - 2) * fs_ptr->csize;
+	free_sectors  = free_clusters * fs_ptr->csize;
+
+	// Sector size is 512 bytes -> 1 sector = 0.5 KiB
+	// Convert to MB: (sectors / 2) / 1024 = MB
+	stats.totalMB = total_sectors / 2048;
+	stats.freeMB  = free_sectors / 2048;
+	stats.success = true;
+
+	return stats;
+}

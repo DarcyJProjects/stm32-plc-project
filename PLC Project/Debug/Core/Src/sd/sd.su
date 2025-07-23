@@ -3,3 +3,4 @@
 ../Core/Src/sd/sd.c:44:6:SD_IsMounted	4	static
 ../Core/Src/sd/sd.c:48:6:SD_Log	312	static
 ../Core/Src/sd/sd.c:95:6:SD_Unmount	8	static
+../Core/Src/sd/sd.c:100:10:SD_GetStats	56	static

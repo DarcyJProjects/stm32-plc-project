@@ -334,6 +334,9 @@ int main(void)
 		  lastTimeTick = HAL_GetTick();
 		  loopCounter = 0;
 
+		  // Check for SD card insertion/removal
+		  SD_Detect(); // Will automatically mount/unmount
+
 		  // Update display
 		  display_StatusPage();
 	  }
