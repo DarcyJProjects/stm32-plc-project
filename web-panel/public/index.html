@@ -2773,6 +2773,10 @@
           
           if (data.success == true) {
             frStatus.innerHTML = newStatus("alert-success", `Successfully performed a factory reset.`);
+
+            await ruleListUpdate();
+            await vrListUpdate();
+            await hwGetModes();
           } else {
             frStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error}`);
           }
