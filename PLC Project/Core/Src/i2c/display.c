@@ -10,7 +10,7 @@
 
 // Variables
 uint16_t currentPage = 0;
-uint16_t endPage = 8;
+uint16_t endPage = 9;
 
 void display_Setup() {
 	// Initialise SSD1306
@@ -216,6 +216,29 @@ void display_StatusPage(void) {
 
 			ssd1306_SetCursor(2, 40);
 			sprintf(buf, "%02d/%02d/20%02d", current.day, current.month, current.year);
+			ssd1306_WriteString(buf, Font_6x8, White);
+			break;
+		case 9:
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(5, 0);
+			ssd1306_WriteString("Emerg. Stop", Font_11x18, White);
+
+			bool defined = emergencyStop_isDefined();
+
+			ssd1306_SetCursor(2, 25);
+			sprintf(buf, "Enabled: %s", defined ? "true" : "false");
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 40);
+			if (defined) {
+			    sprintf(buf, "D. Input: %u", emergencyStop_getChannel());
+			} else {
+			    sprintf(buf, "D. Input: -");
+			}
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			ssd1306_SetCursor(2, 55);
+			sprintf(buf, "Input Mode: %s", defined ? (emergencyStop_getInputMode() == EMERGENCY_STOP_NO ? "NO" : "NC") : "-");
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
 	}

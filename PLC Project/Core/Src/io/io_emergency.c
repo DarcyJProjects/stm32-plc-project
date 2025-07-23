@@ -27,6 +27,18 @@ bool emergencyStop_setInput(uint16_t index, Emergency_Stop_Input_Mode mode) {
 	return true;
 }
 
+bool emergencyStop_isDefined(void) {
+	return defined;
+}
+
+uint16_t emergencyStop_getChannel(void) {
+	return channel;
+}
+
+Emergency_Stop_Input_Mode emergencyStop_getInputMode(void) {
+	return inputMode;
+}
+
 bool emergencyStop_check(void) {
 	if (!defined) return false;
 	if (latched) return true;

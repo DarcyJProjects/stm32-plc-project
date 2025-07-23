@@ -11,6 +11,12 @@ typedef enum {
 
 bool emergencyStop_setInput(uint16_t index, Emergency_Stop_Input_Mode mode);
 
+bool emergencyStop_isDefined(void);
+
+uint16_t emergencyStop_getChannel(void);
+
+Emergency_Stop_Input_Mode emergencyStop_getInputMode(void);
+
 bool emergencyStop_check(void);
 
 void emergencyStop_reset(void);

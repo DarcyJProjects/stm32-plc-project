@@ -1,7 +1,7 @@
 ../Core/Src/i2c/display.c:15:6:display_Setup	1
 ../Core/Src/i2c/display.c:20:6:display_Boot	1
-../Core/Src/i2c/display.c:29:6:display_StatusPage	25
-../Core/Src/i2c/display.c:230:6:display_FactoryResetPage	5
-../Core/Src/i2c/display.c:269:6:display_EmergencyStop	1
-../Core/Src/i2c/display.c:283:6:display_BtnPress	2
-../Core/Src/i2c/display.c:294:6:display_setPage	2
+../Core/Src/i2c/display.c:29:6:display_StatusPage	30
+../Core/Src/i2c/display.c:253:6:display_FactoryResetPage	5
+../Core/Src/i2c/display.c:292:6:display_EmergencyStop	1
+../Core/Src/i2c/display.c:306:6:display_BtnPress	2
+../Core/Src/i2c/display.c:317:6:display_setPage	2
