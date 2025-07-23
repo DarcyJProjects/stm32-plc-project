@@ -1,3 +1,6 @@
-../Core/Src/io/io_emergency.c:11:6:emergencyStop_setInput	2
-../Core/Src/io/io_emergency.c:22:6:emergencyStop_check	7
-../Core/Src/io/io_emergency.c:44:6:emergencyStop_reset	1
+../Core/Src/io/io_emergency.c:15:6:emergencyStop_setInput	2
+../Core/Src/io/io_emergency.c:30:6:emergencyStop_check	7
+../Core/Src/io/io_emergency.c:52:6:emergencyStop_reset	1
+../Core/Src/io/io_emergency.c:56:6:emergencyStop_save	3
+../Core/Src/io/io_emergency.c:94:6:emergencyStop_clear	2
+../Core/Src/io/io_emergency.c:105:6:emergencyStop_load	5

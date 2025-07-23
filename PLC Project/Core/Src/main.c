@@ -275,9 +275,6 @@ int main(void)
 	// TEMP: ->> needs to be in a timer to update every few seconds for eg TODO
 	display_StatusPage();
 
-	// TEST ONLY TODO
-	emergencyStop_setInput(0, EMERGENCY_STOP_NO);
-
   // ---------------------------------------------------------------------------------------------//
   /* USER CODE END 2 */
 

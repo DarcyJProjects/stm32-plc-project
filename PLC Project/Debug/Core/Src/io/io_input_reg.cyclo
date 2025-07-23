@@ -4,5 +4,5 @@
 ../Core/Src/io/io_input_reg.c:115:6:io_input_reg_set_mode	2
 ../Core/Src/io/io_input_reg.c:125:6:io_input_reg_get_mode	2
 ../Core/Src/io/io_input_reg.c:133:6:io_input_reg_type_save	8
-../Core/Src/io/io_input_reg.c:184:6:io_input_reg_type_clear	4
-../Core/Src/io/io_input_reg.c:199:6:io_input_reg_type_load	7
+../Core/Src/io/io_input_reg.c:187:6:io_input_reg_type_clear	4
+../Core/Src/io/io_input_reg.c:202:6:io_input_reg_type_load	7

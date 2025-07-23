@@ -178,7 +178,10 @@ bool io_input_reg_type_save(uint16_t baseAddress) {
 	uint16_t crc = modbus_crc16(buffer, offset);
 	if (!EEPROM_WriteBlock(baseAddress, &crc, sizeof(crc))) return false;
 
-	return true;
+	// Pass onto emergency stop to save
+	baseAddress += sizeof(crc);
+
+	return emergencyStop_save(baseAddress);
 }
 
 bool io_input_reg_type_clear(bool factoryResetMode) {
@@ -240,5 +243,9 @@ bool io_input_reg_type_load(uint16_t baseAddress) {
 		}
 	}
 
-	return true;
+	// Pass onto emergencystop to load
+	baseAddress += offset;
+	baseAddress += sizeof(stored_crc);
+
+	return emergencyStop_load(baseAddress);
 }

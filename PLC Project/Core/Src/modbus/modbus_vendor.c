@@ -7,6 +7,7 @@
 
 #include "io/io_coils.h"
 #include "io/io_holding_reg.h"
+#include "io/io_emergency.h"
 
 // Handle a full received modbus frame
 void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
@@ -552,6 +553,40 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 			responseData[0] = slave_address; // the address of us
 			responseData[1] = MODBUS_VENDOR_FUNC_GET_REG_MODE;
 			responseData[2] = mode + 1; // mode
+
+			uint16_t responseLen = 3;
+
+			modbus_send_response(responseData, responseLen);
+			break;
+		}
+		case MODBUS_VENDOR_FUNC_SET_EMERGENCY_STOP: {
+			uint16_t channel = (frame[2] << 8) | frame[3];
+			Emergency_Stop_Input_Mode inputMode = frame[4] - 1;
+
+			// Check request length (Slave Address, Function Code, Index High, Index Low, Input Mode [1 = NO, 2 = NC], CRC Low, CRC High)
+			if (len != 7) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Check inputMode
+			if (frame[4] < 1 || frame[4] > 2) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			// Set the emergency stop configuration
+			if (!emergencyStop_setInput(channel, inputMode)) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+				return;
+			}
+
+			// Create the response frame
+			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+
+			responseData[0] = slave_address; // the address of us
+			responseData[1] = MODBUS_VENDOR_FUNC_SET_EMERGENCY_STOP;
+			responseData[2] = 0x01; // status byte (0x01 = success)
 
 			uint16_t responseLen = 3;
 
