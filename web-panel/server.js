@@ -644,6 +644,44 @@ app.get("/setrtc", async (req, res) => {
 });
 
 
+// Set emergency stop configuration
+app.get("/setemergencystop", async (req, res) => {
+    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+
+    const func = 0x72;
+
+    const channel = parseInt(req.query.channel);
+    const inputMode = parseInt(req.query.inputMode) + 1;
+
+    if (isNaN(channel) || channel < 0 || channel > 0xFFFF) {
+        return res.status(400).json({ error: "Invalid or missing discrete input channel" });
+    }
+
+    if (isNaN(inputMode) || inputMode < 1 || inputMode > 2) { // add one to checks
+        return res.status(400).json({ error: "Invalid or missing inputMode. 0 is NO, 1 is NC" });
+    }
+
+    const request = Buffer.alloc(3);
+    request.writeUInt16BE(channel, 0);
+    request.writeUInt8(inputMode, 2);
+
+    try {
+        const result = await modbus.sendRequest(func, request);
+
+        // Check response
+        if (result.length < 3) throw new Error("Invalid response length");
+        if (result[2] !== 0x01) throw new Error("Invalid status byte");
+
+        res.json({
+            success: true,
+            raw: result.toString("hex") 
+        });
+    } catch (err) {
+        console.error("Read error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ------
 // List serial ports
 app.get("/ports", async (req, res) => {
