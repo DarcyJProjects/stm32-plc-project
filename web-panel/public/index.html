@@ -42,6 +42,31 @@
   </div>
   </div>
 
+  <!-- Factory Reset Confirmation Modal -->
+  <div class="modal fade" id="factoryResetModal" tabindex="-1" aria-labelledby="factoryResetModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="factoryResetModalLabel">Confirm Factory Reset</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        Are you sure you want to perform a factory reset? This action is irreversible.
+        <br><br>
+        Note: A factory reset will clear all automation rules, virtual registers, analogue IO mode configurations, emergency stop button configuration, and possibly more depending on the firmware revision!
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmFactoryResetButton">RESET</button>
+      </div>
+
+    </div>
+  </div>
+  </div>
+
   <!-- STATUS ALERTS -->
   <script>
     function newStatus(alertClass, message) {
@@ -2474,6 +2499,22 @@
                 <div id="rtcStatus" class="mt-3"></div>
               </div>
               </div>
+
+              <div class="card m-3">
+              <div class="card-body">
+                <div class="mb-3">
+                  <h6>Factory Reset</h6>
+
+                  <span style="color: red;">Warning: This cannot be undone!</span><br>
+                  <span>A factory reset will clear all automation rules, virtual registers, analogue IO mode configurations, emergency stop button configuration, and possibly more depending on the firmware revision!</span>
+                  <br><br>
+                  <button id="factoryResetBtn" class="btn btn-primary d-inline-block">Confirm</button>
+
+                </div>
+
+                <div id="frStatus" class="mt-3"></div>
+              </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2713,6 +2754,29 @@
         });
 
         populateTimezones();
+      </script>
+      <script>
+        const confirmFactoryResetButton = document.getElementById('confirmFactoryResetButton');
+        const frModal = new bootstrap.Modal(document.getElementById('factoryResetModal'));
+
+        const factoryResetBtn = document.getElementById("factoryResetBtn");
+        const frStatus = document.getElementById("frStatus");
+
+        factoryResetBtn.addEventListener("click", () => frModal.show());
+
+        confirmFactoryResetButton.addEventListener("click", async () => {
+          frModal.hide();
+
+          const url = `/factoryreset?confirmation=true`;
+          const response = await fetch(url);
+          const data = await response.json();
+          
+          if (data.success == true) {
+            frStatus.innerHTML = newStatus("alert-success", `Successfully performed a factory reset.`);
+          } else {
+            frStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error}`);
+          }
+        });
       </script>
     </div>
   </div>
