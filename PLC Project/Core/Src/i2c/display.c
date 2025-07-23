@@ -339,6 +339,20 @@ void display_EmergencyStop(void) {
 	ssd1306_UpdateScreen();
 }
 
+void display_dfu(void) {
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(15, 10);
+	ssd1306_WriteString("DFU Mode", Font_11x18, White);
+
+	ssd1306_SetCursor(10, 35);
+	ssd1306_WriteString("Ready for upload", Font_6x8, White);
+
+	ssd1306_SetCursor(30, 45);
+	ssd1306_WriteString("over usb.", Font_6x8, White);
+
+	ssd1306_UpdateScreen();
+}
+
 void display_BtnPress() {
 	if (currentPage == endPage) {
 		currentPage = 0;

@@ -17,7 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <modbus/modbus_slave.h>
 #include "main.h"
 #include "app_fatfs.h"
 #include "usb_device.h"
@@ -287,6 +286,8 @@ int main(void)
 	uint32_t loopCounter = 0;
 	uint32_t lastTimeTick = HAL_GetTick();  // ms
 
+	bool boot0_pressed = false;
+
   while (1)
   {
 	  loopCounter++;
@@ -328,17 +329,33 @@ int main(void)
 
 
 	  /* SCHEDULE BEGIN*/
+	  // Every 100ms
+	  if ((HAL_GetTick() - lastTimeTick) >= 100 || (HAL_GetTick() < lastTimeTick)) { // wraparound-safe comparison
+		  // Check if BOOT0 button pressed
+		  GPIO_PinState boot0 = HAL_GPIO_ReadPin(GPIOB, BOOT0_Pin);
+		  if (boot0 == GPIO_PIN_SET) {
+			  display_dfu();
+			  boot0_pressed = true;
+		  } else {
+			  display_StatusPage();
+			  boot0_pressed = false;
+		  }
+	  }
+
 
 	  // Every second
 	  if ((HAL_GetTick() - lastTimeTick) >= 1000 || (HAL_GetTick() < lastTimeTick)) { // wraparound-safe comparison
-		  lastTimeTick = HAL_GetTick();
+		  lastTimeTick = HAL_GetTick(); // needs to be put in largest tick block
+
 		  loopCounter = 0;
 
 		  // Check for SD card insertion/removal
 		  SD_Detect(); // Will automatically mount/unmount
 
 		  // Update display
-		  display_StatusPage();
+		  if (boot0_pressed == false) {
+			  display_StatusPage();
+		  }
 	  }
 
 	  // Every 10 seconds since pressing display button, go to main page
@@ -761,8 +778,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : DIN3_Pin DIN4_Pin */
-  GPIO_InitStruct.Pin = DIN3_Pin|DIN4_Pin;
+  /*Configure GPIO pins : DIN3_Pin DIN4_Pin BOOT0_Pin */
+  GPIO_InitStruct.Pin = DIN3_Pin|DIN4_Pin|BOOT0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);

@@ -99,6 +99,8 @@ void Error_Handler(void);
 #define SD_CARD_GPIO_Port GPIOC
 #define SD_CS_Pin GPIO_PIN_11
 #define SD_CS_GPIO_Port GPIOC
+#define BOOT0_Pin GPIO_PIN_8
+#define BOOT0_GPIO_Port GPIOB
 #define BTN2_Pin GPIO_PIN_9
 #define BTN2_GPIO_Port GPIOB
 

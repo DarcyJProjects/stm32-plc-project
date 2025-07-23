@@ -14,6 +14,8 @@ void display_FactoryResetPage(uint8_t page);
 
 void display_EmergencyStop(void);
 
+void display_dfu(void);
+
 void display_BtnPress(void);
 
 void display_setPage(uint16_t page);
