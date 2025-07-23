@@ -284,7 +284,8 @@ int main(void)
 	uint32_t lastButtonPress = 0;
 
 	uint32_t loopCounter = 0;
-	uint32_t lastTimeTick = HAL_GetTick();  // ms
+	uint32_t lastTimeTick100ms = HAL_GetTick();
+	uint32_t lastTimeTick1000ms = HAL_GetTick();
 
 	bool boot0_pressed = false;
 
@@ -330,13 +331,15 @@ int main(void)
 
 	  /* SCHEDULE BEGIN*/
 	  // Every 100ms
-	  if ((HAL_GetTick() - lastTimeTick) >= 100 || (HAL_GetTick() < lastTimeTick)) { // wraparound-safe comparison
+	  if ((HAL_GetTick() - lastTimeTick100ms) >= 100 || (HAL_GetTick() < lastTimeTick100ms)) { // wraparound-safe comparison
+		  lastTimeTick100ms = HAL_GetTick();
+
 		  // Check if BOOT0 button pressed
 		  GPIO_PinState boot0 = HAL_GPIO_ReadPin(GPIOB, BOOT0_Pin);
 		  if (boot0 == GPIO_PIN_SET) {
 			  display_dfu();
 			  boot0_pressed = true;
-		  } else {
+		  } else if (boot0_pressed) {
 			  display_StatusPage();
 			  boot0_pressed = false;
 		  }
@@ -344,15 +347,15 @@ int main(void)
 
 
 	  // Every second
-	  if ((HAL_GetTick() - lastTimeTick) >= 1000 || (HAL_GetTick() < lastTimeTick)) { // wraparound-safe comparison
-		  lastTimeTick = HAL_GetTick(); // needs to be put in largest tick block
+	  if ((HAL_GetTick() - lastTimeTick1000ms) >= 1000 || (HAL_GetTick() < lastTimeTick1000ms)) { // wraparound-safe comparison
+		  lastTimeTick1000ms = HAL_GetTick();
 
 		  loopCounter = 0;
 
 		  // Check for SD card insertion/removal
 		  SD_Detect(); // Will automatically mount/unmount
 
-		  // Update display
+		  // Update display if boot0 is not pressed
 		  if (boot0_pressed == false) {
 			  display_StatusPage();
 		  }
