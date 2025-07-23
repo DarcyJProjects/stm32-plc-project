@@ -2485,35 +2485,66 @@
               </div>
 
               <div class="card m-3">
-              <div class="card-body">
-                <div class="mb-3">
-                  <h6>Real Time Clock</h6>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <h6>Emergency Stop</h6>
+                  </div>
 
-                  <label for="rtctimezone">Choose Timezone:</label>
-                  <select id="rtctimezone" class="form-select form-select-sm" style="width: 175px;"></select>
-                  <br>
-                  <button id="rtcset" class="btn btn-primary d-inline-block">Set</button>
+                  <div class="mb-3">
+                    <span>A discrete input channel can be configured as an emergency stop button. This will set all coils to OFF, all holding registers to 0, and will lock out the embedded controller from making any further decisions. It can be reset through a reboot.</span>
+                  </div>
 
+                  <div class="mb-3">
+                    <label for="esChannel" class="form-label">Discrete Input Address:</label>
+                    <input type="number" class="form-control" id="esChannel" placeholder="Enter a discrete input register address (e.g., 0)" min="0" />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="esInputMode" class="form-label">Input Mode:</label>
+                    <select id="esInputMode" class="form-select form-select-sm">
+                      <option>Normally Open (NO)</option>
+                      <option>Normally Closed (NC)</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <button id="esSet" class="btn btn-primary d-inline-block">Set</button>
+                  </div>
+
+                  <div id="esStatus" class="mt-3"></div>
                 </div>
-
-                <div id="rtcStatus" class="mt-3"></div>
-              </div>
               </div>
 
               <div class="card m-3">
-              <div class="card-body">
-                <div class="mb-3">
-                  <h6>Factory Reset</h6>
-
-                  <span style="color: red;">Warning: This cannot be undone!</span><br>
-                  <span>A factory reset will clear all automation rules, virtual registers, analogue IO mode configurations, emergency stop button configuration, and possibly more depending on the firmware revision!</span>
-                  <br><br>
-                  <button id="factoryResetBtn" class="btn btn-primary d-inline-block">Confirm</button>
-
+                <div class="card-body">
+                  <div class="mb-3">
+                    <h6>Real Time Clock</h6>
+                  </div>
+                  <div class="mb-3">
+                    <label for="rtctimezone" class="form-label">Choose Timezone:</label>
+                    <select id="rtctimezone" class="form-select form-select-sm" style="width: 175px;"></select>
+                  </div>
+                  <div class="mb-3">
+                    <button id="rtcset" class="btn btn-primary d-inline-block">Set</button>
+                  </div>
+                  <div id="rtcStatus" class="mt-3"></div>
                 </div>
-
-                <div id="frStatus" class="mt-3"></div>
               </div>
+
+              <div class="card m-3">
+                <div class="card-body">
+                  <div class="mb-3">
+                    <h6>Factory Reset</h6>
+
+                    <span style="color: red;">Warning: This cannot be undone!</span><br>
+                    <span>A factory reset will clear all automation rules, virtual registers, analogue IO mode configurations, emergency stop button configuration, and possibly more depending on the firmware revision!</span>
+                    <br><br>
+                    <button id="factoryResetBtn" class="btn btn-primary d-inline-block">Confirm</button>
+
+                  </div>
+
+                  <div id="frStatus" class="mt-3"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -2779,6 +2810,31 @@
             await hwGetModes();
           } else {
             frStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error}`);
+          }
+        });
+      </script>
+      <script>
+        const esChannel = document.getElementById("esChannel");
+        const esInputMode = document.getElementById("esInputMode");
+        const esSet = document.getElementById("esSet");
+        const esStatus = document.getElementById("esStatus");
+
+        esSet.addEventListener("click", async () => {
+          const channel = esChannel.value;
+          const inputMode = esInputMode.selectedIndex;
+
+          if (isNaN(channel) || channel > 0xFFFF || channel < 0 ) {
+            frStatus.innerHTML = newStatus("alert-danger", `Error: The Discrete Input Address must be a valid.`);
+          }
+
+          const url = `/setemergencystop?channel=${channel}&inputMode=${inputMode}`;
+          const response = await fetch(url);
+          const data = await response.json();
+          
+          if (data.success == true) {
+            esStatus.innerHTML = newStatus("alert-success", `Successfully configured the emergency stop button.`);
+          } else {
+            esStatus.innerHTML = newStatus("alert-danger", `Error: ${data.error}`);
           }
         });
       </script>
