@@ -1,0 +1,3 @@
+../Core/Src/io/io_emergency.c:11:6:emergencyStop_setInput	16	static
+../Core/Src/io/io_emergency.c:22:6:emergencyStop_check	8	static
+../Core/Src/io/io_emergency.c:44:6:emergencyStop_reset	4	static

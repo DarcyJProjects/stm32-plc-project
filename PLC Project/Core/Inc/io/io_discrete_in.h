@@ -34,4 +34,7 @@ GPIO_PinState io_discrete_in_read(uint16_t index);
 // Read function for physical discrete input channels, i2c is device dependent
 GPIO_PinState hardware_discrete_in_read_func(void* context);
 
+// Used by io_emergency
+bool io_discrete_in_check_channel(uint16_t index); // checks if a channel is defined or not
+
 #endif

@@ -36,6 +36,8 @@ GPIO_PinState io_coil_read_func(void* context);
 // Writes to the coil
 void io_coil_write(uint16_t index, GPIO_PinState state);
 
+void io_coils_emergencystop(void);
+
 void hardware_coil_write_func(void* context, GPIO_PinState state);
 
 #endif

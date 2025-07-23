@@ -34,6 +34,7 @@
 #include "i2c/bmp280.h"
 #include "sd/sd.h"
 #include "io/io_modbus_slaves.h"
+#include "io/io_emergency.h"
 //#include "sensors/dht11.h"
 /* USER CODE END Includes */
 
@@ -274,6 +275,9 @@ int main(void)
 	// TEMP: ->> needs to be in a timer to update every few seconds for eg TODO
 	display_StatusPage();
 
+	// TEST ONLY TODO
+	emergencyStop_setInput(0, EMERGENCY_STOP_NO);
+
   // ---------------------------------------------------------------------------------------------//
   /* USER CODE END 2 */
 
@@ -289,6 +293,12 @@ int main(void)
   while (1)
   {
 	  loopCounter++;
+
+	  /* CHECK FOR EMERGENCY STOP BEGIN*/
+	  if (emergencyStop_check()) {
+		  break; // Do not continue with main loop.
+	  }
+	  /* CHECK FOR EMERGENCY STOP END*/
 
 	  /* RS485 Circular Frame Handling BEGIN*/
 	  RS485_ProcessPendingFrames();

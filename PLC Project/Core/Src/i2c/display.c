@@ -266,6 +266,20 @@ void display_FactoryResetPage(uint8_t page) {
 	ssd1306_UpdateScreen();
 }
 
+void display_EmergencyStop(void) {
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(5, 0);
+	ssd1306_WriteString("EMERGENCY", Font_11x18, White);
+
+	ssd1306_SetCursor(2, 25);
+	ssd1306_WriteString("All outputs set OFF.", Font_6x8, White);
+
+	ssd1306_SetCursor(2, 40);
+	ssd1306_WriteString("Reboot to reset.", Font_6x8, White);
+
+	ssd1306_UpdateScreen();
+}
+
 void display_BtnPress() {
 	if (currentPage == endPage) {
 		currentPage = 0;

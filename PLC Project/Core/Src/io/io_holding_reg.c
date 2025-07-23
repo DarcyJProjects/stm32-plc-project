@@ -58,6 +58,14 @@ void io_holding_reg_write(uint16_t index, uint16_t value) {
 	}
 }
 
+void io_holding_reg_emergencystop(void) {
+	// Iterate over all coils, even if outside channel count just to be safe
+	for (uint16_t i = 0; i < MAX_IO_HOLDING_REG; i++) {
+		io_holding_reg_write(i, 0);
+	}
+}
+
+
 
 void dac_write_func(uint32_t channel, uint16_t value, IO_Holding_Reg_Mode mode) {
 #ifdef HAL_DAC_MODULE_ENABLED

@@ -52,6 +52,8 @@ uint16_t io_holding_reg_read(uint16_t index);
 
 void io_holding_reg_write(uint16_t index, uint16_t value);
 
+void io_holding_reg_emergencystop(void);
+
 // Write function for physical adc channels, i2c is device dependent
 void dac_write_func(uint32_t channel, uint16_t value, IO_Holding_Reg_Mode mode);
 

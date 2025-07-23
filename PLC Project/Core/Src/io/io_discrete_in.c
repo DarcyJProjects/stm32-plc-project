@@ -53,12 +53,10 @@ GPIO_PinState hardware_discrete_in_read_func(void* context) {
 }
 
 
-
-
-
-
-
-
-
-
-
+// Used by io_emergency
+bool io_discrete_in_check_channel(uint16_t index) {
+	if (index < io_discrete_in_channel_count) {
+		return true;
+	}
+	return false;
+}

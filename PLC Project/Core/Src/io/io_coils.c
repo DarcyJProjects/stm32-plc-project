@@ -45,6 +45,13 @@ void io_coil_write(uint16_t index, GPIO_PinState state) {
 	}
 }
 
+void io_coils_emergencystop(void) {
+	// Iterate over all coils, even if outside channel count just to be safe
+	for (uint16_t i = 0; i < MAX_IO_COILS; i++) {
+		io_coil_write(i, GPIO_PIN_RESET); // low
+	}
+}
+
 void hardware_coil_write_func(void* context, GPIO_PinState state) {
 	gpio_config* gpio = (gpio_config*)context;
 	HAL_GPIO_WritePin(gpio->port, gpio->pin, state);
