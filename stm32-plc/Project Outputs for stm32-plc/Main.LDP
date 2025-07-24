@@ -1,0 +1,4 @@
+Layer Pairs Export File for PCB: C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc
+LayersSetName=Top_Bot_Plated_Thru_Holes|DrillFile=main-roundholes-plated.txt|DrillLayers=gtl,gbl
+LayersSetName=Top_Bot_Plated_Slot_Holes|DrillFile=main-slotholes-plated.txt|DrillLayers=gtl,gbl
+LayersSetName=Top_Bot_NonPlated_Thru_Holes|DrillFile=main-roundholes-nonplated.txt|DrillLayers=gtl,gbl

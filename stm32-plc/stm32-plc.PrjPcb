@@ -594,54 +594,66 @@ GenerateClassCluster=0
 DocumentUniqueId=XKUNKLTV
 
 [GeneratedDocument1]
-DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles.TXT
+DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles-NonPlated.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument2]
-DocumentPath=Project Outputs for stm32-plc\Main-SlotHoles.TXT
+DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles-Plated.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument3]
-DocumentPath=Project Outputs for stm32-plc\Main.DRR
+DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument4]
-DocumentPath=Project Outputs for stm32-plc\Main.LDP
+DocumentPath=Project Outputs for stm32-plc\Main-SlotHoles-Plated.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument5]
-DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main-SlotHoles.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument6]
-DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Top.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.DRR
 DItemRevisionGUID=
 
 [GeneratedDocument7]
-DocumentPath=Project Outputs for stm32-plc\Main_Legend_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.LDP
 DItemRevisionGUID=
 
 [GeneratedDocument8]
-DocumentPath=Project Outputs for stm32-plc\Main_Legend_Top.gbr
+DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Bot.gbr
 DItemRevisionGUID=
 
 [GeneratedDocument9]
-DocumentPath=Project Outputs for stm32-plc\Main_Paste_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Top.gbr
 DItemRevisionGUID=
 
 [GeneratedDocument10]
-DocumentPath=Project Outputs for stm32-plc\Main_Paste_Top.gbr
+DocumentPath=Project Outputs for stm32-plc\Main_Legend_Bot.gbr
 DItemRevisionGUID=
 
 [GeneratedDocument11]
-DocumentPath=Project Outputs for stm32-plc\Main_Profile.gbr
+DocumentPath=Project Outputs for stm32-plc\Main_Legend_Top.gbr
 DItemRevisionGUID=
 
 [GeneratedDocument12]
-DocumentPath=Project Outputs for stm32-plc\Main_Soldermask_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main_Paste_Bot.gbr
 DItemRevisionGUID=
 
 [GeneratedDocument13]
+DocumentPath=Project Outputs for stm32-plc\Main_Paste_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument14]
+DocumentPath=Project Outputs for stm32-plc\Main_Profile.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument15]
+DocumentPath=Project Outputs for stm32-plc\Main_Soldermask_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument16]
 DocumentPath=Project Outputs for stm32-plc\Main_Soldermask_Top.gbr
 DItemRevisionGUID=
 
@@ -941,7 +953,7 @@ OutputDefault8=0
 Configuration8_Name1=ForceUpdateSettings
 Configuration8_Item1=False
 Configuration8_Name2=OutputConfigurationParameter1
-Configuration8_Item2=BoardEdgeRoutToolDia=2000000|GenerateBoardEdgeRout=False|GenerateDrilledSlotsG85=False|GenerateEIADrillFile=False|GenerateSeparatePlatedNonPlatedFiles=False|GenerateSeparateViaTypeFiles=False|GenerateToolsByDrillSymbols=False|NumberOfDecimals=3|NumberOfUnits=4|OptimizeChangeLocationCommands=True|OriginPosition=Absolute|Record=DrillView|Units=Metric|ZeroesMode=SuppressTrailingZeroes|DocumentPath=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc
+Configuration8_Item2=BoardEdgeRoutToolDia=2000000|GenerateBoardEdgeRout=False|GenerateDrilledSlotsG85=False|GenerateEIADrillFile=False|GenerateSeparatePlatedNonPlatedFiles=True|GenerateSeparateViaTypeFiles=False|GenerateToolsByDrillSymbols=False|NumberOfDecimals=3|NumberOfUnits=4|OptimizeChangeLocationCommands=True|OriginPosition=Absolute|Record=DrillView|Units=Metric|ZeroesMode=SuppressTrailingZeroes|DocumentPath=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc
 OutputType9=IPC2581
 OutputName9=IPC-2581 Files
 OutputDocumentPath9=
