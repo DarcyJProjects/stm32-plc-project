@@ -21,7 +21,16 @@ static uint16_t endPage = 10;
 static int8_t offsetX = 0;
 static int8_t offsetY = 0;
 static uint32_t lastShiftTime = 0;
-const uint32_t shiftIntervalMs = 1000; // Cannot be less than how often display_StatusPage is called. 60000: every minute
+const uint32_t shiftIntervalMs = 30000; // Cannot be less than how often display_StatusPage is called. 60000: every minute
+
+// Heartbeat
+static bool doHearthbeat = false;
+static uint8_t heartbeatOn = 0;
+static uint32_t lastHeartbeatTime = 0;
+const uint32_t heartbeatIntervalMs = 1000; // 1s - Cannot be less than how often display_StatusPage is called.
+
+// Uptime
+RTC_Time startTime = {0};
 
 void display_Setup() {
 	// Initialise SSD1306
@@ -29,6 +38,9 @@ void display_Setup() {
 
 	// Entropy source
 	srand(HAL_GetTick()); // seed the random number generator
+
+	// Get start time
+	DS3231_ReadTime(&startTime);
 }
 
 void display_Boot(void) {
@@ -48,6 +60,39 @@ static int8_t display_RandOffset(void) {
 	return (rand() % 3) - 1; // random number from -1 to 1
 }
 
+
+static uint32_t rtcToSeconds(RTC_Time t) {
+    uint32_t days = 0;
+
+    // Days per month for non-leap year
+    const uint8_t daysInMonth[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+
+    // Check leap year helper
+    bool isLeapYear(uint8_t year) {
+        uint16_t fullYear = 2000 + year;
+        return (fullYear % 4 == 0 && (fullYear % 100 != 0 || fullYear % 400 == 0));
+    }
+
+    // Add days for full years passed
+    for (uint8_t y = 0; y < t.year; y++) {
+        days += isLeapYear(y) ? 366 : 365;
+    }
+
+    // Add days for full months passed this year
+    for (uint8_t m = 1; m < t.month; m++) {
+        days += daysInMonth[m - 1];
+        if (m == 2 && isLeapYear(t.year)) days += 1; // leap day
+    }
+
+    // Add days passed this month
+    days += t.day - 1;
+
+    // Calculate total seconds
+    return (((days * 24UL + t.hours) * 60 + t.minutes) * 60 + t.seconds);
+}
+
+
+
 void display_StatusPage(void) {
 	uint32_t now = HAL_GetTick();
 
@@ -60,6 +105,23 @@ void display_StatusPage(void) {
 	char buf[32]; // buffer for formatted strings
 
 	ssd1306_Fill(Black);
+
+	// heartbeat
+	if (doHearthbeat) {
+		if ((uint32_t)(now - lastHeartbeatTime) > heartbeatIntervalMs) {
+			heartbeatOn = !heartbeatOn;
+			lastHeartbeatTime = now;
+		}
+
+		if (currentPage == 0) {
+			if (heartbeatOn) {
+				ssd1306_FillCircle(120 + offsetX, 8 + offsetY, 4, White); // filled 4px circle
+			} else {
+				ssd1306_DrawCircle(120 + offsetX, 8 + offsetY, 4, White); // hollow 4px circle
+			}
+
+		}
+	}
 
 	switch(currentPage) {
 		case 0:
@@ -234,12 +296,29 @@ void display_StatusPage(void) {
 			RTC_Time current;
 			DS3231_ReadTime(&current);
 
+			uint32_t nowSecs = rtcToSeconds(current);
+			uint32_t bootSecs = rtcToSeconds(startTime);
+			uint32_t uptimeSecs = nowSecs - bootSecs;
+
+			uint32_t days    = uptimeSecs / 86400;
+			uint32_t hours   = (uptimeSecs % 86400) / 3600;
+			uint32_t minutes = (uptimeSecs % 3600) / 60;
+			uint32_t seconds = uptimeSecs % 60;
+
 			display_SetCursor(2, 25);
-			sprintf(buf, "%02d:%02d:%02d", current.hours, current.minutes, current.seconds);
+			if (days > 0) {
+				sprintf(buf, "Uptime: %lud %02lu:%02lu:%02lu", days, hours, minutes, seconds);
+			} else {
+				sprintf(buf, "Uptime: %02lu:%02lu:%02lu", hours, minutes, seconds);
+			}
 			ssd1306_WriteString(buf, Font_6x8, White);
 
 			display_SetCursor(2, 40);
-			sprintf(buf, "%02d/%02d/20%02d", current.day, current.month, current.year);
+			sprintf(buf, "Date: %02d/%02d/20%02d", current.day, current.month, current.year);
+			ssd1306_WriteString(buf, Font_6x8, White);
+
+			display_SetCursor(2, 55);
+			sprintf(buf, "Time: %02d:%02d:%02d", current.hours, current.minutes, current.seconds);
 			ssd1306_WriteString(buf, Font_6x8, White);
 			break;
 		case 9:
