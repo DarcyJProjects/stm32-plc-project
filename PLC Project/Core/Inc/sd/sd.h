@@ -20,6 +20,7 @@
 #define SD_CARD_PIN GPIO_PIN_10
 
 // TODO: ENABLE ON FINAL PCB
+// Remounting when removed and reinserted at run-time will not work if set to false
 #define SD_CARD_DETECT_ENABLE false
 
 

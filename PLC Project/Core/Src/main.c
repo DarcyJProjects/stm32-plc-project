@@ -79,6 +79,10 @@ static void MX_DAC1_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 
+void SPI_ReInit(void) {
+	MX_SPI1_Init();
+}
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/

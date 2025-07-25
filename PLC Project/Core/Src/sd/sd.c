@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "app_fatfs.h"
+#include "main.h" // for SPI_ReInit()
+#include "usb_serial.h"
 
 static FATFS fatFs;
 static FIL logFile;
@@ -10,7 +12,11 @@ static bool isMounted = false;
 
 static char logFilename[32];
 
+
 static bool SD_Mount(void) {
+	// Reinit SD card interface (SPI)
+	SPI_ReInit();
+
 	FRESULT res = f_mount(&fatFs, "", 1);
 	if (res != FR_OK) {
 		isMounted = false;
@@ -36,7 +42,8 @@ bool SD_Detect(void) {
             return false;
         }
     } else {
-        // No card detect pin, just try mounting every time
+        // No card detect pin, just try mounting every time.
+    	// Remounting will not work. This is for test only.
         return SD_Mount();
     }
 }
