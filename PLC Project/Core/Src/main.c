@@ -34,6 +34,7 @@
 #include "sd/sd.h"
 #include "io/io_modbus_slaves.h"
 #include "io/io_emergency.h"
+#include "i2c/eeprom_utils.h"
 //#include "sensors/dht11.h"
 /* USER CODE END Includes */
 
@@ -154,6 +155,7 @@ int main(void)
 	HAL_Delay(2000);
 	SD_Detect();
 	SD_Log("System booting");
+
 
 	// Check for Factory Reset
 	GPIO_PinState factoryResetBtn = HAL_GPIO_ReadPin(GPIOB, BTN2_Pin);

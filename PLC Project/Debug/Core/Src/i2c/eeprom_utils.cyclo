@@ -1,0 +1,2 @@
+../Core/Src/i2c/eeprom_utils.c:6:6:EEPROM_Dump	4
+../Core/Src/i2c/eeprom_utils.c:32:6:EEPROM_Wipe	4

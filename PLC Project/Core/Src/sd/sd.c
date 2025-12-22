@@ -5,6 +5,11 @@
 #include "app_fatfs.h"
 #include "main.h" // for SPI_ReInit()
 #include "usb_serial.h"
+#include "ff_gen_drv.h"
+
+// Defined in app_fatfs.c by CubeMX
+extern char USERPath[4];
+extern Diskio_drvTypeDef USER_Driver;
 
 static FATFS fatFs;
 static FIL logFile;
@@ -14,10 +19,19 @@ static char logFilename[32];
 
 
 static bool SD_Mount(void) {
-	// Reinit SD card interface (SPI)
+	// Clear any previous driver link
+	SD_Unmount();
+
+	// Relink the driver
+	if (FATFS_LinkDriver(&USER_Driver, USERPath) != 0) {
+		return false;
+	}
+
+	// Reset SPI Hardware
 	SPI_ReInit();
 
-	FRESULT res = f_mount(&fatFs, "", 1);
+	// Force mount
+	FRESULT res = f_mount(&fatFs, (TCHAR const*)USERPath, 1);
 	if (res != FR_OK) {
 		isMounted = false;
 		return false;
@@ -25,6 +39,16 @@ static bool SD_Mount(void) {
 
 	isMounted = true;
 	return true;
+}
+
+void SD_Unmount(void) {
+	// Unmount
+	f_mount(NULL, (TCHAR const*)USERPath, 0);
+
+	// Unlink the driver
+	FATFS_UnLinkDriver(USERPath);
+
+	isMounted = false;
 }
 
 // Detects if card is installed and tries to mount automatically
@@ -97,11 +121,6 @@ bool SD_Log(const char* message) {
 	f_close(&logFile);
 
 	return (res == FR_OK && bytesWritten == strlen(line));
-}
-
-void SD_Unmount(void) {
-	f_mount(NULL, "", 0);
-	isMounted = false;
 }
 
 SD_Stats SD_GetStats(void) {
