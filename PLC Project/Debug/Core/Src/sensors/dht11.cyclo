@@ -1,9 +1,6 @@
-../Core/Src/sensors/dht11.c:13:13:DWT_Init	2
 ../Core/Src/sensors/dht11.c:21:13:delay_us	2
-../Core/Src/sensors/dht11.c:28:13:set_input	1
 ../Core/Src/sensors/dht11.c:36:13:set_output	1
 ../Core/Src/sensors/dht11.c:46:17:wait_for_input_state	3
-../Core/Src/sensors/dht11.c:59:13:DHT11_Init	1
-../Core/Src/sensors/dht11.c:76:6:DHT11_Setup	4
-../Core/Src/sensors/dht11.c:110:16:DHT11_Read	10
+../Core/Src/sensors/dht11.c:76:6:DHT11_Setup	5
+../Core/Src/sensors/dht11.c:110:16:DHT11_Read	8
 ../Core/Src/sensors/dht11.c:167:10:DHT11_read_func	2

@@ -1,4 +1,4 @@
-../Core/Src/modbus/modbus_util.c:5:10:modbus_crc16	4
+../Core/Src/modbus/modbus_util.c:5:10:modbus_crc16	3
 ../Core/Src/modbus/modbus_util.c:25:6:modbus_send_response	1
 ../Core/Src/modbus/modbus_util.c:41:6:modbus_send_exception	1
 ../Core/Src/modbus/modbus_util.c:59:10:get_ms	1

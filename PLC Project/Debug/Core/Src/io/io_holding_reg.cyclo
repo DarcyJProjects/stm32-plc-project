@@ -1,8 +1,8 @@
+../Core/Src/io/io_holding_reg.c:70:6:dac_write_func	3
 ../Core/Src/io/io_holding_reg.c:17:6:io_holding_reg_add_channel	4
 ../Core/Src/io/io_holding_reg.c:43:10:io_holding_reg_read	2
 ../Core/Src/io/io_holding_reg.c:52:6:io_holding_reg_write	3
 ../Core/Src/io/io_holding_reg.c:61:6:io_holding_reg_emergencystop	2
-../Core/Src/io/io_holding_reg.c:70:6:dac_write_func	3
 ../Core/Src/io/io_holding_reg.c:103:6:io_holding_reg_set_mode	2
 ../Core/Src/io/io_holding_reg.c:113:6:io_holding_reg_get_mode	2
 ../Core/Src/io/io_holding_reg.c:121:6:io_holding_reg_type_save	8

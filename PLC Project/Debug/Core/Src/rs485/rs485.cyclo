@@ -1,7 +1,7 @@
 ../Core/Src/rs485/rs485.c:42:6:RS485_SetTransmitMode	1
 ../Core/Src/rs485/rs485.c:50:6:RS485_SetReceiveMode	1
 ../Core/Src/rs485/rs485.c:58:6:RS485_Setup	1
-../Core/Src/rs485/rs485.c:76:6:RS485_Transmit	4
+../Core/Src/rs485/rs485.c:76:6:RS485_Transmit	3
 ../Core/Src/rs485/rs485.c:95:6:HAL_UARTEx_RxEventCallback	5
 ../Core/Src/rs485/rs485.c:119:6:RS485_TCCallback	1
 ../Core/Src/rs485/rs485.c:134:6:RS485_ProcessPendingFrames	3

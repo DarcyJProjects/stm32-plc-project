@@ -1,6 +1,5 @@
-../Core/Src/sd/sd.c:22:13:SD_Mount	16	static
 ../Core/Src/sd/sd.c:47:6:SD_Unmount	8	static
-../Core/Src/sd/sd.c:58:11:SD_Detect	8	static
-../Core/Src/sd/sd.c:90:6:SD_IsMounted	4	static
+../Core/Src/sd/sd.c:58:11:SD_Detect	24	static
+../Core/Src/sd/sd.c:90:6:SD_IsMounted	0	static
 ../Core/Src/sd/sd.c:94:6:SD_Log	312	static
-../Core/Src/sd/sd.c:141:10:SD_GetStats	56	static
+../Core/Src/sd/sd.c:141:10:SD_GetStats	16	static

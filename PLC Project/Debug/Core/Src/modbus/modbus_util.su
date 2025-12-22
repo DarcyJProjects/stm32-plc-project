@@ -1,4 +1,4 @@
-../Core/Src/modbus/modbus_util.c:5:10:modbus_crc16	24	static
-../Core/Src/modbus/modbus_util.c:25:6:modbus_send_response	24	static
-../Core/Src/modbus/modbus_util.c:41:6:modbus_send_exception	24	static
-../Core/Src/modbus/modbus_util.c:59:10:get_ms	8	static
+../Core/Src/modbus/modbus_util.c:5:10:modbus_crc16	12	static
+../Core/Src/modbus/modbus_util.c:25:6:modbus_send_response	16	static
+../Core/Src/modbus/modbus_util.c:41:6:modbus_send_exception	16	static
+../Core/Src/modbus/modbus_util.c:59:10:get_ms	0	static

@@ -1,4 +1,4 @@
 ../Core/Src/i2c/bmp280.c:21:6:BMP280_Init	40	static
 ../Core/Src/i2c/bmp280.c:71:6:BMP280_ReadRaw	24	static
-../Core/Src/i2c/bmp280.c:87:6:BMP280_ReadCompensated	352	static
-../Core/Src/i2c/bmp280.c:121:10:BMP280_Read_Temp_Func	24	static
+../Core/Src/i2c/bmp280.c:87:6:BMP280_ReadCompensated	32	static
+../Core/Src/i2c/bmp280.c:121:10:BMP280_Read_Temp_Func	16	static

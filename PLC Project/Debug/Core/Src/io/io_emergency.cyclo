@@ -4,6 +4,6 @@
 ../Core/Src/io/io_emergency.c:38:27:emergencyStop_getInputMode	1
 ../Core/Src/io/io_emergency.c:42:6:emergencyStop_check	7
 ../Core/Src/io/io_emergency.c:64:6:emergencyStop_reset	1
-../Core/Src/io/io_emergency.c:68:6:emergencyStop_save	3
+../Core/Src/io/io_emergency.c:68:6:emergencyStop_save	2
 ../Core/Src/io/io_emergency.c:106:6:emergencyStop_clear	2
 ../Core/Src/io/io_emergency.c:117:6:emergencyStop_load	5

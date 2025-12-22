@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#define VERSION "1.154"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

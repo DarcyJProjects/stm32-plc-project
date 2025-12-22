@@ -1,3 +1,1 @@
-../Core/Src/i2c/ssd1306/ssd1306_icons.c:29:23:get_icon_dimensions	24	static
-../Core/Src/i2c/ssd1306/ssd1306_icons.c:41:20:get_icon_bitmap	16	static
-../Core/Src/i2c/ssd1306/ssd1306_icons.c:54:6:ssd1306_DrawIcon	40	static
+../Core/Src/i2c/ssd1306/ssd1306_icons.c:54:6:ssd1306_DrawIcon	32	static

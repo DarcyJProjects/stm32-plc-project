@@ -1,9 +1,9 @@
 ../Core/Src/io/io_emergency.c:15:6:emergencyStop_setInput	16	static
-../Core/Src/io/io_emergency.c:30:6:emergencyStop_isDefined	4	static
-../Core/Src/io/io_emergency.c:34:10:emergencyStop_getChannel	4	static
-../Core/Src/io/io_emergency.c:38:27:emergencyStop_getInputMode	4	static
-../Core/Src/io/io_emergency.c:42:6:emergencyStop_check	8	static
-../Core/Src/io/io_emergency.c:64:6:emergencyStop_reset	4	static
-../Core/Src/io/io_emergency.c:68:6:emergencyStop_save	32	static
-../Core/Src/io/io_emergency.c:106:6:emergencyStop_clear	16	static
-../Core/Src/io/io_emergency.c:117:6:emergencyStop_load	64	dynamic
+../Core/Src/io/io_emergency.c:30:6:emergencyStop_isDefined	0	static
+../Core/Src/io/io_emergency.c:34:10:emergencyStop_getChannel	0	static
+../Core/Src/io/io_emergency.c:38:27:emergencyStop_getInputMode	0	static
+../Core/Src/io/io_emergency.c:42:6:emergencyStop_check	16	static
+../Core/Src/io/io_emergency.c:64:6:emergencyStop_reset	0	static
+../Core/Src/io/io_emergency.c:68:6:emergencyStop_save	16	static
+../Core/Src/io/io_emergency.c:106:6:emergencyStop_clear	0	static
+../Core/Src/io/io_emergency.c:117:6:emergencyStop_load	32	static

@@ -19,6 +19,7 @@ RM := rm -rf
 -include FATFS/App/subdir.mk
 -include Drivers/STM32G4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
+-include Core/Src/splash_screens/subdir.mk
 -include Core/Src/sensors/subdir.mk
 -include Core/Src/sd/subdir.mk
 -include Core/Src/rtc/subdir.mk

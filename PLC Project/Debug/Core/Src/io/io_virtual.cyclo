@@ -1,4 +1,4 @@
-../Core/Src/io/io_virtual.c:12:6:io_virtual_add	6
+../Core/Src/io/io_virtual.c:12:6:io_virtual_add	5
 ../Core/Src/io/io_virtual.c:44:6:io_virtual_get_count	4
 ../Core/Src/io/io_virtual.c:62:6:io_virtual_read	6
 ../Core/Src/io/io_virtual.c:87:6:io_virtual_write	5

@@ -1,4 +1,3 @@
-../Core/Src/i2c/ina226.c:7:13:INA226_WriteRegister	1
 ../Core/Src/i2c/ina226.c:16:17:INA226_ReadRegister	1
 ../Core/Src/i2c/ina226.c:26:6:INA226_Init	1
 ../Core/Src/i2c/ina226.c:37:10:INA226_ReadBusVoltageRaw	1

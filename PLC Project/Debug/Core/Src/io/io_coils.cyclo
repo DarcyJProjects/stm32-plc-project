@@ -1,5 +1,5 @@
+../Core/Src/io/io_coils.c:55:6:hardware_coil_write_func	1
 ../Core/Src/io/io_coils.c:9:6:io_coil_add_channel	4
 ../Core/Src/io/io_coils.c:31:15:io_coil_read	2
 ../Core/Src/io/io_coils.c:39:6:io_coil_write	3
 ../Core/Src/io/io_coils.c:48:6:io_coils_emergencystop	2
-../Core/Src/io/io_coils.c:55:6:hardware_coil_write_func	1

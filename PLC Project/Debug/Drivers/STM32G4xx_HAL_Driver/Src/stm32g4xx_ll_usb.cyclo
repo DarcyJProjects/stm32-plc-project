@@ -5,9 +5,8 @@
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:154:19:USB_DevInit	1
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:183:19:USB_FlushTxFifo	1
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:202:19:USB_FlushRxFifo	1
-../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:223:19:USB_ActivateEndpoint	34
+../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:223:19:USB_ActivateEndpoint	30
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:360:19:USB_DeactivateEndpoint	10
-../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:419:19:USB_EPStartXfer	57
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:633:19:USB_EPSetStall	2
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:653:19:USB_EPClearStall	5
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:682:19:USB_EPStopXfer	6
@@ -19,4 +18,5 @@
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:803:19:USB_ActivateRemoteWakeup	1
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:815:19:USB_DeActivateRemoteWakeup	1
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:830:6:USB_WritePMA	2
+../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:419:19:USB_EPStartXfer	30
 ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usb.c:865:6:USB_ReadPMA	3

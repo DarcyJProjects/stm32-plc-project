@@ -35,6 +35,7 @@
 #include "io/io_modbus_slaves.h"
 #include "io/io_emergency.h"
 #include "i2c/eeprom_utils.h"
+#include "splash_screens/splash_boot.h"
 //#include "sensors/dht11.h"
 /* USER CODE END Includes */
 
@@ -141,7 +142,8 @@ int main(void)
   // SETUP ---------------------------------------------------------------------------------------//
     // Splash Screen
 	display_Setup();
-	display_Boot();
+	//display_Boot();
+	// Display after checking for factory reset
 
 	// Config
 	#define DEBOUNCE_DELAY 50 // milliseconds
@@ -152,7 +154,7 @@ int main(void)
 	I2C_Setup(&hi2c1);
 
 	// Initialise SD if installed
-	HAL_Delay(2000);
+	//HAL_Delay(2000);
 	SD_Detect();
 	SD_Log("System booting");
 
@@ -199,9 +201,9 @@ int main(void)
 			}
 
 		}
-
-		display_Boot();
 	}
+
+	splash_screen_boot_play();
 
   	// Communication
     modbus_Setup(0x01); // Set modbus slave address

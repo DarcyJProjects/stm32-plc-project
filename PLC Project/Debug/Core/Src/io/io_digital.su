@@ -1,3 +1,3 @@
-../Core/Src/io/io_digital.c:17:6:io_digital_add_channel	16	static
-../Core/Src/io/io_digital.c:33:15:io_digital_read	16	static
-../Core/Src/io/io_digital.c:48:6:io_digital_write	16	static
+../Core/Src/io/io_digital.c:17:6:io_digital_add_channel	12	static
+../Core/Src/io/io_digital.c:33:15:io_digital_read	0	static
+../Core/Src/io/io_digital.c:48:6:io_digital_write	4	static

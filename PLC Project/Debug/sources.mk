@@ -32,6 +32,7 @@ Core/Src/rs485 \
 Core/Src/rtc \
 Core/Src/sd \
 Core/Src/sensors \
+Core/Src/splash_screens \
 Core/Startup \
 Drivers/STM32G4xx_HAL_Driver/Src \
 FATFS/App \

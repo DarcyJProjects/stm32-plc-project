@@ -1,6 +1,5 @@
-../Core/Src/sd/sd.c:22:13:SD_Mount	3
 ../Core/Src/sd/sd.c:47:6:SD_Unmount	1
-../Core/Src/sd/sd.c:58:11:SD_Detect	5
+../Core/Src/sd/sd.c:58:11:SD_Detect	6
 ../Core/Src/sd/sd.c:90:6:SD_IsMounted	1
-../Core/Src/sd/sd.c:94:6:SD_Log	7
+../Core/Src/sd/sd.c:94:6:SD_Log	6
 ../Core/Src/sd/sd.c:141:10:SD_GetStats	3

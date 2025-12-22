@@ -1,4 +1,4 @@
 ../Core/Src/i2c/eeprom.c:5:6:EEPROM_Write	4
-../Core/Src/i2c/eeprom.c:31:6:EEPROM_Read	3
+../Core/Src/i2c/eeprom.c:31:6:EEPROM_Read	2
 ../Core/Src/i2c/eeprom.c:46:6:EEPROM_WriteBlock	2
 ../Core/Src/i2c/eeprom.c:52:6:EEPROM_LoadBlock	1
