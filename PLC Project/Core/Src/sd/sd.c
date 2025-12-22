@@ -14,6 +14,7 @@ extern Diskio_drvTypeDef USER_Driver;
 static FATFS fatFs;
 static FIL logFile;
 static bool isMounted = false;
+static bool lastKnownInsertedStatus = false; // false = not inserted, true = inserted
 
 static char logFilename[32];
 
@@ -37,6 +38,8 @@ static bool SD_Mount(void) {
 		return false;
 	}
 
+	lastKnownInsertedStatus = true;
+
 	isMounted = true;
 	return true;
 }
@@ -52,23 +55,35 @@ void SD_Unmount(void) {
 }
 
 // Detects if card is installed and tries to mount automatically
-bool SD_Detect(void) {
+SD_Status SD_Detect(void) {
     if (SD_CARD_DETECT_ENABLE == true) {
         if (HAL_GPIO_ReadPin(SD_CARD_PORT, SD_CARD_PIN) == GPIO_PIN_RESET) {
+        	// Card is detected
+
+        	lastKnownInsertedStatus = true;
+
             if (!isMounted) {
-                return SD_Mount();
+                return SD_Mount() ? SD_INSERTED_MOUNT_SUCCESS : SD_INSERTED_MOUNT_FAILURE;
             }
-            return true;
+
+            return SD_MOUNTED;
         } else {
-            // Card not present
+            // Card is not detected
             isMounted = false;
-            f_mount(NULL, "", 0);  // Unmount cleanly if card is removed
-            return false;
+
+            if (lastKnownInsertedStatus) {
+            	SD_Unmount();
+            	lastKnownInsertedStatus = false;
+            	return SD_REMOVED;
+            }
+
+            lastKnownInsertedStatus = false;
+            return SD_NO_CARD;
         }
     } else {
         // No card detect pin, just try mounting every time.
     	// Remounting will not work. This is for test only.
-        return SD_Mount();
+        return SD_Mount() ? SD_MOUNTED : SD_NO_CARD;
     }
 }
 

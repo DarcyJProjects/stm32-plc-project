@@ -292,6 +292,8 @@ int main(void)
 	uint32_t loopCounter = 0;
 	uint32_t lastTimeTick100ms = HAL_GetTick();
 	uint32_t lastTimeTick1000ms = HAL_GetTick();
+	uint32_t sdSecondCount = 0;
+	bool displayingSDStatus = false;
 
 	bool boot0_pressed = false;
 
@@ -358,18 +360,41 @@ int main(void)
 
 		  loopCounter = 0;
 
-		  // Check for SD card insertion/removal
-		  SD_Detect(); // Will automatically mount/unmount
+		  if (displayingSDStatus) {
+			  usb_serial_println("displayingSDstatus");
+			  if (sdSecondCount >= 2) { // show for 2s
+				  displayingSDStatus = false;
+				  sdSecondCount = 0;
 
-		  // Update display if boot0 is not pressed
-		  if (boot0_pressed == false) {
-			  display_StatusPage();
+				  // Update display if boot0 is not pressed
+				  if (boot0_pressed == false) {
+					  display_StatusPage();
+				  }
+			  } else {
+				  sdSecondCount++;
+			  }
+		  } else {
+			  usb_serial_println("sd status triggered 1");
+			  // Check for SD card insertion/removal
+			  SD_Status sd_status = SD_Detect(); // Will automatically mount/unmount
+			  if (sd_status == SD_INSERTED_MOUNT_FAILURE || sd_status == SD_INSERTED_MOUNT_SUCCESS || sd_status == SD_REMOVED) {
+				  usb_serial_println("sd status triggered 2");
+				  display_sd_status(sd_status);
+				  displayingSDStatus = true;
+			  } else {
+				  // Update display if boot0 is not pressed
+				  if (boot0_pressed == false) {
+					  display_StatusPage();
+				  }
+			  }
 		  }
 	  }
 
 	  // Every 10 seconds since pressing display button, go to main page
 	  if ((HAL_GetTick() - lastButtonPress) >= 10000|| (HAL_GetTick() < lastButtonPress)) { // wraparound-safe comparison
-		  display_setPage(0);
+		  if (!displayingSDStatus) {
+			  display_setPage(0);
+		  }
 	  }
 
 	  /* SCHEDULE END*/

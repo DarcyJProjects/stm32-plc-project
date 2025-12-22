@@ -21,7 +21,7 @@
 
 // TODO: ENABLE ON FINAL PCB
 // Remounting when removed and reinserted at run-time will not work if set to false
-#define SD_CARD_DETECT_ENABLE false
+#define SD_CARD_DETECT_ENABLE true
 
 
 typedef struct {
@@ -30,8 +30,16 @@ typedef struct {
 	bool success;
 } SD_Stats;
 
+typedef enum {
+	SD_NO_CARD,					// No card is inserted
+	SD_INSERTED_MOUNT_FAILURE,	// Card was just inserted but mount failed
+	SD_INSERTED_MOUNT_SUCCESS,	// Card was just inserted and mount succeeded
+	SD_REMOVED,					// Card was just removed
+	SD_MOUNTED					// Card is inserted and has already been mounted
+} SD_Status;
 
-bool SD_Detect(void);
+
+SD_Status SD_Detect(void);
 
 bool SD_IsMounted(void);
 

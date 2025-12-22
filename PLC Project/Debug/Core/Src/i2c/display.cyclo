@@ -10,3 +10,4 @@
 ../Core/Src/i2c/display.c:441:6:display_dfu	1
 ../Core/Src/i2c/display.c:455:6:display_BtnPress	2
 ../Core/Src/i2c/display.c:466:6:display_setPage	2
+../Core/Src/i2c/display.c:471:6:display_sd_status	5

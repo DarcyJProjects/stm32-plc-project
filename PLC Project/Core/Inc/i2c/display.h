@@ -3,6 +3,7 @@
 
 #include "stm32g4xx_hal.h"
 #include <stdio.h>
+#include "sd/sd.h"
 
 void display_Setup();
 
@@ -19,5 +20,7 @@ void display_dfu(void);
 void display_BtnPress(void);
 
 void display_setPage(uint16_t page);
+
+void display_sd_status(SD_Status sd_status);
 
 #endif

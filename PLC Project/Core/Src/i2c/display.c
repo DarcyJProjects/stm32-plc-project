@@ -467,3 +467,34 @@ void display_setPage(uint16_t page) {
 	if (page > endPage) return;
 	currentPage = page;
 }
+
+void display_sd_status(SD_Status sd_status)
+{
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(5, 0);
+	ssd1306_WriteString("SD CARD", Font_11x18, White);
+
+	ssd1306_SetCursor(2, 25);
+
+	switch (sd_status) {
+		case SD_INSERTED_MOUNT_FAILURE:
+			ssd1306_WriteString("SD Card Inserted", Font_6x8, White);
+			ssd1306_SetCursor(2, 40);
+			ssd1306_WriteString("Mounting failed!", Font_6x8, White);
+			break;
+		case SD_INSERTED_MOUNT_SUCCESS:
+			ssd1306_WriteString("SD Card Inserted", Font_6x8, White);
+			ssd1306_SetCursor(2, 40);
+			ssd1306_WriteString("Mount succeeded.", Font_6x8, White);
+			break;
+		case SD_REMOVED:
+			ssd1306_WriteString("SD Card Removed!", Font_6x8, White);
+			ssd1306_SetCursor(2, 40);
+			ssd1306_WriteString("Forced unmount.", Font_6x8, White);
+			break;
+		default:
+			return;
+	}
+
+	ssd1306_UpdateScreen();
+}
