@@ -1,2 +1,2 @@
-../Core/Src/splash_screens/splash_boot.c:35:13:splash_screen0_end_frame	16	static
-../Core/Src/splash_screens/splash_boot.c:141:6:splash_screen_boot_play	96	static
+../Core/Src/splash_screens/splash_boot.c:36:13:splash_screen0_end_frame	16	static
+../Core/Src/splash_screens/splash_boot.c:146:6:splash_screen_boot_play	96	static

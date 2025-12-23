@@ -203,7 +203,7 @@ int main(void)
 		}
 	}
 
-	splash_screen_boot_play();
+	splash_screen_boot_play(GPIOC, BTN1_Pin);
 
   	// Communication
     modbus_Setup(0x01); // Set modbus slave address

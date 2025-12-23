@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "i2c/ssd1306/ssd1306.h"
 #include "i2c/ssd1306/ssd1306_fonts.h"
 #include "i2c/ssd1306/ssd1306_icons.h"
@@ -104,7 +105,7 @@ static void splash_screen1(void) {
 
 static void splash_screen2(void) {
 	int phase = 0;
-	int duration = 100; // 100 = roughly 3 seconds at 30 ms delay
+	int duration = 60; // 100 = roughly 3 seconds at 30 ms delay
 
 	for (int frame = 0; frame < duration; frame++) {
 		ssd1306_Fill(Black);
@@ -138,10 +139,20 @@ static void splash_screen2(void) {
 	}
 }
 
-void splash_screen_boot_play(void) {
+static bool should_skip(GPIO_TypeDef* port, uint16_t pin) {
+	return HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET;
+}
+
+void splash_screen_boot_play(GPIO_TypeDef* port, uint16_t pin) {
+	if (should_skip(port, pin)) return;
 	splash_screen0();
+
+	if (should_skip(port, pin)) return;
 	splash_screen1();
+
+	if (should_skip(port, pin)) return;
 	HAL_Delay(1500);
 
+	if (should_skip(port, pin)) return;
 	splash_screen2();
 }

@@ -9,6 +9,9 @@
 #include "io/io_virtual.h"
 #include "sd/sd.h"
 
+#include "i2c/icons.h"
+extern const unsigned char icon_sd_16x17 [];
+
 #include <stdlib.h> // for rand()
 #include <time.h> // for seeding rand
 
@@ -471,26 +474,33 @@ void display_setPage(uint16_t page) {
 void display_sd_status(SD_Status sd_status)
 {
 	ssd1306_Fill(Black);
-	ssd1306_SetCursor(5, 0);
-	ssd1306_WriteString("SD CARD", Font_11x18, White);
 
-	ssd1306_SetCursor(2, 25);
+	ssd1306_DrawBitmap(15, 2, icon_sd_16x17, 16, 17, White);
+
+	ssd1306_SetCursor(38, 2);
+	ssd1306_WriteString("SD Card", Font_11x18, White);
 
 	switch (sd_status) {
 		case SD_INSERTED_MOUNT_FAILURE:
+			ssd1306_SetCursor(16, 28);
 			ssd1306_WriteString("SD Card Inserted", Font_6x8, White);
-			ssd1306_SetCursor(2, 40);
+
+			ssd1306_SetCursor(16, 40);
 			ssd1306_WriteString("Mounting failed!", Font_6x8, White);
 			break;
 		case SD_INSERTED_MOUNT_SUCCESS:
+			ssd1306_SetCursor(16, 28);
 			ssd1306_WriteString("SD Card Inserted", Font_6x8, White);
-			ssd1306_SetCursor(2, 40);
-			ssd1306_WriteString("Mount succeeded.", Font_6x8, White);
+
+			ssd1306_SetCursor(10, 40);
+			ssd1306_WriteString("Mounting succeeded", Font_6x8, White);
 			break;
 		case SD_REMOVED:
+			ssd1306_SetCursor(16, 28);
 			ssd1306_WriteString("SD Card Removed!", Font_6x8, White);
-			ssd1306_SetCursor(2, 40);
-			ssd1306_WriteString("Forced unmount.", Font_6x8, White);
+
+			ssd1306_SetCursor(22, 40);
+			ssd1306_WriteString("Forced unmount", Font_6x8, White);
 			break;
 		default:
 			return;

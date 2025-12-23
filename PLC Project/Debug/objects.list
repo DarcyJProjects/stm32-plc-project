@@ -4,6 +4,7 @@
 "./Core/Src/i2c/eeprom.o"
 "./Core/Src/i2c/eeprom_utils.o"
 "./Core/Src/i2c/i2c.o"
+"./Core/Src/i2c/icons.o"
 "./Core/Src/i2c/ina226.o"
 "./Core/Src/i2c/ssd1306/ssd1306.o"
 "./Core/Src/i2c/ssd1306/ssd1306_fonts.o"
