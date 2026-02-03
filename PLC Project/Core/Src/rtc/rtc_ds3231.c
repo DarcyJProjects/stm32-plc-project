@@ -8,6 +8,38 @@ static uint8_t DecimalToBCD(uint8_t dec) {
 	return ((dec / 10) << 4) | (dec % 10);
 }
 
+static HAL_StatusTypeDef EnableVBATOperation(void) {
+	uint8_t controlReg = 0;
+	uint8_t statusReg = 0;
+
+	// Read the current control register (0X0E)
+	if (HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &controlReg, 1, HAL_MAX_DELAY) != HAL_OK) {
+		return HAL_ERROR;
+	}
+
+	// Clear bit 7 (EOSC) to enable oscillator when on VBAT
+	// (keep other bits intact)
+	controlReg &= ~(1 << 7);
+
+	// Write back to control register
+	if (HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &controlReg, 1, HAL_MAX_DELAY) != HAL_OK) {
+		return HAL_ERROR;
+	}
+
+	// Clear the oscillator stop flag (OSF) in the status register (0x0F)
+	if (HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0F, 1, &statusReg, 1, HAL_MAX_DELAY) != HAL_OK) {
+		return HAL_ERROR;
+	}
+
+	// Clear bit 7 (OSF)
+	statusReg &= ~(1 << 7);
+	if (HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0F, 1, &statusReg, 1, HAL_MAX_DELAY) != HAL_OK) {
+		return HAL_ERROR;
+	}
+
+	return HAL_OK;
+}
+
 HAL_StatusTypeDef DS3231_ReadTime(RTC_Time* time) {
 	uint8_t rawData[7]; // 7 bytes
 	uint8_t startRegister = 0x00;
@@ -47,6 +79,11 @@ HAL_StatusTypeDef DS3231_SetTime(RTC_Time* time) {
 	rawData[6] = DecimalToBCD(time->year);
 
 	if (HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, startRegister, 1, rawData, 7, HAL_MAX_DELAY) != HAL_OK) {
+		return HAL_ERROR;
+	}
+
+	// Without this, the RTC may stop when the board is un-powered even with VBAT installed
+	if (EnableVBATOperation() != HAL_OK) {
 		return HAL_ERROR;
 	}
 
