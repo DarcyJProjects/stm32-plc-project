@@ -2,6 +2,7 @@
 #define BMP280_H
 
 #include <stdint.h>
+#include "io/io_input_reg.h"
 
 // BMP280 I2C address (0x76 if SDO pulled LOW, 0x77 if SDO pulled HIGH)
 #define BMP280_REG_CTRL_MEAS       0xF4
@@ -17,6 +18,6 @@ void BMP280_Init(void);
 void BMP280_ReadRaw(int32_t* raw_temp, int32_t* raw_pres);
 void BMP280_ReadCompensated(int32_t* temperature, uint32_t* pressure);
 
-uint16_t BMP280_Read_Temp_Func(void* context);
+uint16_t BMP280_Read_Temp_Func(void* context, IO_Input_Reg_Mode mode);
 
 #endif

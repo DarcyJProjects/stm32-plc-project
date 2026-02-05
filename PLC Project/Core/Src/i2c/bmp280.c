@@ -118,7 +118,7 @@ void BMP280_ReadCompensated(int32_t* temperature, uint32_t* pressure) {
     *pressure = (uint32_t)p;
 }
 
-uint16_t BMP280_Read_Temp_Func(void* context) {
+uint16_t BMP280_Read_Temp_Func(void* context, IO_Input_Reg_Mode mode) {
     (void)context;
 
     int32_t temperature;
@@ -131,5 +131,5 @@ uint16_t BMP280_Read_Temp_Func(void* context) {
     usb_serial_println(msg);
 #endif
 
-    return (temperature < 0) ? 0 : (uint16_t)(temperature / 100);
+    return (temperature < 0) ? 0 : (uint16_t)(temperature); // centi-degrees
 }

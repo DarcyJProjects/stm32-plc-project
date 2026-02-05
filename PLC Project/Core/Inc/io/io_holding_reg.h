@@ -23,7 +23,8 @@ extern uint16_t io_holding_adc_reg_channel_count; // count for only physical dac
 // Enumeration to define voltage or current mode (only for physical channels, so default to voltage for all).
 typedef enum {
 	IO_HOLDING_REG_VOLTAGE,
-	IO_HOLDING_REG_CURRENT
+	IO_HOLDING_REG_CURRENT,
+	IO_HOLDING_REG_I2C
 } IO_Holding_Reg_Mode;
 
 

@@ -20,7 +20,8 @@ extern uint16_t io_input_adc_reg_channel_count; // count for only physical adc c
 // Enumeration to define voltage or current mode (only for physical channels, so default to voltage for all).
 typedef enum {
 	IO_INPUT_REG_VOLTAGE,
-	IO_INPUT_REG_CURRENT
+	IO_INPUT_REG_CURRENT,
+	IO_INPUT_REG_I2C
 } IO_Input_Reg_Mode;
 
 

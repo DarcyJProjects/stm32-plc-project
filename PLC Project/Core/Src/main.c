@@ -142,7 +142,6 @@ int main(void)
   // SETUP ---------------------------------------------------------------------------------------//
     // Splash Screen
 	display_Setup();
-	//display_Boot();
 	// Display after checking for factory reset
 
 	// Config
@@ -252,8 +251,8 @@ int main(void)
   	automation_Init();
 
   	// TODO: DEMO ONLY - BMP280
-	//BMP280_Init();
-	//io_input_reg_add_channel(BMP280_Read_Temp_Func, NULL);
+	BMP280_Init();
+	io_input_reg_add_channel(BMP280_Read_Temp_Func, NULL, IO_INPUT_REG_I2C);
 
   	// TODO: DEMO ONLY - MODBUS SLAVE
   	/*
@@ -363,7 +362,7 @@ int main(void)
 		  loopCounter = 0;
 
 		  if (displayingSDStatus) {
-			  usb_serial_println("displayingSDstatus");
+			  //usb_serial_println("displayingSDstatus");
 			  if (sdSecondCount >= 2) { // show for 2s
 				  displayingSDStatus = false;
 				  sdSecondCount = 0;
@@ -376,11 +375,11 @@ int main(void)
 				  sdSecondCount++;
 			  }
 		  } else {
-			  usb_serial_println("sd status triggered 1");
+			  //usb_serial_println("sd status triggered 1");
 			  // Check for SD card insertion/removal
 			  SD_Status sd_status = SD_Detect(); // Will automatically mount/unmount
 			  if (sd_status == SD_INSERTED_MOUNT_FAILURE || sd_status == SD_INSERTED_MOUNT_SUCCESS || sd_status == SD_REMOVED) {
-				  usb_serial_println("sd status triggered 2");
+				  //usb_serial_println("sd status triggered 2");
 				  display_sd_status(sd_status);
 				  displayingSDStatus = true;
 			  } else {

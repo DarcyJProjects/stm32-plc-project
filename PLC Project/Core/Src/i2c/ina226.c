@@ -47,7 +47,8 @@ uint16_t INA226_ReadCurrentRaw(void* context) {
 }
 
 float INA226_ReadCurrent(void) {
-	return INA226_ReadCurrentRaw(NULL) * 0.00015f; // 150uA per LSB with calibration value 0x0155
+    int16_t raw_current = (int16_t)INA226_ReadCurrentRaw(NULL);
+    return raw_current * 0.00015f;
 }
 
 uint16_t INA226_ReadPowerRaw(void* context) {
