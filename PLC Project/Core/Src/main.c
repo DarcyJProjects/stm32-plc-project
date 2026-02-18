@@ -251,8 +251,8 @@ int main(void)
   	automation_Init();
 
   	// TODO: DEMO ONLY - BMP280
-	BMP280_Init();
-	io_input_reg_add_channel(BMP280_Read_Temp_Func, NULL, IO_INPUT_REG_I2C);
+	//BMP280_Init();
+	//io_input_reg_add_channel(BMP280_Read_Temp_Func, NULL, IO_INPUT_REG_I2C);
 
   	// TODO: DEMO ONLY - MODBUS SLAVE
   	/*

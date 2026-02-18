@@ -231,5 +231,5 @@ bool io_virtual_factory_reset(uint16_t baseAddress) {
 	memset(virtual_holding_reg_channels, 0, sizeof(virtual_holding_reg_channels));
 
 	// Save virtual registers to EEPROM
-	io_virtual_save(baseAddress);
+	return io_virtual_save(baseAddress);
 }

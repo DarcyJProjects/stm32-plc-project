@@ -128,8 +128,7 @@ bool io_holding_reg_type_save(uint16_t baseAddress) {
 		// ignore other types as they cannot be changed on the fly
 	}
 
-	if (count == 0) return true; // nothing to save
-	// TODO: ^^^ WILL NOT PASS ONTO NEXT SAVE!!!
+	if (count == 0) return io_input_reg_type_save(baseAddress); // nothing to save
 
 
 	// Buffer to hold all data for CRC16
