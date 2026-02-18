@@ -2,10 +2,11 @@ const { SerialPort } = require("serialport");
 const EventEmitter = require("events");
 
 class ModbusRTU extends EventEmitter {
-    constructor(path, baudRate = 9600) {
+    constructor() {
         super();
         this.port = null;
         this.slaveId = null;
+        this.queue = Promise.resolve();
     }
 
     async connect(slaveId, path, baudRate, parity) {
@@ -42,6 +43,15 @@ class ModbusRTU extends EventEmitter {
         });
     }
 
+    checkCRC(buffer) {
+        if (buffer.length < 3) return false;
+        
+        const receivedCRC = buffer.readUInt16LE(buffer.length - 2);
+        const dataWithoutCRC = buffer.slice(0, buffer.length - 2);
+        const calculatedCRC = ModbusRTU.crc16(dataWithoutCRC);
+        return receivedCRC === calculatedCRC;
+    }
+
     buildFrame(slaveId, functionCode, payloadBuffer) {
         const frame = Buffer.alloc(2 + payloadBuffer.length); // Slave + flunc + payload buffer
         frame.writeUInt8(slaveId, 0);
@@ -56,6 +66,17 @@ class ModbusRTU extends EventEmitter {
     }
 
     async sendRequest(functionCode, payload) {
+        // queue requests
+        const result = this.queue.catch(() =>{}).then(() =>
+            this._executeRequest(functionCode, payload)
+        );
+
+        this.queue = result; // Update the queue tail
+        return result;
+    }
+
+
+    async _executeRequest(functionCode, payload) {
         if (!this.port || !this.port.isOpen) {
             throw new Error("Serial port is not open.");
         }
@@ -63,41 +84,57 @@ class ModbusRTU extends EventEmitter {
         const frame = this.buildFrame(this.slaveId, functionCode, payload);
         console.log("Transmit:", frame.toString("hex"));
 
+        // Clear old buffer before sending
+        this.port.flush();
+
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 this.port.off("data", onData);
                 reject(new Error("Response Timeout"));
-            }, 500);
+            }, 1000);
 
-            const chunks = [];
+            let chunks = Buffer.alloc(0);
+
             const onData = (data) => {
-                chunks.push(data);
+                chunks = Buffer.concat([chunks, data]);
 
-                const full = Buffer.concat(chunks);
-                if (full.length >= 5) { // Slave + Func + data + 2 bytes CRC
-                    clearTimeout(timeout);
-                    this.port.off("data", onData);
-                    console.log("Received:", full.toString("hex"));
-                    
-                    const receivedFunc = full[1];
-                    if ((receivedFunc & 0x80) === 0x80) {
-                        const exceptionCode = full[2];
-                        const funcName = this.getFunctionName(receivedFunc & 0x7F);
-                        const errMsg = `Modbus Exception 0x${exceptionCode.toString(16).padStart(2, '0')} (${this.decodeExceptionCode(exceptionCode)}) on ${funcName}`;
+                if (chunks.length >= 5) { // Slave + Func + data + 2 bytes CRC
+
+                    // 1. Check for exception (MSB of function code set)
+                    if ((chunks[1] & 0x80) === 0x80) {
+                        cleanup();
+                        const exceptionCode = chunks[2];
+                        // Verify CRC of exception frame too
+                        if (!this.checkCRC(chunks)) {
+                            reject(new Error("Received Exception with invalid CRC"));
+                            return;
+                        }
+                        const funcName = this.getFunctionName(chunks[1] & 0x7F);
+                        const errMsg = `Modbus Exception 0x${exceptionCode.toString(16)} on ${funcName}`;
                         reject(new Error(errMsg));
                         return;
                     }
                     
-                    resolve(full);
+                    // 2. Verify CRC
+                    if (this.checkCRC(chunks)) {
+                        cleanup();
+                        console.log("Received Valid:", chunks.toString("hex"));
+                        resolve(chunks);
+                    }
+                    // Ignore if invalid CRC
                 }
             };
+
+            const cleanup = () => {
+                clearTimeout(timeout);
+                this.port.off("data", onData);
+            }
 
             this.port.on("data", onData);
 
             this.port.write(frame, (err) => {
                 if (err) {
-                    clearTimeout(timeout);
-                    this.port.off("data", onData);
+                    cleanup();
                     reject(err);
                 }
             });
