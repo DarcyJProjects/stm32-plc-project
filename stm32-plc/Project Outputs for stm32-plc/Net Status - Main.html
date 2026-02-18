@@ -1,0 +1,1250 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<style type="text/css">
+		h1, h2, h3, h4, h5, h6 { 
+			font-family : segoe ui;
+			color : black;
+			background-color : #EDE7D9;
+			padding: 0.3em;
+		}
+
+		h1 {
+			font-size: 1.2em;
+		}		
+
+		h2 {
+			font-size: 1.2em;
+		}
+
+		body { 
+			font-family : segoe ui;
+		}
+
+		td, th {  
+			padding: 0.5em;
+			text-align : left;
+		}
+		th { 
+			background-color : #EEEEEE;
+		
+		}
+		th.column1, td.column1 { 
+			width : 50%; 
+		}
+
+        th.column2, td.column2 {
+            width : 25%;
+        }
+
+		table { 
+			width : 100%; 
+            font-size: 0.9em;
+		}
+		.front_matter, .front_matter_column1, .front_matter_column2, .front_matter_column3
+		{
+			left : 0;
+			top : 0;
+			padding: 0em;
+			padding-top : 0.1em;
+			border : 0px solid black;
+			width : 100%;
+			vertical-align: top;
+			text-align: left;
+		}
+
+		.front_matter_column1 {
+			width : 5em;
+			font-weight: bold;
+		}
+
+		.front_matter_column2 {
+			width: 0.1em;
+		}
+
+		.front_matter_column3 {
+			width : auto;
+		}
+
+		.total_column1, .total_column {
+			font-weight : bold;
+		}
+		.total_column1 {
+			text-align : left;
+		}
+		.warning, .error { 
+			color : red;
+			font-weight : bold;
+		}	
+		tr.onmouseout_odd { 
+			background-color : #white;
+		}
+		tr.onmouseout_even { 
+			background-color : #FAFAFA;
+		}
+		tr.onmouseover_odd, tr.onmouseover_even { 
+			background-color : #EEEEEE;
+		} 
+		a:link, a:visited, .q a:link,.q a:active,.q {
+			color: #21489e; 
+		}
+		a:link.callback, a:visited.callback { 
+			color: #21489e;
+		}
+		a:link.customize, a:visited.customize {
+			color: #C0C0C0;
+			position: absolute; 
+			right: 10px;
+		}	
+		p.contents_level1 {
+			font-weight : bold;
+			font-size : 110%;
+			margin : 0.5em;
+		}
+		p.contents_level2 {
+			position : relative;
+			left : 20px;
+			margin : 0.5em;
+		}
+	</style><script type="text/javascript">
+		function coordToMils(coord) {
+			var number = coord / 10000;
+			
+			if (number != number.toFixed(3))
+				number = number.toFixed(3);
+			
+			return number + 'mil'
+		}
+
+		function coordToMM(coord) {
+			var number = 0.0254 * coord / 10000;
+			
+			if (number != number.toFixed(4))
+				number = number.toFixed(4);
+			
+			return number + 'mm'
+		}
+	
+		function convertCoord(coordNode, units) {
+			for (var i = 0; i < coordNode.childNodes.length; i++) {
+				coordNode.removeChild(coordNode.childNodes[i]);		
+			}
+
+			var coord = coordNode.getAttribute('value');
+			if (coord != null) {
+				if (units == 'mm') {	
+					textNode = document.createTextNode(coordToMM(coord));
+					coordNode.appendChild(textNode);
+				} else if (units == 'mil') {
+					textNode = document.createTextNode(coordToMils(coord));		
+					coordNode.appendChild(textNode);	
+				}
+			}
+		}
+	
+		function convertUnits(unitNode, units) {
+			for (var i = 0; i < unitNode.childNodes.length; i++) {
+				unitNode.removeChild(unitNode.childNodes[i]);		
+			}
+		
+			textNode = document.createTextNode(units); 
+			unitNode.appendChild(textNode);
+		}
+	
+		function changeUnits(radio_input, units) {
+			if (radio_input.checked) {
+			
+				var elements = document.getElementsByName('coordinate');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertCoord(elements[i], units);
+					}
+				}
+	
+				var elements = document.getElementsByName('units');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertUnits(elements[i], units);
+					}
+				}
+			}
+		}	
+	</script><title>Net Status Report</title>
+</head>
+<body onload="document.getElementById('radio_mm').click()"><img ALT="Altium" src="
+			file://C:\Users\Public\Documents\Altium\Templates\AD_logo.png
+		"><a href="dxpprocess://Client:SetupPreferences?Server=PCB|PageName=Reports" class="customize"><acronym title="dxpprocess://Client:SetupPreferences?Server=PCB|PageName=Reports">customize</acronym></a><h1>Net Status Report</h1>
+<table class="front_matter">
+<tr class="front_matter">
+<td class="front_matter_column1">Date:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">18/02/2026</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">1:24:00 PM</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Elapsed Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">00:00:00</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Filename:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3"><a href="file:///C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc" class="file"><acronym title="C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc">C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc</acronym></a></td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Units:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">
+<form><input type="radio" name="radio_units" id="radio_mm" onclick="changeUnits(this, 'mm')">mm<input type="radio" name="radio_units" id="radio_mil" onclick="changeUnits(this, 'mil')">mils</form>
+</td>
+</tr>
+</table><a name="IDTDFIUJX2F0EVE2F34BOX3UKJZPNRH5IFSHPGJQLX2JSROWOA1JTJ"><table>
+<tr>
+<th class="column1">Nets</th>
+<th class="column2">Layer</th>
+<th class="column3">Length</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1585.567mil|Location2.X=2290.417mil|Location1.Y=2714.504mil|Location2.Y=3311.024mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1585.567mil|Location2.X=2290.417mil|Location1.Y=2714.504mil|Location2.Y=3311.024mil|Absolute=True">24V</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1183.672mil|Location2.X=1583.724mil|Location1.Y=2714.504mil|Location2.Y=3305.845mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1183.672mil|Location2.X=1583.724mil|Location1.Y=2714.504mil|Location2.Y=3305.845mil|Absolute=True">24V_PREMEASURE</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=908.976mil|Location2.X=7398.11mil|Location1.Y=1383.795mil|Location2.Y=3417.795mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=908.976mil|Location2.X=7398.11mil|Location1.Y=1383.795mil|Location2.Y=3417.795mil|Absolute=True">3V3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=594.016mil|Location2.X=3748.065mil|Location1.Y=2298.74mil|Location2.Y=3468.504mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=594.016mil|Location2.X=3748.065mil|Location1.Y=2298.74mil|Location2.Y=3468.504mil|Absolute=True">5V</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=590.429mil|Location2.X=7103.228mil|Location1.Y=680.236mil|Location2.Y=2070.929mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=590.429mil|Location2.X=7103.228mil|Location1.Y=680.236mil|Location2.Y=2070.929mil|Absolute=True">5V_ISO</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=446.535mil|Location2.X=7407.793mil|Location1.Y=446.535mil|Location2.Y=2079.449mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=446.535mil|Location2.X=7407.793mil|Location1.Y=446.535mil|Location2.Y=2079.449mil|Absolute=True">5V_ISO_GND</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=550.472mil|Location2.X=1127.032mil|Location1.Y=571.787mil|Location2.Y=1220.602mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=550.472mil|Location2.X=1127.032mil|Location1.Y=571.787mil|Location2.Y=1220.602mil|Absolute=True">A</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="13676207">34.7376mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1666.866mil|Location2.X=4450.591mil|Location1.Y=2274.262mil|Location2.Y=2781.811mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1666.866mil|Location2.X=4450.591mil|Location1.Y=2274.262mil|Location2.Y=2781.811mil|Absolute=True">AIN1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="32014229">81.3161mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2242.441mil|Location1.Y=700.472mil|Location2.Y=1100.709mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2242.441mil|Location1.Y=700.472mil|Location2.Y=1100.709mil|Absolute=True">AIN1_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5787635">14.7006mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2139.307mil|Location2.X=4450.591mil|Location1.Y=2274.994mil|Location2.Y=2753.346mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2139.307mil|Location2.X=4450.591mil|Location1.Y=2274.994mil|Location2.Y=2753.346mil|Absolute=True">AIN2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="26998083">68.5751mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2484.567mil|Location1.Y=665.354mil|Location2.Y=1100.709mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2484.567mil|Location1.Y=665.354mil|Location2.Y=1100.709mil|Absolute=True">AIN2_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7479179">18.9971mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2611.748mil|Location2.X=4760.905mil|Location1.Y=2175.039mil|Location2.Y=2708.592mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2611.748mil|Location2.X=4760.905mil|Location1.Y=2175.039mil|Location2.Y=2708.592mil|Absolute=True">AIN3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="29193185">74.1507mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2714.882mil|Location1.Y=598.425mil|Location2.Y=1100.709mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2714.882mil|Location1.Y=598.425mil|Location2.Y=1100.709mil|Absolute=True">AIN3_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="9461462">24.0321mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3084.189mil|Location2.X=4757.397mil|Location1.Y=2161.26mil|Location2.Y=2678.937mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3084.189mil|Location2.X=4757.397mil|Location1.Y=2161.26mil|Location2.Y=2678.937mil|Absolute=True">AIN4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="24524177">62.2914mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2957.008mil|Location1.Y=480.315mil|Location2.Y=1100.709mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1980.315mil|Location2.X=2957.008mil|Location1.Y=480.315mil|Location2.Y=1100.709mil|Absolute=True">AIN4_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="12360553">31.3958mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1824.803mil|Location2.X=2129.921mil|Location1.Y=1025.276mil|Location2.Y=1725.163mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1824.803mil|Location2.X=2129.921mil|Location1.Y=1025.276mil|Location2.Y=1725.163mil|Absolute=True">AIN_SENSEA</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7796236">19.8024mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2198.819mil|Location2.X=2362.362mil|Location1.Y=1025.276mil|Location2.Y=1725.163mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2198.819mil|Location2.X=2362.362mil|Location1.Y=1025.276mil|Location2.Y=1725.163mil|Absolute=True">AIN_SENSEB</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7099593">18.033mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2509.528mil|Location2.X=2645.669mil|Location1.Y=1025.276mil|Location2.Y=1718.619mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2509.528mil|Location2.X=2645.669mil|Location1.Y=1025.276mil|Location2.Y=1718.619mil|Absolute=True">AIN_SENSEC</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="6877926">17.4699mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2751.653mil|Location2.X=3039.37mil|Location1.Y=1025.276mil|Location2.Y=1718.619mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2751.653mil|Location2.X=3039.37mil|Location1.Y=1025.276mil|Location2.Y=1718.619mil|Absolute=True">AIN_SENSED</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7522077">19.1061mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3806.039mil|Location2.X=4450.591mil|Location1.Y=2417.323mil|Location2.Y=2694.291mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3806.039mil|Location2.X=4450.591mil|Location1.Y=2417.323mil|Location2.Y=2694.291mil|Absolute=True">AOUT1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8666147">22.012mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3123.858mil|Location2.X=3336.929mil|Location1.Y=700.472mil|Location2.Y=1100.709mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3123.858mil|Location2.X=3336.929mil|Location1.Y=700.472mil|Location2.Y=1100.709mil|Absolute=True">AOUT1_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4703295">11.9464mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4451.378mil|Location2.X=4501.726mil|Location1.Y=2333.704mil|Location2.Y=2678.937mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4451.378mil|Location2.X=4501.726mil|Location1.Y=2333.704mil|Location2.Y=2678.937mil|Absolute=True">AOUT2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3120693">7.9266mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3306.378mil|Location2.X=3581.024mil|Location1.Y=700.472mil|Location2.Y=1100.709mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3306.378mil|Location2.X=3581.024mil|Location1.Y=700.472mil|Location2.Y=1100.709mil|Absolute=True">AOUT2_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4462267">11.3342mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3261.496mil|Location2.X=3975.905mil|Location1.Y=869.269mil|Location2.Y=1725.906mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3261.496mil|Location2.X=3975.905mil|Location1.Y=869.269mil|Location2.Y=1725.906mil|Absolute=True">AOUT_CURRENTA</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="11702151">29.7235mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3367.953mil|Location2.X=4375.905mil|Location1.Y=474.094mil|Location2.Y=1212.4mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3367.953mil|Location2.X=4375.905mil|Location1.Y=474.094mil|Location2.Y=1212.4mil|Absolute=True">AOUT_CURRENTB</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="13230080">33.6044mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=700.472mil|Location2.X=1360.157mil|Location1.Y=490.236mil|Location2.Y=1170.602mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=700.472mil|Location2.X=1360.157mil|Location1.Y=490.236mil|Location2.Y=1170.602mil|Absolute=True">B</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="13574584">34.4794mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3950.472mil|Location2.X=7270mil|Location1.Y=2552.835mil|Location2.Y=3468.504mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3950.472mil|Location2.X=7270mil|Location1.Y=2552.835mil|Location2.Y=3468.504mil|Absolute=True">BTN1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="56099914">142.4938mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4152.868mil|Location2.X=7316.008mil|Location1.Y=2504.072mil|Location2.Y=3440.184mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4152.868mil|Location2.X=7316.008mil|Location1.Y=2504.072mil|Location2.Y=3440.184mil|Absolute=True">BTN2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="44896071">114.036mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4580.132mil|Location2.X=5202.819mil|Location1.Y=2911.614mil|Location2.Y=3283.462mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4580.132mil|Location2.X=5202.819mil|Location1.Y=2911.614mil|Location2.Y=3283.462mil|Absolute=True">CARD_DETECT</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="11949113">30.3507mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5253.094mil|Location2.X=5468.567mil|Location1.Y=2841.472mil|Location2.Y=3097.307mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5253.094mil|Location2.X=5468.567mil|Location1.Y=2841.472mil|Location2.Y=3097.307mil|Absolute=True">CLK</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3176148">8.0674mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4490.748mil|Location2.X=5381.953mil|Location1.Y=2257.559mil|Location2.Y=3097.307mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4490.748mil|Location2.X=5381.953mil|Location1.Y=2257.559mil|Location2.Y=3097.307mil|Absolute=True">CMD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="17520376">44.5018mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4471.063mil|Location2.X=5599.213mil|Location1.Y=2227.596mil|Location2.Y=3097.307mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4471.063mil|Location2.X=5599.213mil|Location1.Y=2227.596mil|Location2.Y=3097.307mil|Absolute=True">DAT0</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="19931802">50.6268mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4580.954mil|Location2.X=5338.646mil|Location1.Y=2732.284mil|Location2.Y=3097.307mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4580.954mil|Location2.X=5338.646mil|Location1.Y=2732.284mil|Location2.Y=3097.307mil|Absolute=True">DAT3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="14186617">36.034mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4344.173mil|Location2.X=4627.032mil|Location1.Y=1924.15mil|Location2.Y=2733.661mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4344.173mil|Location2.X=4627.032mil|Location1.Y=1924.15mil|Location2.Y=2733.661mil|Absolute=True">DIN1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="10485616">26.6335mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4423.701mil|Location2.X=4531.102mil|Location1.Y=700.472mil|Location2.Y=1194.952mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4423.701mil|Location2.X=4531.102mil|Location1.Y=700.472mil|Location2.Y=1194.952mil|Absolute=True">DIN1_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4500868">11.4322mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4383.543mil|Location2.X=4818.89mil|Location1.Y=1927.198mil|Location2.Y=2713.976mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4383.543mil|Location2.X=4818.89mil|Location1.Y=1927.198mil|Location2.Y=2713.976mil|Absolute=True">DIN2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="11100644">28.1956mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4573.701mil|Location2.X=4727.953mil|Location1.Y=700.472mil|Location2.Y=1194.952mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4573.701mil|Location2.X=4727.953mil|Location1.Y=700.472mil|Location2.Y=1194.952mil|Absolute=True">DIN2_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4451694">11.3073mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=5020.732mil|Location1.Y=1924.15mil|Location2.Y=2713.976mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=5020.732mil|Location1.Y=1924.15mil|Location2.Y=2713.976mil|Absolute=True">DIN3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="10344630">26.2754mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4723.701mil|Location2.X=4924.803mil|Location1.Y=700.472mil|Location2.Y=1194.953mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4723.701mil|Location2.X=4924.803mil|Location1.Y=700.472mil|Location2.Y=1194.953mil|Absolute=True">DIN3_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4645758">11.8002mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=5217.583mil|Location1.Y=1904.465mil|Location2.Y=2733.661mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=5217.583mil|Location1.Y=1904.465mil|Location2.Y=2733.661mil|Absolute=True">DIN4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="11716299">29.7594mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4873.701mil|Location2.X=5121.654mil|Location1.Y=700.472mil|Location2.Y=1194.953mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4873.701mil|Location2.X=5121.654mil|Location1.Y=700.472mil|Location2.Y=1194.953mil|Absolute=True">DIN4_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4839821">12.2931mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=820.551mil|Location2.X=1147.953mil|Location1.Y=1141.602mil|Location2.Y=2070.929mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=820.551mil|Location2.X=1147.953mil|Location1.Y=1141.602mil|Location2.Y=2070.929mil|Absolute=True">DIR</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="12622793">32.0619mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4510.433mil|Location2.X=5370.142mil|Location1.Y=1883.795mil|Location2.Y=2678.937mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4510.433mil|Location2.X=5370.142mil|Location1.Y=1883.795mil|Location2.Y=2678.937mil|Absolute=True">DOUT1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="11524452">29.2721mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5278.542mil|Location2.X=5547.244mil|Location1.Y=700.472mil|Location2.Y=1228.347mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5278.542mil|Location2.X=5547.244mil|Location1.Y=700.472mil|Location2.Y=1228.347mil|Absolute=True">DOUT1_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="6832963">17.3557mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4530.118mil|Location2.X=5566.992mil|Location1.Y=1883.795mil|Location2.Y=2678.937mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4530.118mil|Location2.X=5566.992mil|Location1.Y=1883.795mil|Location2.Y=2678.937mil|Absolute=True">DOUT2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="13284986">33.7439mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5229.52mil|Location2.X=5778.622mil|Location1.Y=649.854mil|Location2.Y=1263.393mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5229.52mil|Location2.X=5778.622mil|Location1.Y=649.854mil|Location2.Y=1263.393mil|Absolute=True">DOUT2_FIELD</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="15443159">39.2256mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=446.535mil|Location2.X=7427.48mil|Location1.Y=1292.267mil|Location2.Y=3542.638mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=446.535mil|Location2.X=7427.48mil|Location1.Y=1292.267mil|Location2.Y=3542.638mil|Absolute=True">GND</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1328.677mil|Location2.X=6684.173mil|Location1.Y=2192.85mil|Location2.Y=3407.795mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1328.677mil|Location2.X=6684.173mil|Location1.Y=2192.85mil|Location2.Y=3407.795mil|Absolute=True">I2C_SCL</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="83506842">212.1074mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1387.732mil|Location2.X=6784.173mil|Location1.Y=2183.071mil|Location2.Y=3410.906mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1387.732mil|Location2.X=6784.173mil|Location1.Y=2183.071mil|Location2.Y=3410.906mil|Absolute=True">I2C_SDA</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="85483706">217.1286mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4088.268mil|Location2.X=7342.126mil|Location1.Y=1708.539mil|Location2.Y=3453.963mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4088.268mil|Location2.X=7342.126mil|Location1.Y=1708.539mil|Location2.Y=3453.963mil|Absolute=True">NRST</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="56462042">143.4136mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5767.85mil|Location2.X=7083.244mil|Location1.Y=2139.449mil|Location2.Y=2870.646mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5767.85mil|Location2.X=7083.244mil|Location1.Y=2139.449mil|Location2.Y=2870.646mil|Absolute=True">NetBT1_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="17795378">45.2003mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1056.102mil|Location2.X=1136.554mil|Location1.Y=3096.457mil|Location2.Y=3223.168mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1056.102mil|Location2.X=1136.554mil|Location1.Y=3096.457mil|Location2.Y=3223.168mil|Absolute=True">NetC16_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1200289">3.0487mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1089.184mil|Location2.X=1136.554mil|Location1.Y=3096.457mil|Location2.Y=3185.767mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1089.184mil|Location2.X=1136.554mil|Location1.Y=3096.457mil|Location2.Y=3185.767mil|Absolute=True">NetC16_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="635214">1.6134mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4142.984mil|Location2.X=4450.591mil|Location1.Y=2856.89mil|Location2.Y=2990.656mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4142.984mil|Location2.X=4450.591mil|Location1.Y=2856.89mil|Location2.Y=2990.656mil|Absolute=True">NetC5_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3216130">8.169mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4142.984mil|Location2.X=4450.591mil|Location1.Y=2809.553mil|Location2.Y=2887.194mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4142.984mil|Location2.X=4450.591mil|Location1.Y=2809.553mil|Location2.Y=2887.194mil|Absolute=True">NetC6_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3221033">8.1814mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4240.078mil|Location2.X=4450.591mil|Location1.Y=2666.115mil|Location2.Y=2838.74mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4240.078mil|Location2.X=4450.591mil|Location1.Y=2666.115mil|Location2.Y=2838.74mil|Absolute=True">NetC7_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3402743">8.643mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4161.027mil|Location2.X=4450.591mil|Location1.Y=2533.307mil|Location2.Y=2824.961mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4161.027mil|Location2.X=4450.591mil|Location1.Y=2533.307mil|Location2.Y=2824.961mil|Absolute=True">NetC8_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4738545">12.0359mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=901.968mil|Location2.X=1447.283mil|Location1.Y=3172.423mil|Location2.Y=3474.41mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=901.968mil|Location2.X=1447.283mil|Location1.Y=3172.423mil|Location2.Y=3474.41mil|Absolute=True">NetD10_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2311.945mil|Location2.X=2984.315mil|Location1.Y=2697.772mil|Location2.Y=2985.299mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2311.945mil|Location2.X=2984.315mil|Location1.Y=2697.772mil|Location2.Y=2985.299mil|Absolute=True">NetD12_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5859.528mil|Location2.X=6429.373mil|Location1.Y=1493.386mil|Location2.Y=1964.63mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5859.528mil|Location2.X=6429.373mil|Location1.Y=1493.386mil|Location2.Y=1964.63mil|Absolute=True">NetD17A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8499918">21.5898mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6511.048mil|Location2.X=7066.468mil|Location1.Y=1493.386mil|Location2.Y=1964.63mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6511.048mil|Location2.X=7066.468mil|Location1.Y=1493.386mil|Location2.Y=1964.63mil|Absolute=True">NetD17B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="9044749">22.9737mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1396.591mil|Location2.X=1468.567mil|Location1.Y=1519.622mil|Location2.Y=1823.882mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1396.591mil|Location2.X=1468.567mil|Location1.Y=1519.622mil|Location2.Y=1823.882mil|Absolute=True">NetD19_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2591382">6.5821mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3123.858mil|Location2.X=3909.449mil|Location1.Y=818.898mil|Location2.Y=1818.961mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3123.858mil|Location2.X=3909.449mil|Location1.Y=818.898mil|Location2.Y=1818.961mil|Absolute=True">NetD1A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="19440353">49.3785mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3375.669mil|Location2.X=4253.016mil|Location1.Y=1017.559mil|Location2.Y=1759.906mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3375.669mil|Location2.X=4253.016mil|Location1.Y=1017.559mil|Location2.Y=1759.906mil|Absolute=True">NetD1B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="13984875">35.5216mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1405.449mil|Location2.X=1828.89mil|Location1.Y=1265.644mil|Location2.Y=1452.819mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1405.449mil|Location2.X=1828.89mil|Location1.Y=1265.644mil|Location2.Y=1452.819mil|Absolute=True">NetD20_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4407444">11.1949mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1287.339mil|Location2.X=1381.89mil|Location1.Y=1381.827mil|Location2.Y=1823.882mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1287.339mil|Location2.X=1381.89mil|Location1.Y=1381.827mil|Location2.Y=1823.882mil|Absolute=True">NetD20_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4164737">10.5784mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1405.449mil|Location2.X=1646.198mil|Location1.Y=1265.644mil|Location2.Y=1354.394mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1405.449mil|Location2.X=1646.198mil|Location1.Y=1265.644mil|Location2.Y=1354.394mil|Absolute=True">NetD21_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2053840">5.2168mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1255.906mil|Location2.X=1350.457mil|Location1.Y=1283.402mil|Location2.Y=1823.882mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1255.906mil|Location2.X=1350.457mil|Location1.Y=1283.402mil|Location2.Y=1823.882mil|Absolute=True">NetD21_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5253588">13.3441mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6121mil|Location2.X=6190.552mil|Location1.Y=1837.535mil|Location2.Y=1964.63mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6121mil|Location2.X=6190.552mil|Location1.Y=1837.535mil|Location2.Y=1964.63mil|Absolute=True">NetD22A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="826981">2.1005mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6629.158mil|Location2.X=6799.56mil|Location1.Y=1837.535mil|Location2.Y=1964.63mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6629.158mil|Location2.X=6799.56mil|Location1.Y=1837.535mil|Location2.Y=1964.63mil|Absolute=True">NetD22B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1486871">3.7767mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5204.657mil|Location2.X=5267.775mil|Location1.Y=2380.843mil|Location2.Y=2515.815mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5204.657mil|Location2.X=5267.775mil|Location1.Y=2380.843mil|Location2.Y=2515.815mil|Absolute=True">NetD8_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="807810">2.0518mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5204.657mil|Location2.X=5298.291mil|Location1.Y=2223.362mil|Location2.Y=2358.334mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5204.657mil|Location2.X=5298.291mil|Location1.Y=2223.362mil|Location2.Y=2358.334mil|Absolute=True">NetD9_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="970918">2.4661mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=700.472mil|Location2.X=905.512mil|Location1.Y=3291.417mil|Location2.Y=3474.41mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=700.472mil|Location2.X=905.512mil|Location1.Y=3291.417mil|Location2.Y=3474.41mil|Absolute=True">NetF1_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=633.937mil|Location2.X=875.984mil|Location1.Y=1633.858mil|Location2.Y=1879.449mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=633.937mil|Location2.X=875.984mil|Location1.Y=1633.858mil|Location2.Y=1879.449mil|Absolute=True">NetF2_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1069.819mil|Location2.X=1260.157mil|Location1.Y=690.236mil|Location2.Y=985.299mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1069.819mil|Location2.X=1260.157mil|Location1.Y=690.236mil|Location2.Y=985.299mil|Absolute=True">NetJ1_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2976108">7.5593mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1069.819mil|Location2.X=1260.157mil|Location1.Y=590.236mil|Location2.Y=926.244mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1069.819mil|Location2.X=1260.157mil|Location1.Y=590.236mil|Location2.Y=926.244mil|Absolute=True">NetJ1_3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3302211">8.3876mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1077.693mil|Location2.X=1260.157mil|Location1.Y=490.236mil|Location2.Y=569.606mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1077.693mil|Location2.X=1260.157mil|Location1.Y=490.236mil|Location2.Y=569.606mil|Absolute=True">NetJ1_5</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1187625">3.0166mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6096.339mil|Location2.X=6418.032mil|Location1.Y=700.472mil|Location2.Y=1663.504mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6096.339mil|Location2.X=6418.032mil|Location1.Y=700.472mil|Location2.Y=1663.504mil|Absolute=True">NetJ_RELAY1_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6172.913mil|Location2.X=6423.937mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6172.913mil|Location2.X=6423.937mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True">NetJ_RELAY1_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5859.528mil|Location2.X=6118.032mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5859.528mil|Location2.X=6118.032mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True">NetJ_RELAY1_3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6765.63mil|Location2.X=7008.583mil|Location1.Y=700.472mil|Location2.Y=1663.504mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6765.63mil|Location2.X=7008.583mil|Location1.Y=700.472mil|Location2.Y=1663.504mil|Absolute=True">NetJ_RELAY2_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6763.465mil|Location2.X=7093.228mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6763.465mil|Location2.X=7093.228mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True">NetJ_RELAY2_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6528.819mil|Location2.X=6708.583mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6528.819mil|Location2.X=6708.583mil|Location1.Y=700.472mil|Location2.Y=1105.039mil|Absolute=True">NetJ_RELAY2_3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3513.717mil|Location2.X=3615.22mil|Location1.Y=1553.087mil|Location2.Y=1715.614mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3513.717mil|Location2.X=3615.22mil|Location1.Y=1553.087mil|Location2.Y=1715.614mil|Absolute=True">NetQ1A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1267414">3.2192mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3379.806mil|Location2.X=3600.457mil|Location1.Y=1371.984mil|Location2.Y=1537.755mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3379.806mil|Location2.X=3600.457mil|Location1.Y=1371.984mil|Location2.Y=1537.755mil|Absolute=True">NetQ1A_3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2522229">6.4065mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4190.882mil|Location2.X=4257.937mil|Location1.Y=1104.268mil|Location2.Y=1292.386mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4190.882mil|Location2.X=4257.937mil|Location1.Y=1104.268mil|Location2.Y=1292.386mil|Absolute=True">NetQ1B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1253090">3.1828mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4009.78mil|Location2.X=4271.077mil|Location1.Y=1104.268mil|Location2.Y=1490.511mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4009.78mil|Location2.X=4271.077mil|Location1.Y=1104.268mil|Location2.Y=1490.511mil|Absolute=True">NetQ1B_3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5136041">13.0455mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5377.89mil|Location2.X=5439.764mil|Location1.Y=1820.866mil|Location2.Y=1935.102mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5377.89mil|Location2.X=5439.764mil|Location1.Y=1820.866mil|Location2.Y=1935.102mil|Absolute=True">NetQ2A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="781930">1.9861mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5349.346mil|Location2.X=5473.488mil|Location1.Y=1392.654mil|Location2.Y=1604.331mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5349.346mil|Location2.X=5473.488mil|Location1.Y=1392.654mil|Location2.Y=1604.331mil|Absolute=True">NetQ2A_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2432743">6.1792mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5574.74mil|Location2.X=5636.618mil|Location1.Y=1820.868mil|Location2.Y=1935.102mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5574.74mil|Location2.X=5636.618mil|Location1.Y=1820.868mil|Location2.Y=1935.102mil|Absolute=True">NetQ2B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="781926">1.9861mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5605.122mil|Location2.X=5729.394mil|Location1.Y=1392.654mil|Location2.Y=1604.333mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5605.122mil|Location2.X=5729.394mil|Location1.Y=1392.654mil|Location2.Y=1604.333mil|Absolute=True">NetQ2B_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2245852">5.7045mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5270.606mil|Location2.X=5584.646mil|Location1.Y=1291.339mil|Location2.Y=1431.166mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5270.606mil|Location2.X=5584.646mil|Location1.Y=1291.339mil|Location2.Y=1431.166mil|Absolute=True">NetQ3A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3164298">8.0373mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5526.512mil|Location2.X=5781.496mil|Location1.Y=1291.339mil|Location2.Y=1431.166mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5526.512mil|Location2.X=5781.496mil|Location1.Y=1291.339mil|Location2.Y=1431.166mil|Absolute=True">NetQ3B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2544220">6.4623mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6125.921mil|Location2.X=6384.646mil|Location1.Y=2214.567mil|Location2.Y=2287.402mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6125.921mil|Location2.X=6384.646mil|Location1.Y=2214.567mil|Location2.Y=2287.402mil|Absolute=True">NetQ4A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2594428">6.5898mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6189.961mil|Location2.X=6352.467mil|Location1.Y=1827.756mil|Location2.Y=1998.031mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6189.961mil|Location2.X=6352.467mil|Location1.Y=1827.756mil|Location2.Y=1998.031mil|Absolute=True">NetQ4A_3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3073931">7.8078mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6199.74mil|Location2.X=6384.646mil|Location1.Y=1837.535mil|Location2.Y=1998.031mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6199.74mil|Location2.X=6384.646mil|Location1.Y=1837.535mil|Location2.Y=1998.031mil|Absolute=True">NetQ4A_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2016929">5.123mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6880.708mil|Location2.X=7013.842mil|Location1.Y=2212.535mil|Location2.Y=2259.905mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6880.708mil|Location2.X=7013.842mil|Location1.Y=2212.535mil|Location2.Y=2259.905mil|Absolute=True">NetQ4B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="925479">2.3507mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6780.708mil|Location2.X=6989.562mil|Location1.Y=1827.756mil|Location2.Y=1998.031mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6780.708mil|Location2.X=6989.562mil|Location1.Y=1827.756mil|Location2.Y=1998.031mil|Absolute=True">NetQ4B_3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2898586">7.3624mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6836.835mil|Location2.X=6912.204mil|Location1.Y=1837.535mil|Location2.Y=1998.031mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=6836.835mil|Location2.X=6912.204mil|Location1.Y=1837.535mil|Location2.Y=1998.031mil|Absolute=True">NetQ4B_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1391398">3.5342mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4446.787mil|Location2.X=4529.59mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4446.787mil|Location2.X=4529.59mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True">NetQ6A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="923334">2.3453mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4481.496mil|Location2.X=4527.78mil|Location1.Y=1820.866mil|Location2.Y=1975.457mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4481.496mil|Location2.X=4527.78mil|Location1.Y=1820.866mil|Location2.Y=1975.457mil|Absolute=True">NetQ6A_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1202024">3.0531mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4643.638mil|Location2.X=4726.441mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4643.638mil|Location2.X=4726.441mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True">NetQ6B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="923350">2.3453mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4660.37mil|Location2.X=4709.846mil|Location1.Y=1820.866mil|Location2.Y=2028.606mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4660.37mil|Location2.X=4709.846mil|Location1.Y=1820.866mil|Location2.Y=2028.606mil|Absolute=True">NetQ6B_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1735214">4.4074mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4840.488mil|Location2.X=4923.291mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4840.488mil|Location2.X=4923.291mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True">NetQ6C_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="923334">2.3453mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4857.22mil|Location2.X=4906.693mil|Location1.Y=1820.866mil|Location2.Y=2028.606mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4857.22mil|Location2.X=4906.693mil|Location1.Y=1820.866mil|Location2.Y=2028.606mil|Absolute=True">NetQ6C_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1735198">4.4074mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5037.339mil|Location2.X=5120.142mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5037.339mil|Location2.X=5120.142mil|Location1.Y=1462.535mil|Location2.Y=1604.331mil|Absolute=True">NetQ6D_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="923334">2.3453mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5054.071mil|Location2.X=5103.543mil|Location1.Y=1820.866mil|Location2.Y=2028.606mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5054.071mil|Location2.X=5103.543mil|Location1.Y=1820.866mil|Location2.Y=2028.606mil|Absolute=True">NetQ6D_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1735198">4.4074mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1183.672mil|Location2.X=1297.283mil|Location1.Y=3191.546mil|Location2.Y=3388.365mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1183.672mil|Location2.X=1297.283mil|Location1.Y=3191.546mil|Location2.Y=3388.365mil|Absolute=True">NetQ7_4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1974317">5.0148mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1756.448mil|Location2.X=1876.653mil|Location1.Y=1128.874mil|Location2.Y=1254.041mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1756.448mil|Location2.X=1876.653mil|Location1.Y=1128.874mil|Location2.Y=1254.041mil|Absolute=True">NetQ8_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1538780">3.9085mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1573.756mil|Location2.X=1693.961mil|Location1.Y=1128.874mil|Location2.Y=1254.041mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1573.756mil|Location2.X=1693.961mil|Location1.Y=1128.874mil|Location2.Y=1254.041mil|Absolute=True">NetQ9_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1538779">3.9085mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1650.527mil|Location2.X=2242.441mil|Location1.Y=919.134mil|Location2.Y=1548.291mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1650.527mil|Location2.X=2242.441mil|Location1.Y=919.134mil|Location2.Y=1548.291mil|Absolute=True">NetR14A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="9370677">23.8015mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1648.559mil|Location2.X=2112.52mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1648.559mil|Location2.X=2112.52mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True">NetR14A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8878139">22.5505mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2024.543mil|Location2.X=2484.567mil|Location1.Y=919.134mil|Location2.Y=1548.291mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2024.543mil|Location2.X=2484.567mil|Location1.Y=919.134mil|Location2.Y=1548.291mil|Absolute=True">NetR14B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8828205">22.4236mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2022.575mil|Location2.X=2354.646mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2022.575mil|Location2.X=2354.646mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True">NetR14B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8229259">20.9023mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2398.559mil|Location2.X=2714.882mil|Location1.Y=919.134mil|Location2.Y=1548.291mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2398.559mil|Location2.X=2714.882mil|Location1.Y=919.134mil|Location2.Y=1548.291mil|Absolute=True">NetR14C_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8232976">20.9118mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2396.59mil|Location2.X=2584.961mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2396.59mil|Location2.X=2584.961mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True">NetR14C_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7634032">19.3904mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2730.157mil|Location2.X=2957.008mil|Location1.Y=919.134mil|Location2.Y=1538.449mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2730.157mil|Location2.X=2957.008mil|Location1.Y=919.134mil|Location2.Y=1538.449mil|Absolute=True">NetR14D_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7980932">20.2716mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2743.937mil|Location2.X=2827.756mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2743.937mil|Location2.X=2827.756mil|Location1.Y=926.85mil|Location2.Y=1686.087mil|Absolute=True">NetR14D_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7602718">19.3109mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1836.551mil|Location2.X=2242.441mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1836.551mil|Location2.X=2242.441mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True">NetR16A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5329430">13.5368mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2210.567mil|Location2.X=2484.567mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2210.567mil|Location2.X=2484.567mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True">NetR16B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4783125">12.1491mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2509.528mil|Location2.X=2714.882mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2509.528mil|Location2.X=2714.882mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True">NetR16C_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4709740">11.9627mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2751.653mil|Location2.X=3029.59mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2751.653mil|Location2.X=3029.59mil|Location1.Y=1123.701mil|Location2.Y=1513.842mil|Absolute=True">NetR16D_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5337584">13.5575mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7177.102mil|Location2.X=7225.457mil|Location1.Y=2664.307mil|Location2.Y=3126.047mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7177.102mil|Location2.X=7225.457mil|Location1.Y=2664.307mil|Location2.Y=3126.047mil|Absolute=True">NetR27_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4194311">10.6535mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7329.661mil|Location2.X=7381.953mil|Location1.Y=2249.937mil|Location2.Y=2549.695mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=7329.661mil|Location2.X=7381.953mil|Location1.Y=2249.937mil|Location2.Y=2549.695mil|Absolute=True">NetR28_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2583346">6.5617mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4446.787mil|Location2.X=4529.594mil|Location1.Y=1246.007mil|Location2.Y=1411.48mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4446.787mil|Location2.X=4529.594mil|Location1.Y=1246.007mil|Location2.Y=1411.48mil|Absolute=True">NetR37A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="984199">2.4999mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4643.638mil|Location2.X=4726.445mil|Location1.Y=1246.007mil|Location2.Y=1411.48mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4643.638mil|Location2.X=4726.445mil|Location1.Y=1246.007mil|Location2.Y=1411.48mil|Absolute=True">NetR37B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="984195">2.4999mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4840.488mil|Location2.X=4923.295mil|Location1.Y=1246.008mil|Location2.Y=1411.48mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4840.488mil|Location2.X=4923.295mil|Location1.Y=1246.008mil|Location2.Y=1411.48mil|Absolute=True">NetR37C_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="984192">2.4998mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5037.339mil|Location2.X=5120.146mil|Location1.Y=1246.008mil|Location2.Y=1411.48mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=5037.339mil|Location2.X=5120.146mil|Location1.Y=1246.008mil|Location2.Y=1411.48mil|Absolute=True">NetR37D_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="984189">2.4998mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3412.632mil|Location2.X=3792.386mil|Location1.Y=2455.646mil|Location2.Y=2549.566mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3412.632mil|Location2.X=3792.386mil|Location1.Y=2455.646mil|Location2.Y=2549.566mil|Absolute=True">NetR5A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3484493">8.8506mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4389.395mil|Location2.X=4738.291mil|Location1.Y=2240.157mil|Location2.Y=2379.106mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4389.395mil|Location2.X=4738.291mil|Location1.Y=2240.157mil|Location2.Y=2379.106mil|Absolute=True">NetR5B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5443460">13.8264mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3287.978mil|Location2.X=3556.165mil|Location1.Y=1574.45mil|Location2.Y=1715.614mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3287.978mil|Location2.X=3556.165mil|Location1.Y=1574.45mil|Location2.Y=1715.614mil|Absolute=True">NetR7A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2848804">7.236mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4114.75mil|Location2.X=4254.984mil|Location1.Y=1306.04mil|Location2.Y=1565.314mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4114.75mil|Location2.X=4254.984mil|Location1.Y=1306.04mil|Location2.Y=1565.314mil|Absolute=True">NetR7B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="2715007">6.8961mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3668.244mil|Location2.X=3726.835mil|Location1.Y=1849.346mil|Location2.Y=2021.717mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3668.244mil|Location2.X=3726.835mil|Location1.Y=1849.346mil|Location2.Y=2021.717mil|Absolute=True">NetR8A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1034807">2.6284mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3178.149mil|Location2.X=3654.591mil|Location1.Y=1499.646mil|Location2.Y=1890.811mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3178.149mil|Location2.X=3654.591mil|Location1.Y=1499.646mil|Location2.Y=1890.811mil|Absolute=True">NetR8A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="9791822">24.8712mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4144.032mil|Location2.X=4205.772mil|Location1.Y=1849.346mil|Location2.Y=2021.717mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4144.032mil|Location2.X=4205.772mil|Location1.Y=1849.346mil|Location2.Y=2021.717mil|Absolute=True">NetR8B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1047852">2.6615mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4139.41mil|Location2.X=4262.795mil|Location1.Y=1613.126mil|Location2.Y=1890.811mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4139.41mil|Location2.X=4262.795mil|Location1.Y=1613.126mil|Location2.Y=1890.811mil|Absolute=True">NetR8B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3505014">8.9027mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3187.929mil|Location2.X=3626.835mil|Location1.Y=1589.504mil|Location2.Y=2021.717mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3187.929mil|Location2.X=3626.835mil|Location1.Y=1589.504mil|Location2.Y=2021.717mil|Absolute=True">NetR9A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7483077">19.007mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3187.929mil|Location2.X=3544.354mil|Location1.Y=1538.323mil|Location2.Y=1803.503mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3187.929mil|Location2.X=3544.354mil|Location1.Y=1538.323mil|Location2.Y=1803.503mil|Absolute=True">NetR9A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5354807">13.6012mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4044.032mil|Location2.X=4099.276mil|Location1.Y=1849.346mil|Location2.Y=2021.717mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4044.032mil|Location2.X=4099.276mil|Location1.Y=1849.346mil|Location2.Y=2021.717mil|Absolute=True">NetR9B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="995669">2.529mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4101.315mil|Location2.X=4253.016mil|Location1.Y=1745.948mil|Location2.Y=1890.811mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4101.315mil|Location2.X=4253.016mil|Location1.Y=1745.948mil|Location2.Y=1890.811mil|Absolute=True">NetR9B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1910793">4.8534mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3131.575mil|Location2.X=3336.929mil|Location1.Y=926.85mil|Location2.Y=1002.283mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3131.575mil|Location2.X=3336.929mil|Location1.Y=926.85mil|Location2.Y=1002.283mil|Absolute=True">NetSW1A_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1299212">3.3mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3131.575mil|Location2.X=3352.477mil|Location1.Y=1123.701mil|Location2.Y=1561.339mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3131.575mil|Location2.X=3352.477mil|Location1.Y=1123.701mil|Location2.Y=1561.339mil|Absolute=True">NetSW1A_6</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5269604">13.3848mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3375.669mil|Location2.X=3581.024mil|Location1.Y=926.85mil|Location2.Y=1002.283mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3375.669mil|Location2.X=3581.024mil|Location1.Y=926.85mil|Location2.Y=1002.283mil|Absolute=True">NetSW1B_1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="1299212">3.3mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3375.669mil|Location2.X=4179.249mil|Location1.Y=1123.701mil|Location2.Y=1502.284mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3375.669mil|Location2.X=4179.249mil|Location1.Y=1123.701mil|Location2.Y=1502.284mil|Absolute=True">NetSW1B_6</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="10473209">26.602mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3320.804mil|Location2.X=3726.835mil|Location1.Y=2279.071mil|Location2.Y=2549.566mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=3320.804mil|Location2.X=3726.835mil|Location1.Y=2279.071mil|Location2.Y=2549.566mil|Absolute=True">NetU2A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="4486348">11.3953mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4144.032mil|Location2.X=4724.511mil|Location1.Y=2267.469mil|Location2.Y=2405.512mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4144.032mil|Location2.X=4724.511mil|Location1.Y=2267.469mil|Location2.Y=2405.512mil|Absolute=True">NetU2B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="6932789">17.6093mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1666.866mil|Location2.X=1862.92mil|Location1.Y=1660.664mil|Location2.Y=2021.717mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1666.866mil|Location2.X=1862.92mil|Location1.Y=1660.664mil|Location2.Y=2021.717mil|Absolute=True">NetU7A_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3889362">9.879mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2135.473mil|Location2.X=2234.606mil|Location1.Y=1660.664mil|Location2.Y=2021.716mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2135.473mil|Location2.X=2234.606mil|Location1.Y=1660.664mil|Location2.Y=2021.716mil|Absolute=True">NetU7B_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3391606">8.6147mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2509.489mil|Location2.X=2666.992mil|Location1.Y=1654.12mil|Location2.Y=2021.716mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2509.489mil|Location2.X=2666.992mil|Location1.Y=1654.12mil|Location2.Y=2021.716mil|Absolute=True">NetU7C_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3404861">8.6483mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2883.505mil|Location2.X=3139.433mil|Location1.Y=1654.12mil|Location2.Y=2021.716mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=2883.505mil|Location2.X=3139.433mil|Location1.Y=1654.12mil|Location2.Y=2021.716mil|Absolute=True">NetU7D_2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="3812551">9.6839mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1121.966mil|Location2.X=4786.249mil|Location1.Y=2220.41mil|Location2.Y=3098.819mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1121.966mil|Location2.X=4786.249mil|Location1.Y=2220.41mil|Location2.Y=3098.819mil|Absolute=True">PA10</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="46464401">118.0196mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=4895.732mil|Location1.Y=2837.205mil|Location2.Y=3352.362mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=4895.732mil|Location1.Y=2837.205mil|Location2.Y=3352.362mil|Absolute=True">PA11</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="7340719">18.6454mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=4820.929mil|Location1.Y=2856.89mil|Location2.Y=3342.583mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=4820.929mil|Location1.Y=2856.89mil|Location2.Y=3342.583mil|Absolute=True">PA12</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="5983711">15.1986mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4234.331mil|Location2.X=4734.27mil|Location1.Y=2896.26mil|Location2.Y=3424.685mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4234.331mil|Location2.X=4734.27mil|Location1.Y=2896.26mil|Location2.Y=3424.685mil|Absolute=True">PA13</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="9470182">24.0543mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4334.331mil|Location2.X=4734.322mil|Location1.Y=2911.614mil|Location2.Y=3424.685mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4334.331mil|Location2.X=4734.322mil|Location1.Y=2911.614mil|Location2.Y=3424.685mil|Absolute=True">PA14</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8395074">21.3235mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=820.551mil|Location2.X=4813.808mil|Location1.Y=2220.41mil|Location2.Y=3126.378mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=820.551mil|Location2.X=4813.808mil|Location1.Y=2220.41mil|Location2.Y=3126.378mil|Absolute=True">PA8</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="50921473">129.3405mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1068.582mil|Location2.X=4800.028mil|Location1.Y=2220.41mil|Location2.Y=3112.599mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1068.582mil|Location2.X=4800.028mil|Location1.Y=2220.41mil|Location2.Y=3112.599mil|Absolute=True">PA9</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="47766822">121.3277mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4549.803mil|Location2.X=6118.173mil|Location1.Y=2082.677mil|Location2.Y=2678.937mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4549.803mil|Location2.X=6118.173mil|Location1.Y=2082.677mil|Location2.Y=2678.937mil|Absolute=True">PB1</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="18520005">47.0408mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True">PB10</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True">PB15</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4569.488mil|Location2.X=7013.842mil|Location1.Y=2096.457mil|Location2.Y=2678.937mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4569.488mil|Location2.X=7013.842mil|Location1.Y=2096.457mil|Location2.Y=2678.937mil|Absolute=True">PB2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="27941778">70.9721mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4429.371mil|Location2.X=5292.59mil|Location1.Y=2780.512mil|Location2.Y=3424.685mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4429.371mil|Location2.X=5292.59mil|Location1.Y=2780.512mil|Location2.Y=3424.685mil|Absolute=True">PB3</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="20736983">52.6719mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True">PB4</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True">PB5</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True">PB6</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4169.577mil|Location2.X=7392.397mil|Location1.Y=1292.267mil|Location2.Y=3253.54mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4169.577mil|Location2.X=7392.397mil|Location1.Y=1292.267mil|Location2.Y=3253.54mil|Absolute=True">PB8_BOOT0</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="54577832">138.6277mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=5249.079mil|Location1.Y=2223.362mil|Location2.Y=2773.031mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4683.268mil|Location2.X=5249.079mil|Location1.Y=2223.362mil|Location2.Y=2773.031mil|Absolute=True">PC6</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="8175972">20.767mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=998.882mil|Location2.X=1615.22mil|Location1.Y=1077.693mil|Location2.Y=2080.709mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=998.882mil|Location2.X=1615.22mil|Location1.Y=1077.693mil|Location2.Y=2080.709mil|Absolute=True">RX</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="15779207">40.0792mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1341.142mil|Location2.X=1691.378mil|Location1.Y=490.63mil|Location2.Y=2069.882mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1341.142mil|Location2.X=1691.378mil|Location1.Y=490.63mil|Location2.Y=2069.882mil|Absolute=True">SCL2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="17900971">45.4685mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1391.142mil|Location2.X=1791.378mil|Location1.Y=490.63mil|Location2.Y=2069.882mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=1391.142mil|Location2.X=1791.378mil|Location1.Y=490.63mil|Location2.Y=2069.882mil|Absolute=True">SDA2</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="18311685">46.5117mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=989.102mil|Location2.X=1797.913mil|Location1.Y=1067.913mil|Location2.Y=2070.929mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=989.102mil|Location2.X=1797.913mil|Location1.Y=1067.913mil|Location2.Y=2070.929mil|Absolute=True">TX</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="19131079">48.5929mm
+			</a></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mil|Location2.X=0mil|Location1.Y=0mil|Location2.Y=0mil|Absolute=True">VBAT</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4589.173mil|Location2.X=4903.465mil|Location1.Y=2406.575mil|Location2.Y=2680.319mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=4589.173mil|Location2.X=4903.465mil|Location1.Y=2406.575mil|Location2.Y=2680.319mil|Absolute=True">VREF+</acronym></a></td>
+<td class="column2">Signal Layers Only</td>
+<td class="column3"><a name="coordinate" value="0">0mm
+			</a></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br></body>
+</html>
