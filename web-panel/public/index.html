@@ -14,816 +14,927 @@
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Font Awesome -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./css/custom.css">
 </head>
-<body class="bg-light py-4">
+<body class="d-flex flex-column min-vh-100">
   
   <!-- MODALS -->
   <!-- Delete Confirmation Modal -->
   <div class="modal fade" id="confirmDeleteRuleModal" tabindex="-1" aria-labelledby="confirmDeleteRuleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmDeleteRuleModalLabel">Confirm Delete</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDeleteRuleModalLabel">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          Are you sure you want to delete this rule? This action is irreversible.
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteRuleButton">Delete</button>
+        </div>
+
       </div>
-
-      <div class="modal-body">
-        Are you sure you want to delete this rule? This action is irreversible.
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteRuleButton">Delete</button>
-      </div>
-
     </div>
-  </div>
   </div>
 
   <!-- Factory Reset Confirmation Modal -->
   <div class="modal fade" id="factoryResetModal" tabindex="-1" aria-labelledby="factoryResetModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title" id="factoryResetModalLabel">Confirm Factory Reset</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-header">
+          <h5 class="modal-title" id="factoryResetModalLabel">Confirm Factory Reset</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          Are you sure you want to perform a factory reset? This action is irreversible.
+          <br><br>
+          Note: A factory reset will clear all automation rules, virtual registers, analogue IO mode configurations, emergency stop button configuration, and possibly more depending on the firmware revision!
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmFactoryResetButton">RESET</button>
+        </div>
+
       </div>
-
-      <div class="modal-body">
-        Are you sure you want to perform a factory reset? This action is irreversible.
-        <br><br>
-        Note: A factory reset will clear all automation rules, virtual registers, analogue IO mode configurations, emergency stop button configuration, and possibly more depending on the firmware revision!
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirmFactoryResetButton">RESET</button>
-      </div>
-
     </div>
   </div>
-  </div>
-  <div class="container">
-    <h1 class="mb-4">Embedded Controller Control Panel</h1>
 
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs" id="mainTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-connection" type="button" role="tab">Serial Connection</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-manual" type="button" role="tab">Manual Control</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-graphing" type="button" role="tab">Graphing</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-rules" type="button" role="tab">Rules Manager</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-virtual" type="button" role="tab">Virtual Registers</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-hardware" type="button" role="tab">Hardware Configuration</button>
-      </li>
-    </ul>
+  <nav class="navbar navbar-dark navbar-custom mb-4">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="fas fa-microchip fa-lg me-3 text-info"></i>
+        <div class="d-flex flex-column">
+            <span class="brand-text">CONTROLLER PANEL</span>
+            <span style="font-size: 0.7rem; color: #aab8c5; text-transform: uppercase; letter-spacing: 0.1em;">By DarcyJProjects</span>
+        </div>
+      </a>
+      <div class="d-flex text-white-50 align-items-center d-none d-md-flex">
+          <div class="me-4 text-end">
+              <div style="font-size: 0.7rem; text-transform: uppercase;">Firmware</div>
+              <div class="text-white small fw-bold">v1.162</div>
+          </div>
+          <div class="text-end border-start ps-4 border-secondary">
+              <div style="font-size: 0.7rem; text-transform: uppercase;">MCU</div>
+              <div class="text-white small fw-bold">STM32G431CBU6</div>
+          </div>
+      </div>
+    </div>
+  </nav>
 
-    <div class="tab-content mt-3" id="mainTabContent">
+  <div class="container flex-grow-1">
+    
+    <div class="card mb-4">
+      <div class="card-header pb-0 border-bottom-0 bg-white pt-3">
+        <ul class="nav nav-tabs card-header-tabs" id="mainTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-connection" type="button" role="tab"><i class="fas fa-plug fa-fw me-1"></i> Connection</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-manual" type="button" role="tab"><i class="fas fa-sliders-h fa-fw me-1"></i> Control</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-graphing" type="button" role="tab"><i class="fas fa-chart-line fa-fw me-1"></i> Graphing</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-rules" type="button" role="tab"><i class="fas fa-gavel fa-fw me-1"></i> Rules</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-virtual" type="button" role="tab"><i class="fas fa-memory fa-fw me-1"></i> Registers</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-hardware" type="button" role="tab"><i class="fas fa-wrench fa-fw me-1"></i> Config</button>
+          </li>
+        </ul>
+      </div>
+
       <!-- Serial connection panel -->
-      <div class="tab-pane fade show active" id="tab-connection" role="tabpanel">
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Serial Connection</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#serialConnectionBody">Toggle</a>
-          </div>
-          <div class="card-body">
-            <div id="serialConnectionBody" class="collapse show">
-              <div class="mb-3">
-                <label for="portSelect" class="form-label">Select COM Port</label>
-                <div class="d-flex">
-                  <select id="portSelect" class="form-select me-2">
-                    <option>Loading...</option>
-                  </select>
-                  <button id="refreshPortsBtn" class="btn btn-outline-secondary" title="Refresh ports">
-                    <i class="fas fa-sync-alt"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="baudSelect" class="form-label">Select Baud Rate</label>
-                <select id="baudSelect" class="form-select">
-                  <option>9600</option> <!-- hardcoded only option for now -->
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="slaveAddress" class="form-label">Slave Address</label>
-                <input type="number" class="form-control" id="slaveAddress" placeholder="Enter slave address (e.g., 1)" min="0" />
-              </div>
-            </div>
-            <button id="connectBtn" class="btn btn-success">Connect</button>
-            &nbsp;&nbsp;<div id="connectionStatus" class="mt-2 text-muted d-inline-block"></div>
-          </div>
-        </div>
-
-        <!-- Status panel -->
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Status</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#statusBody">Toggle</a>
-          </div>
-          <div class="card-body">
-            <div id="statusBody" class="collapse show">
-              <div class="mb-3">
-                <a id="statusVoltage">Please initiate a serial connection to view device status.</a><br>
-                <a id="statusCurrent"></a>
-              </div>
-              <div id="statusStatus" class="mt-3"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Functions control panel -->
-      <div class="tab-pane fade" id="tab-manual" role="tabpanel">
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Manual Control</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#functionsBody">Toggle</a>
-          </div>
-          <div class="card-body">
-            <div id="functionsBody" class="collapse show">
-              <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="coils-tab" data-bs-toggle="tab"
-                    data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
-                    aria-selected="true">Coils</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="discrete-tab" data-bs-toggle="tab"
-                    data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
-                    aria-selected="true">Discrete Inputs</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="holding-tab" data-bs-toggle="tab"
-                    data-bs-target="#holding" type="button" role="tab" aria-controls="holding"
-                    aria-selected="true">Holding Registers</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="input-tab" data-bs-toggle="tab"
-                    data-bs-target="#input" type="button" role="tab" aria-controls="input"
-                    aria-selected="true">Input Registers</button>
-                </li>
-              </ul>
-              <div class="tab-content mt-3" id="myTabContent">
-                <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
-                  <div class="card">
-                    <div class="card-body">
-                      <h6>Read Coils (0x01)</h6>
+      <div class="card-body bg-white border-top">
+        <div class="tab-content" id="mainTabContent">
+          <div class="tab-pane fade show active" id="tab-connection" role="tabpanel">
+            <div class="row">
+              <div class="col-lg-8">
+                <div class="card mb-4 h-100">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-network-wired me-2 text-primary"></i>Serial Connection</span>
+                    <a class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="collapse" href="#serialConnectionBody"><i class="fas fa-chevron-down"></i></a>
+                  </div>
+                  <div class="card-body">
+                    <div id="serialConnectionBody" class="collapse show">
                       <div class="mb-3">
-                        <label for="coilAddressR" class="form-label">Coil Address</label>
-                        <input type="number" class="form-control" id="coilAddressR" placeholder="Enter coil address (e.g., 0)" min="0" />
+                        <label for="portSelect" class="form-label text-muted small text-uppercase fw-bold">Select COM Port</label>
+                        <div class="d-flex">
+                          <select id="portSelect" class="form-select me-2">
+                            <option>Loading...</option>
+                          </select>
+                          <button id="refreshPortsBtn" class="btn btn-outline-secondary" title="Refresh ports">
+                            <i class="fas fa-sync-alt"></i>
+                          </button>
+                        </div>
                       </div>
-                      <div class="mb-3">
-                        <label for="coilQuantityR" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="coilQuantityR" placeholder="Enter quantity of coils to read (e.g., 1)" min="1" />
+                      <div class="row">
+                          <div class="col-md-6 mb-3">
+                            <label for="baudSelect" class="form-label text-muted small text-uppercase fw-bold">Baud Rate</label>
+                            <select id="baudSelect" class="form-select">
+                              <option>9600</option> </select> <!-- hardcoded only option for now -->
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="slaveAddress" class="form-label text-muted small text-uppercase fw-bold">Slave Address</label>
+                            <input type="number" class="form-control" id="slaveAddress" placeholder="Enter slave address (e.g., 1)" min="0" />
+                          </div>
                       </div>
-
-                      <button id="coilSendR" class="btn btn-primary">Read</button>
-
-                      <div id="coilStatusR" class="mt-3"></div>
-
-                      <table id="coilResultTableR" class="table table-bordered">
-                        <thead class="table-light">
-                          <tr id="coilResultTableR_heading"></tr>
-                        </thead>
-                        <tbody>
-                          <tr id="coilResultTableR_value"></tr>
-                        </tbody>
-                      </table>
                     </div>
-
-                    <div class="card-body">
-                      <h6>Write Single Coil (0x05)</h6>
-                      <div class="mb-3">
-                        <label for="coilAddressW" class="form-label">Coil Address</label>
-                        <input type="number" class="form-control" id="coilAddressW" placeholder="Enter coil address (e.g., 0)" min="0" />
-                      </div>
-
-                      <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="coilToggleW" disabled/>
-                        <label class="form-check-label" for="coilToggleW">Coil OFF/ON (0/1)</label>
-                      </div>
-
-                      <button id="coilSendW" class="btn btn-primary">Write</button>
-
-                      <div id="coilStatusW" class="mt-3"></div>
-                    </div>
-
-                    <div class="card-body">
-                      <h6>Write Multiple Coils (0x0f)</h6>
-                      <div class="mb-3">
-                        <label for="coilAddressWM" class="form-label">Coil Address</label>
-                        <input type="number" class="form-control" id="coilAddressWM" placeholder="Enter coil address (e.g., 0)" min="0" />
-                      </div>
-                      <div class="mb-3">
-                        <label for="coilQuantityWM" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="coilQuantityWM" placeholder="Enter quantity of coils to write to (e.g., 2)" min="1" />
-                      </div>
-                      <div id="coilWriteMultipleToggleDiv">
-                        <!--<div class="form-check form-switch mb-3">
-                          <input class="form-check-input" type="checkbox" id="coilToggleWM" disabled/>
-                          <label class="form-check-label" for="coilToggleWM">Coil OFF/ON (0/1)</label>
-                        </div>-->
-                      </div>
-                      <button id="coilSendWM" class="btn btn-primary">Write</button>
-
-                      <div id="coilStatusWM" class="mt-3"></div>
+                    <hr class="text-muted">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <button id="connectBtn" class="btn btn-success"><i class="fas fa-link me-2"></i>Connect</button>
+                        <div id="connectionStatus" class="text-muted small"></div>
                     </div>
                   </div>
                 </div>
-                <div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
-                  <div class="card">
-                    <div class="card-body">
-                      <h6>Read Discrete Inputs (0x02)</h6>
-                      <div class="mb-3">
-                        <label for="discreteAddressR" class="form-label">Input Address</label>
-                        <input type="number" class="form-control" id="discreteAddressR" placeholder="Enter discrete input address (e.g., 0)" min="0" />
-                      </div>
-                      <div class="mb-3">
-                        <label for="discreteQuantityR" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="discreteQuantityR" placeholder="Enter quantity of discrete inputs to read (e.g., 1)" min="1" />
-                      </div>
+              </div>
 
-                      <button id="discreteSendR" class="btn btn-primary">Read</button>
-
-                      <div id="discreteStatusR" class="mt-3"></div>
-
-                      <table id="discreteResultTableR" class="table table-bordered">
-                        <thead class="table-light">
-                          <tr id="discreteResultTableR_heading"></tr>
-                        </thead>
-                        <tbody>
-                          <tr id="discreteResultTableR_value"></tr>
-                        </tbody>
-                      </table>
-                    </div>
+              <!-- Status panel -->
+              <div class="col-lg-4">
+                <div class="card mb-4 h-100">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-info-circle me-2 text-info"></i>Device Status</span>
+                    <a class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="collapse" href="#statusBody"><i class="fas fa-chevron-down"></i></a>
                   </div>
-                </div>
-                <div class="tab-pane fade show" id="holding" role="tabpanel" aria-labelledby="holding-tab">
-                  <div class="card">
-                    <div class="card-body">
-                      <h6>Read Holding Registers (0x03)</h6>
-                      <div class="mb-3">
-                        <label for="holdingAddressR" class="form-label">Register Address</label>
-                        <input type="number" class="form-control" id="holdingAddressR" placeholder="Enter holding register address (e.g., 0)" min="0" />
+                  <div class="card-body">
+                    <div id="statusBody" class="collapse show">
+                      <div class="alert alert-light border mb-3">
+                        <div id="statusVoltage" class="fw-bold text-dark">Not Connected</div>
+                        <div id="statusCurrent" class="small text-muted"></div>
                       </div>
-                      <div class="mb-3">
-                        <label for="holdingQuantityR" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="holdingQuantityR" placeholder="Enter quantity of holding registers to read (e.g., 1)" min="1" />
-                      </div>
-
-                      <button id="holdingSendR" class="btn btn-primary">Read</button>
-
-                      <div id="holdingStatusR" class="mt-3"></div>
-
-                      <table id="holdingResultTableR" class="table table-bordered">
-                        <thead class="table-light">
-                          <tr id="holdingResultTableR_heading"></tr>
-                        </thead>
-                        <tbody>
-                          <tr id="holdingResultTableR_value"></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="card-body">
-                      <h6>Write Single Register (0x06)</h6>
-                      <div class="mb-3">
-                        <label for="holdingAddressW" class="form-label">Register Address</label>
-                        <input type="number" class="form-control" id="holdingAddressW" placeholder="Enter holding register address (e.g., 0)" min="0" />
-                      </div>
-                      <div class="mb-3">
-                        <label for="holdingValueW" class="form-label">Value</label>
-                        <input type="number" class="form-control" id="holdingValueW" placeholder="Enter value to write (0-65535)" min="0" />
-                      </div>
-
-                      <button id="holdingSendW" class="btn btn-primary">Write</button>
-
-                      <div id="holdingStatusW" class="mt-3"></div>
-                    </div>
-
-                    <div class="card-body">
-                      <h6>Write Multiple Registers (0x10)</h6>
-                      <div class="mb-3">
-                        <label for="holdingAddressWM" class="form-label">Register Address</label>
-                        <input type="number" class="form-control" id="holdingAddressWM" placeholder="Enter holding register address (e.g., 0)" min="0" />
-                      </div>
-                      <div class="mb-3">
-                        <label for="holdingQuantityWM" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="holdingQuantityWM" placeholder="Enter quantity of holding registers to write to (e.g., 2)" min="1" />
-                      </div>
-                      <div id="holdingWriteMultipleToggleDiv">
-                      </div>
-                      <button id="holdingSendWM" class="btn btn-primary">Write</button>
-
-                      <div id="holdingStatusWM" class="mt-3"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="tab-pane fade show" id="input" role="tabpanel" aria-labelledby="input-tab">
-                  <div class="card">
-                    <div class="card-body">
-                      <h6>Read Input Registers (0x04)</h6>
-                      <div class="mb-3">
-                        <label for="inputAddressR" class="form-label">Input Address</label>
-                        <input type="number" class="form-control" id="inputAddressR" placeholder="Enter input register address (e.g., 0)" min="0" />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputQuantityR" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="inputQuantityR" placeholder="Enter quantity of inputs registers to read (e.g., 1)" min="1" />
-                      </div>
-
-                      <button id="inputSendR" class="btn btn-primary">Read</button>
-
-                      <div id="inputStatusR" class="mt-3"></div>
-
-                      <table id="inputResultTableR" class="table table-bordered">
-                        <thead class="table-light">
-                          <tr id="inputResultTableR_heading"></tr>
-                        </thead>
-                        <tbody>
-                          <tr id="inputResultTableR_value"></tr>
-                        </tbody>
-                      </table>
+                      <div id="statusStatus" class="mt-3"></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="tab-pane fade" id="tab-graphing" role="tabpanel">
-        <!-- Graphing panel -->
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Graphing</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#graphingBody">Toggle</a>
-          </div>
-          <div class="card-body">
-            <div id="graphingBody" class="collapse show">
-              <div>
-                <!-- Register select, graph address, graph quantity not active yet -->
-                <div class="mb-3">
-                  <label for="registerSelect" class="form-label">Select Register Type:</label>
-                  <select id="registerSelect" class="form-select">
-                    <option>Coil</option>
-                    <option>Discrete Input</option>
-                    <option>Holding Register</option>
-                    <option>Input Register</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="graphAddress" class="form-label">Address:</label>
-                  <input type="number" class="form-control" id="graphAddress" placeholder="Enter register address (e.g., 0)" min="0" />
-                </div>
-                <!--<div class="mb-3">
-                  <label for="graphQuantity" class="form-label">Quantity:</label>
-                  <input type="number" class="form-control" id="graphQuantity" placeholder="Enter quantity of registers to read (e.g., 1)" min="1" />
-                </div>-->
 
-                <button id="addGraphingItem" class="btn btn-primary">Add</button>&nbsp;&nbsp;
-                <button id="removeGraphingItem" class="btn btn-danger">Remove</button>
-                <div id="addGraphingItemStatus" class="mt-3"></div>
-                <div id="removeGraphingItemStatus" class="mt-3"></div>
-
-                <br>
-                <div id="graphStatus" class="mt-3"></div>
-
-
-                <div class="card-body">
-                  <canvas id="registerChart" height="100"></canvas>
-                </div>
-
-                <div class="mb-3">
-                  Polling Interval: 
-                  <input type="number" id="intervalInput" class="form-control d-inline-block" style="width: 80px;" value="5"> s&nbsp;&nbsp;
-                  <button id="chartStartStop" class="btn btn-success">Start</button>&nbsp;&nbsp;
-                  <button id="chartResetZoom" class="btn btn-secondary">Reset Zoom</button>&nbsp;&nbsp;
-                  <button id="chartExport" class="btn btn-secondary">Export to CSV</button>
-                </div>
-                
-              </div> 
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade" id="tab-rules" role="tabpanel">
-        <!-- Rules Manager -->
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Rules Manager</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#rulesBody">Toggle</a>
-          </div>
-          <div id="rulesBody" class="collapse show">
-            <div class="card m-3">
+          <!-- Functions control panel -->
+          <div class="tab-pane fade" id="tab-manual" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-gamepad me-2 text-primary"></i>Manual Control</span>
+                <a class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="collapse" href="#functionsBody"><i class="fas fa-chevron-down"></i></a>
+              </div>
               <div class="card-body">
-                <div class="mb-3">
-                  <h6>Statistics</h6>
-                  <span id="ruleCount">Unknown Rules</span>
+                <div id="functionsBody" class="collapse show">
+                  <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link active btn-sm" id="coils-tab" data-bs-toggle="tab"
+                        data-bs-target="#coils" type="button" role="tab" aria-controls="coils"
+                        aria-selected="true">Coils</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link btn-sm" id="discrete-tab" data-bs-toggle="tab"
+                        data-bs-target="#discrete" type="button" role="tab" aria-controls="discrete"
+                        aria-selected="true">Discrete Inputs</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link btn-sm" id="holding-tab" data-bs-toggle="tab"
+                        data-bs-target="#holding" type="button" role="tab" aria-controls="holding"
+                        aria-selected="true">Holding Registers</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link btn-sm" id="input-tab" data-bs-toggle="tab"
+                        data-bs-target="#input" type="button" role="tab" aria-controls="input"
+                        aria-selected="true">Input Registers</button>
+                    </li>
+                  </ul>
+                  <div class="tab-content mt-3" id="myTabContent">
+                    <div class="tab-pane fade show active" id="coils" role="tabpanel" aria-labelledby="coils-tab">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6>Read Coils (0x01)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                            <div class="col-md-5">
+                                <label for="coilAddressR" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="coilAddressR" placeholder="0" min="0" />
+                            </div>
+                            <div class="col-md-5">
+                                <label for="coilQuantityR" class="form-label small">Quantity</label>
+                                <input type="number" class="form-control form-control-sm" id="coilQuantityR" placeholder="1" min="1" />
+                            </div>
+                            <div class="col-md-2">
+                                <button id="coilSendR" class="btn btn-primary btn-sm w-100">Read</button>
+                            </div>
+                          </div>
+                          
+
+                          <div id="coilStatusR" class="mt-3"></div>
+
+                          <table id="coilResultTableR" class="table table-bordered mt-3">
+                            <thead class="table-light">
+                              <tr id="coilResultTableR_heading"></tr>
+                            </thead>
+                            <tbody>
+                              <tr id="coilResultTableR_value"></tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div class="card-body border-top">
+                          <h6>Write Single Coil (0x05)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                              <div class="col-md-5">
+                                <label for="coilAddressW" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="coilAddressW" placeholder="0" min="0" />
+                              </div>
+                              <div class="col-md-5">
+                                <div class="form-check form-switch pt-4">
+                                    <input class="form-check-input" type="checkbox" id="coilToggleW" disabled/>
+                                    <label class="form-check-label small" for="coilToggleW">Coil State (0/1)</label>
+                                  </div>
+                              </div>
+                              <div class="col-md-2">
+                                  <button id="coilSendW" class="btn btn-primary btn-sm w-100">Write</button>
+                              </div>
+                          </div>
+
+                          <div id="coilStatusW" class="mt-3"></div>
+                        </div>
+
+                        <div class="card-body border-top">
+                          <h6>Write Multiple Coils (0x0f)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                              <div class="col-md-5">
+                                <label for="coilAddressWM" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="coilAddressWM" placeholder="0" min="0" />
+                              </div>
+                              <div class="col-md-5">
+                                <label for="coilQuantityWM" class="form-label small">Quantity</label>
+                                <input type="number" class="form-control form-control-sm" id="coilQuantityWM" placeholder="2" min="1" />
+                              </div>
+                              <div class="col-md-2">
+                                <button id="coilSendWM" class="btn btn-primary btn-sm w-100">Write</button>
+                              </div>
+                          </div>
+                          
+                          <div id="coilWriteMultipleToggleDiv">
+                            </div>
+
+                          <div id="coilStatusWM" class="mt-3"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="tab-pane fade show" id="discrete" role="tabpanel" aria-labelledby="discrete-tab">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6>Read Discrete Inputs (0x02)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                              <div class="col-md-5">
+                                <label for="discreteAddressR" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="discreteAddressR" placeholder="0" min="0" />
+                              </div>
+                              <div class="col-md-5">
+                                <label for="discreteQuantityR" class="form-label small">Quantity</label>
+                                <input type="number" class="form-control form-control-sm" id="discreteQuantityR" placeholder="1" min="1" />
+                              </div>
+                              <div class="col-md-2">
+                                <button id="discreteSendR" class="btn btn-primary btn-sm w-100">Read</button>
+                              </div>
+                          </div>
+
+                          <div id="discreteStatusR" class="mt-3"></div>
+
+                          <table id="discreteResultTableR" class="table table-bordered mt-3">
+                            <thead class="table-light">
+                              <tr id="discreteResultTableR_heading"></tr>
+                            </thead>
+                            <tbody>
+                              <tr id="discreteResultTableR_value"></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="tab-pane fade show" id="holding" role="tabpanel" aria-labelledby="holding-tab">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6>Read Holding Registers (0x03)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                              <div class="col-md-5">
+                                <label for="holdingAddressR" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="holdingAddressR" placeholder="0" min="0" />
+                              </div>
+                              <div class="col-md-5">
+                                <label for="holdingQuantityR" class="form-label small">Quantity</label>
+                                <input type="number" class="form-control form-control-sm" id="holdingQuantityR" placeholder="1" min="1" />
+                              </div>
+                              <div class="col-md-2">
+                                <button id="holdingSendR" class="btn btn-primary btn-sm w-100">Read</button>
+                              </div>
+                          </div>
+
+                          <div id="holdingStatusR" class="mt-3"></div>
+
+                          <table id="holdingResultTableR" class="table table-bordered mt-3">
+                            <thead class="table-light">
+                              <tr id="holdingResultTableR_heading"></tr>
+                            </thead>
+                            <tbody>
+                              <tr id="holdingResultTableR_value"></tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div class="card-body border-top">
+                          <h6>Write Single Register (0x06)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                              <div class="col-md-5">
+                                <label for="holdingAddressW" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="holdingAddressW" placeholder="0" min="0" />
+                              </div>
+                              <div class="col-md-5">
+                                <label for="holdingValueW" class="form-label small">Value</label>
+                                <input type="number" class="form-control form-control-sm" id="holdingValueW" placeholder="0-65535" min="0" />
+                              </div>
+                              <div class="col-md-2">
+                                <button id="holdingSendW" class="btn btn-primary btn-sm w-100">Write</button>
+                              </div>
+                          </div>
+
+                          <div id="holdingStatusW" class="mt-3"></div>
+                        </div>
+
+                        <div class="card-body border-top">
+                          <h6>Write Multiple Registers (0x10)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                              <div class="col-md-5">
+                                <label for="holdingAddressWM" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="holdingAddressWM" placeholder="0" min="0" />
+                              </div>
+                              <div class="col-md-5">
+                                <label for="holdingQuantityWM" class="form-label small">Quantity</label>
+                                <input type="number" class="form-control form-control-sm" id="holdingQuantityWM" placeholder="2" min="1" />
+                              </div>
+                              <div class="col-md-2">
+                                <button id="holdingSendWM" class="btn btn-primary btn-sm w-100">Write</button>
+                              </div>
+                          </div>
+                          
+                          <div id="holdingWriteMultipleToggleDiv">
+                          </div>
+
+                          <div id="holdingStatusWM" class="mt-3"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="tab-pane fade show" id="input" role="tabpanel" aria-labelledby="input-tab">
+                      <div class="card">
+                        <div class="card-body">
+                          <h6>Read Input Registers (0x04)</h6>
+                          <div class="row g-2 align-items-end mb-3">
+                              <div class="col-md-5">
+                                <label for="inputAddressR" class="form-label small">Address</label>
+                                <input type="number" class="form-control form-control-sm" id="inputAddressR" placeholder="0" min="0" />
+                              </div>
+                              <div class="col-md-5">
+                                <label for="inputQuantityR" class="form-label small">Quantity</label>
+                                <input type="number" class="form-control form-control-sm" id="inputQuantityR" placeholder="1" min="1" />
+                              </div>
+                              <div class="col-md-2">
+                                <button id="inputSendR" class="btn btn-primary btn-sm w-100">Read</button>
+                              </div>
+                          </div>
+
+                          <div id="inputStatusR" class="mt-3"></div>
+
+                          <table id="inputResultTableR" class="table table-bordered mt-3">
+                            <thead class="table-light">
+                              <tr id="inputResultTableR_heading"></tr>
+                            </thead>
+                            <tbody>
+                              <tr id="inputResultTableR_value"></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="card m-3">
+          </div>
+          <!-- Graphing panel -->
+          <div class="tab-pane fade" id="tab-graphing" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-chart-area me-2 text-primary"></i>Graphing</span>
+                <a class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="collapse" href="#graphingBody"><i class="fas fa-chevron-down"></i></a>
+              </div>
               <div class="card-body">
-                <div id="rulesDesignerBody" class="collapse show">
-                  <div class="mb-3">
-                    <h6>Rule Designer</h6>
-                  </div>
-                  <button id="ruleNew" class="btn btn-primary d-inline-block">New Rule</button>
-
-                  <!-- New Rule If 1 -->
-                  <div id="ruleNewIf1" class="mb-3 d-none">
-                    <span class="me-2">If</span>
-
-                    <div class="d-inline-block me-2" style="width: 150px;">
-                      <select id="inputType1" class="form-select form-select-sm">
-                        <option>Select</option>
-                        <option>Coil</option>
-                        <option>Discrete Input</option>
-                        <option>Holding Register</option>
-                        <option>Input Register</option>
-                        <option>Virtual Coil</option>
-                        <option>Virtual Holding Register</option>
-                      </select>
-                    </div>
-
-                    <div class="d-inline-block me-2" style="width: 100px;">
-                      <input type="number" class="form-control form-control-sm" id="inputRegister1" placeholder="address" min="0" />
-                    </div>
-
-                    <div class="d-inline-block me-2" style="width: 85px;">
-                      <select id="op1" class="form-select form-select-sm">
-                        <option>Select</option>
-                        <option>==</option>
-                        <option>!=</option>
-                        <option>></option>
-                        <option><</option>
-                        <option>>=</option>
-                        <option><=</option>
-                      </select>
-                    </div>
-
-                    <div class="d-inline-block me-2" style="width: 100px;">
-                      <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
+                <div id="graphingBody" class="collapse show">
+                  <div>
+                    <div class="row g-3 align-items-end mb-3 bg-light p-3 rounded">
+                        <div class="col-md-4">
+                            <label for="registerSelect" class="form-label small text-muted text-uppercase fw-bold">Register Type</label>
+                            <select id="registerSelect" class="form-select">
+                                <option>Coil</option>
+                                <option>Discrete Input</option>
+                                <option>Holding Register</option>
+                                <option>Input Register</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="graphAddress" class="form-label small text-muted text-uppercase fw-bold">Address</label>
+                            <input type="number" class="form-control" id="graphAddress" placeholder="Address (e.g., 0)" min="0" />
+                        </div>
+                        <div class="col-md-4">
+                            <button id="addGraphingItem" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add</button>
+                            <button id="removeGraphingItem" class="btn btn-danger"><i class="fas fa-trash me-1"></i> Remove</button>
+                        </div>
                     </div>
                     
-                    <!-- join -->
-                    <div id="ruleJoinDiv" class="d-inline-block me-2 d-none" style="width: 80px;">
-                      <select id="ruleJoin" class="form-select form-select-sm">
-                        <option>And</option>
-                        <option>Or</option>
-                      </select>
+                    <div id="addGraphingItemStatus" class="mt-3"></div>
+                    <div id="removeGraphingItemStatus" class="mt-3"></div>
+
+                    <br>
+                    <div id="graphStatus" class="mt-3"></div>
+
+
+                    <div class="card-body border rounded mb-3">
+                      <canvas id="registerChart" height="100"></canvas>
                     </div>
 
-                    <button id="ruleAddJoin" class="btn btn-primary d-inline-block">Add Join</button>&nbsp;&nbsp;
-                  </div>
-
-                  <!-- New Rule If 2 -->
-                  <div id="ruleNewIf2" class="mb-3 d-none">
-
-                    <span class="me-2">If</span>
-
-                    <div class="d-inline-block me-2" style="width: 150px;">
-                      <select id="inputType2" class="form-select form-select-sm">
-                        <option>Select</option>
-                        <option>Coil</option>
-                        <option>Discrete Input</option>
-                        <option>Holding Register</option>
-                        <option>Input Register</option>
-                        <option>Virtual Coil</option>
-                        <option>Virtual Holding Register</option>
-                      </select>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                      <span class="me-2 small fw-bold">Polling:</span>
+                      <div class="input-group input-group-sm me-3" style="width: 120px;">
+                          <input type="number" id="intervalInput" class="form-control" value="5">
+                          <span class="input-group-text">sec</span>
+                      </div>
+                      
+                      <button id="chartStartStop" class="btn btn-success btn-sm"><i class="fas fa-play me-1"></i> Start</button>
+                      <button id="chartResetZoom" class="btn btn-secondary btn-sm"><i class="fas fa-search-minus me-1"></i> Reset Zoom</button>
+                      <button id="chartExport" class="btn btn-outline-secondary btn-sm"><i class="fas fa-file-csv me-1"></i> Export CSV</button>
                     </div>
-
-                    <div class="d-inline-block me-2" style="width: 100px;">
-                      <input type="number" class="form-control form-control-sm" id="inputRegister2" placeholder="address" min="0" />
-                    </div>
-
-                    <div class="d-inline-block me-2" style="width: 85px;">
-                      <select id="op2" class="form-select form-select-sm">
-                        <option>Select</option>
-                        <option>==</option>
-                        <option>!=</option>
-                        <option>></option>
-                        <option><</option>
-                        <option>>=</option>
-                        <option><=</option>
-                      </select>
-                    </div>
-
-                    <div class="d-inline-block me-2" style="width: 100px;">
-                      <input type="number" class="form-control form-control-sm" id="compareValue2" placeholder="value" min="0" />
-                    </div>
-                  </div>
-
-                  <!-- New Rule Then -->
-                  <div id="ruleNewOutput"class="mb-3 d-none">
-                    <span class="me-2">Then set</span>
-
-                    <div class="d-inline-block me-2" style="width: 150px;">
-                      <select id="outputType" class="form-select form-select-sm">
-                        <option>Select</option>
-                        <option>Coil</option>
-                        <option>Holding Register</option>
-                        <option>Virtual Coil</option>
-                        <option>Virtual Holding Register</option>
-                      </select>
-                    </div>
-
-                    <div class="d-inline-block me-2" style="width: 100px;">
-                      <input type="number" class="form-control form-control-sm" id="outputRegister" placeholder="address" min="0" />
-                    </div>
-
-                    <span class="me-2">to</span>
-
-                    <div class="d-inline-block me-2" style="width: 100px;">
-                      <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
-                    </div>
-                  </div>
-      
-                  <div id="rulePreviewArea" class="d-none mb-3">
-                    <label for="rulePreview" class="form-label">Rule Preview:</label>
-                    <textarea id="rulePreview" class="form-control" rows="6" readonly></textarea>
-                  </div>
-
-                  <div>
-                    <button id="ruleSubmit" class="btn btn-success d-inline-block d-none me-1">Add Rule</button>
-                    <button id="ruleCancel" class="btn btn-danger d-inline-block d-none">Discard</button>
-                  </div>
-
-                  <div id="ruleStatus" class="mt-3"></div>
-
-                </div>
-              </div>
-            </div>
-
-            <div class="card m-3">
-              <div class="card-body">
-                <div id="activeRulesBody" class="collapse show">
-                  <div class="mb-3">
-                    <h6>Active Rules</h6>
-                  </div>
-
-                  <div class="list-group mb-3" id="ruleList">
-                    <!-- dynamically updated-->
-                  </div>
-
-                  <div id="ruleListViewArea" class="d-none mb-3">
-                    <label id="ruleListViewAreaLabel" for="ruleListViewAreaContent" class="form-label">Rule:</label>
-                    <textarea id="ruleListViewAreaContent" class="form-control" rows="6" readonly></textarea>
-                  </div>
-
-                  <button id="ruleListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
-                  <button id="ruleListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
-
-                  <button id="ruleListDelete" class="btn btn-danger d-inline-block d-none">Delete</button>
-
-                  <div id="ruleListStatus" class="mt-3"></div>
+                    
+                  </div> 
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="tab-pane fade" id="tab-virtual" role="tabpanel">
-        <!-- Virtual Registers -->
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Virtual Registers</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#virtualBody">Toggle</a>
-          </div>
-          <div id="virtualBody" class="collapse show">
-            <div class="card m-3">
-              <div class="card-body">
-                <div class="mb-3">
-                  <h6>Statistics</h6>
-                  <span id="vrCount">Unknown number</span>
-                </div>
+          <!-- Rules Manager -->
+          <div class="tab-pane fade" id="tab-rules" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-circle-nodes me-2 text-primary"></i>Rules Manager</span>
+                <a class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="collapse" href="#rulesBody"><i class="fas fa-chevron-down"></i></a>
               </div>
-            </div>
-            <div class="card m-3">
-              <div class="card-body">
-                <div id="vrManagerBody" class="collapse show">
-                  <div class="mb-3">
-                    <h6>Virtual Register Manager</h6>
-                  </div>
-                  <button id="vrNew" class="btn btn-primary d-inline-block">New</button>
-
-                  <!-- New Rule If 1 -->
-                  <div id="vrNewControls" class="mb-3 d-none">
-
-                    <span>Type:</span>
-
-                    <div class="d-inline-block me-2" style="width: 150px;">
-                      <select id="vrNewType" class="form-select form-select-sm">
-                        <option>Select</option>
-                        <option>Coil</option>
-                        <option>Holding Register</option>
-                      </select>
-                    </div>
-
-                    <button id="vrNewSubmit" class="btn btn-secondary d-inline-block">Add</button>&nbsp;&nbsp;
-                  </div>
-
-                  <div id="vrNewStatus" class="mt-3"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card m-3">
-              <div class="card-body">
-                <div id="activevrBody" class="collapse show">
-                  <div class="mb-3">
-                    <h6>Virtual Registers</h6>
-                  </div>
-
-                  <div class="list-group mb-3" id="vrList">
-                    <!-- dynamically updated-->
-                  </div>
-
-                  <div id="vrListViewArea" class="card mb-3 d-none">
-                    <div class="card-body">
-                      <span id="vrListViewAreaLabel" class="mb-3">Virtual Register</span><br><br>
-                      <div class="d-flex mb-2">
-                        <!-- Read Section -->
-                        <div class="d-flex align-items-center me-3">
-                          <input type="number" class="form-control form-control-sm" id="vrListViewAreaValueRead" placeholder="value" min="0" readonly />
-                          <button id="vrListViewAreaBtnRead" class="btn btn-primary ms-2">Read</button>
+              <div id="rulesBody" class="collapse show p-3">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="card mb-3 h-100 bg-light border-0">
+                          <div class="card-body text-center d-flex flex-column justify-content-center">
+                              <h6 class="text-muted text-uppercase small">Active Rules</h6>
+                              <span id="ruleCount" class="display-4 fw-bold text-dark">--</span>
+                          </div>
                         </div>
-                        <!-- Write Section -->
-                        <div class="d-flex align-items-center">
-                          <input type="number" class="form-control form-control-sm" id="vrListViewAreaValueWrite" placeholder="value" min="0" />
-                          <button id="vrListViewAreaBtnWrite" class="btn btn-primary ms-2">Write</button>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="card mb-3 h-100">
+                          <div class="card-body">
+                            <div id="rulesDesignerBody" class="collapse show">
+                              <div class="mb-3 border-bottom pb-2">
+                                <h6><i class="fas fa-pencil-alt me-2 text-muted"></i>Rule Designer</h6>
+                              </div>
+                              <button id="ruleNew" class="btn btn-primary d-inline-block mb-3"><i class="fas fa-plus me-1"></i> New Rule</button>
+
+                              <!-- New Rule If 1 -->
+                              <div id="ruleNewIf1" class="mb-3 d-none p-3 bg-light rounded border">
+                                <span class="me-2 fw-bold text-primary">IF</span>
+
+                                <div class="d-inline-block me-2" style="width: 150px;">
+                                  <select id="inputType1" class="form-select form-select-sm">
+                                    <option>Select</option>
+                                    <option>Coil</option>
+                                    <option>Discrete Input</option>
+                                    <option>Holding Register</option>
+                                    <option>Input Register</option>
+                                    <option>Virtual Coil</option>
+                                    <option>Virtual Holding Register</option>
+                                  </select>
+                                </div>
+
+                                <div class="d-inline-block me-2" style="width: 100px;">
+                                  <input type="number" class="form-control form-control-sm" id="inputRegister1" placeholder="address" min="0" />
+                                </div>
+
+                                <div class="d-inline-block me-2" style="width: 85px;">
+                                  <select id="op1" class="form-select form-select-sm">
+                                    <option>Select</option>
+                                    <option>==</option>
+                                    <option>!=</option>
+                                    <option>></option>
+                                    <option><</option>
+                                    <option>>=</option>
+                                    <option><=</option>
+                                  </select>
+                                </div>
+
+                                <div class="d-inline-block me-2" style="width: 100px;">
+                                  <input type="number" class="form-control form-control-sm" id="compareValue1" placeholder="value" min="0" />
+                                </div>
+                                
+                                <!-- Join -->
+                                <div id="ruleJoinDiv" class="d-inline-block me-2 d-none" style="width: 80px;">
+                                  <select id="ruleJoin" class="form-select form-select-sm">
+                                    <option>And</option>
+                                    <option>Or</option>
+                                  </select>
+                                </div>
+
+                                <button id="ruleAddJoin" class="btn btn-outline-primary btn-sm d-inline-block">Add Join</button>&nbsp;&nbsp;
+                              </div>
+
+                              <!-- New Rule If 2 -->
+                              <div id="ruleNewIf2" class="mb-3 d-none p-3 bg-light rounded border">
+
+                                <span class="me-2 fw-bold text-primary">IF</span>
+
+                                <div class="d-inline-block me-2" style="width: 150px;">
+                                  <select id="inputType2" class="form-select form-select-sm">
+                                    <option>Select</option>
+                                    <option>Coil</option>
+                                    <option>Discrete Input</option>
+                                    <option>Holding Register</option>
+                                    <option>Input Register</option>
+                                    <option>Virtual Coil</option>
+                                    <option>Virtual Holding Register</option>
+                                  </select>
+                                </div>
+
+                                <div class="d-inline-block me-2" style="width: 100px;">
+                                  <input type="number" class="form-control form-control-sm" id="inputRegister2" placeholder="address" min="0" />
+                                </div>
+
+                                <div class="d-inline-block me-2" style="width: 85px;">
+                                  <select id="op2" class="form-select form-select-sm">
+                                    <option>Select</option>
+                                    <option>==</option>
+                                    <option>!=</option>
+                                    <option>></option>
+                                    <option><</option>
+                                    <option>>=</option>
+                                    <option><=</option>
+                                  </select>
+                                </div>
+
+                                <div class="d-inline-block me-2" style="width: 100px;">
+                                  <input type="number" class="form-control form-control-sm" id="compareValue2" placeholder="value" min="0" />
+                                </div>
+                              </div>
+
+                              <!-- New Rule Then -->
+                              <div id="ruleNewOutput"class="mb-3 d-none p-3 bg-light rounded border">
+                                <span class="me-2 fw-bold text-success">THEN SET</span>
+
+                                <div class="d-inline-block me-2" style="width: 150px;">
+                                  <select id="outputType" class="form-select form-select-sm">
+                                    <option>Select</option>
+                                    <option>Coil</option>
+                                    <option>Holding Register</option>
+                                    <option>Virtual Coil</option>
+                                    <option>Virtual Holding Register</option>
+                                  </select>
+                                </div>
+
+                                <div class="d-inline-block me-2" style="width: 100px;">
+                                  <input type="number" class="form-control form-control-sm" id="outputRegister" placeholder="address" min="0" />
+                                </div>
+
+                                <span class="me-2">to</span>
+
+                                <div class="d-inline-block me-2" style="width: 100px;">
+                                  <input type="number" class="form-control form-control-sm" id="outputValue" placeholder="value" min="0" />
+                                </div>
+                              </div>
+                  
+                              <div id="rulePreviewArea" class="d-none mb-3">
+                                <label for="rulePreview" class="form-label">Rule Preview:</label>
+                                <textarea id="rulePreview" class="form-control font-monospace" rows="4" readonly style="font-size: 0.9em;"></textarea>
+                              </div>
+
+                              <div>
+                                <button id="ruleSubmit" class="btn btn-success d-inline-block d-none me-1">Add Rule</button>
+                                <button id="ruleCancel" class="btn btn-danger d-inline-block d-none">Discard</button>
+                              </div>
+
+                              <div id="ruleStatus" class="mt-3"></div>
+
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                  <div class="card-body">
+                    <div id="activeRulesBody" class="collapse show">
+                      <div class="mb-3 border-bottom pb-2">
+                        <h6><i class="fas fa-list-ul me-2 text-muted"></i>Active Rules</h6>
+                      </div>
+
+                      <div class="list-group mb-3" id="ruleList">
+                        <!-- dynamically updated -->
+                        </div>
+
+                      <div id="ruleListViewArea" class="d-none mb-3">
+                        <label id="ruleListViewAreaLabel" for="ruleListViewAreaContent" class="form-label">Rule:</label>
+                        <textarea id="ruleListViewAreaContent" class="form-control font-monospace" rows="4" readonly style="font-size: 0.9em;"></textarea>
+                      </div>
+
+                      <button id="ruleListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
+                      <button id="ruleListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
+
+                      <button id="ruleListDelete" class="btn btn-danger d-inline-block d-none">Delete</button>
+
+                      <div id="ruleListStatus" class="mt-3"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Virtual Registers -->
+          <div class="tab-pane fade" id="tab-virtual" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-ghost me-2 text-primary"></i>Virtual Registers</span>
+                <a class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="collapse" href="#virtualBody"><i class="fas fa-chevron-down"></i></a>
+              </div>
+              <div id="virtualBody" class="collapse show p-3">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="card mb-3 bg-light border-0 h-100">
+                          <div class="card-body text-center d-flex flex-column justify-content-center">
+                              <h6 class="text-muted text-uppercase small">Count</h6>
+                              <span id="vrCount" class="display-4 fw-bold text-dark">--</span>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="card mb-3 h-100">
+                          <div class="card-body">
+                            <div id="vrManagerBody" class="collapse show">
+                              <div class="mb-3 border-bottom pb-2">
+                                <h6><i class="fas fa-tasks me-2 text-muted"></i>Manager</h6>
+                              </div>
+                              <button id="vrNew" class="btn btn-primary d-inline-block"><i class="fas fa-plus me-1"></i> New Register</button>
+
+                              <div id="vrNewControls" class="mb-3 d-none mt-3 p-3 bg-light rounded border">
+
+                                <span class="me-2">Type:</span>
+
+                                <div class="d-inline-block me-2" style="width: 150px;">
+                                  <select id="vrNewType" class="form-select form-select-sm">
+                                    <option>Select</option>
+                                    <option>Coil</option>
+                                    <option>Holding Register</option>
+                                  </select>
+                                </div>
+
+                                <button id="vrNewSubmit" class="btn btn-secondary btn-sm d-inline-block">Add</button>&nbsp;&nbsp;
+                              </div>
+
+                              <div id="vrNewStatus" class="mt-3"></div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                  <div class="card-body">
+                    <div id="activevrBody" class="collapse show">
+                      <div class="mb-3 border-bottom pb-2">
+                        <h6><i class="fas fa-list me-2 text-muted"></i>Virtual Registers List</h6>
+                      </div>
+
+                      <div class="list-group mb-3" id="vrList">
+                        </div>
+
+                      <div id="vrListViewArea" class="card mb-3 d-none bg-light">
+                        <div class="card-body">
+                          <span id="vrListViewAreaLabel" class="mb-3 fw-bold">Virtual Register</span><br><br>
+                          <div class="d-flex mb-2">
+                            <div class="d-flex align-items-center me-3">
+                              <input type="number" class="form-control form-control-sm" id="vrListViewAreaValueRead" placeholder="value" min="0" readonly />
+                              <button id="vrListViewAreaBtnRead" class="btn btn-primary btn-sm ms-2">Read</button>
+                            </div>
+                            <div class="d-flex align-items-center">
+                              <input type="number" class="form-control form-control-sm" id="vrListViewAreaValueWrite" placeholder="value" min="0" />
+                              <button id="vrListViewAreaBtnWrite" class="btn btn-primary btn-sm ms-2">Write</button>
+                            </div>
+                          </div>
                         </div>
                       </div>
+
+                      <button id="vrListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
+                      <button id="vrListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
+
+                      <div id="vrListStatus" class="mt-3"></div>
+                      <br>
+                      <div class="alert alert-info small" role="alert"><i class="fas fa-circle-info me-2"></i>Virtual registers current cannot be deleted as rules may reference them. This functionality is planned.</div>
                     </div>
                   </div>
-
-                  <button id="vrListRefresh" class="btn btn-primary d-inline-block">Refresh</button>
-                  <button id="vrListRefreshBusy" class="btn btn-secondary d-inline-block d-none">Refresh</button>
-
-                  <div id="vrListStatus" class="mt-3"></div>
-                  <br>
-                  <div class="alert alert-info" role="alert"><i class="fas fa-circle-info"></i>&nbsp;&nbsp;Virtual registers current cannot be deleted as rules may reference them. This functionality is planned.</div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="tab-pane fade" id="tab-hardware" role="tabpanel">
-        <!-- Hardware Configuration -->
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Hardware Configuration</h5>
-            <a class="btn btn-link" data-bs-toggle="collapse" href="#hardwareBody">Toggle</a>
-          </div>
-          <div id="hardwareBody" class="collapse show">
-            <div class="card m-3">
-              <div class="card-body">
-                <div class="mb-3">
-                  <h6>Configure Analogue Modes</h6>
-                  <br>
-                  <span>AIN1</span>
-                  <div class="d-inline-block me-2" style="width: 175px;">
-                    <select id="ain1Mode" class="form-select form-select-sm">
-                      <option>Voltage (0-5V)</option>
-                      <option>Current (4-20mA)</option>
-                    </select>
-                  </div>
-                  <br>
-                  AIN2
-                  <div class="d-inline-block me-2" style="width: 175px;">
-                    <select id="ain2Mode" class="form-select form-select-sm">
-                      <option>Voltage (0-5V)</option>
-                      <option>Current (4-20mA)</option>
-                    </select>
-                  </div>
-                  <br>
-                  AIN3
-                  <div class="d-inline-block me-2" style="width: 175px;">
-                    <select id="ain3Mode" class="form-select form-select-sm">
-                      <option>Voltage (0-5V)</option>
-                      <option>Current (4-20mA)</option>
-                    </select>
-                  </div>
-                  <br>
-                  AIN4
-                  <div class="d-inline-block me-2" style="width: 175px;">
-                    <select id="ain4Mode" class="form-select form-select-sm">
-                      <option>Voltage (0-5V)</option>
-                      <option>Current (4-20mA)</option>
-                    </select>
-                  </div>
-                  <br><br>
-                  AOUT1
-                  <div class="d-inline-block me-2" style="width: 175px;">
-                    <select id="aout1Mode" class="form-select form-select-sm">
-                      <option>Voltage (0-5V)</option>
-                      <option>Current (4-20mA)</option>
-                    </select>
-                  </div>
-                  <br>
-                  AOUT2
-                  <div class="d-inline-block me-2" style="width: 175px;">
-                    <select id="aout2Mode" class="form-select form-select-sm">
-                      <option>Voltage (0-5V)</option>
-                      <option>Current (4-20mA)</option>
-                    </select>
-                  </div>
-
-                  <br><br>
-                  <button id="hwmodesave" class="btn btn-secondary d-inline-block">Set</button>&nbsp;&nbsp;
-                  </div>
-
-                  <div id="hwStatus" class="mt-3"></div>
-                </div>
+          <!-- Hardware Configuration -->
+          <div class="tab-pane fade" id="tab-hardware" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-toolbox me-2 text-primary"></i>Hardware Configuration</span>
+                <a class="btn btn-link btn-sm text-decoration-none" data-bs-toggle="collapse" href="#hardwareBody"><i class="fas fa-chevron-down"></i></a>
               </div>
+              <div id="hardwareBody" class="collapse show p-3">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card mb-3 h-100">
+                          <div class="card-body">
+                            <div class="mb-3 border-bottom pb-2">
+                              <h6><i class="fas fa-wave-square me-2 text-primary"></i>Analogue Modes</h6>
+                              </div>
+                              <br>
+                              <div class="row g-2 align-items-center mb-2">
+                                  <div class="col-3 text-muted fw-bold small">AIN1</div>
+                                  <div class="col-auto">
+                                      <select id="ain1Mode" class="form-select form-select-sm">
+                                          <option>Voltage (0-5V)</option>
+                                          <option>Current (4-20mA)</option>
+                                        </select>
+                                  </div>
+                              </div>
+                              <div class="row g-2 align-items-center mb-2">
+                                <div class="col-3 text-muted fw-bold small">AIN2</div>
+                                <div class="col-auto">
+                                    <select id="ain2Mode" class="form-select form-select-sm">
+                                        <option>Voltage (0-5V)</option>
+                                        <option>Current (4-20mA)</option>
+                                      </select>
+                                </div>
+                              </div>
+                              <div class="row g-2 align-items-center mb-2">
+                                <div class="col-3 text-muted fw-bold small">AIN3</div>
+                                <div class="col-auto">
+                                    <select id="ain3Mode" class="form-select form-select-sm">
+                                        <option>Voltage (0-5V)</option>
+                                        <option>Current (4-20mA)</option>
+                                      </select>
+                                </div>
+                              </div>
+                              <div class="row g-2 align-items-center mb-2">
+                                <div class="col-3 text-muted fw-bold small">AIN4</div>
+                                <div class="col-auto">
+                                    <select id="ain4Mode" class="form-select form-select-sm">
+                                        <option>Voltage (0-5V)</option>
+                                        <option>Current (4-20mA)</option>
+                                      </select>
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row g-2 align-items-center mb-2">
+                                <div class="col-3 text-muted fw-bold small">AOUT1</div>
+                                <div class="col-auto">
+                                    <select id="aout1Mode" class="form-select form-select-sm">
+                                        <option>Voltage (0-5V)</option>
+                                        <option>Current (4-20mA)</option>
+                                      </select>
+                                </div>
+                              </div>
+                              <div class="row g-2 align-items-center mb-2">
+                                <div class="col-3 text-muted fw-bold small">AOUT2</div>
+                                <div class="col-auto">
+                                    <select id="aout2Mode" class="form-select form-select-sm">
+                                        <option>Voltage (0-5V)</option>
+                                        <option>Current (4-20mA)</option>
+                                      </select>
+                                </div>
+                              </div>
 
-              <div class="card m-3">
-                <div class="card-body">
-                  <div class="mb-3">
-                    <h6>Emergency Stop</h6>
-                  </div>
+                              <br>
+                              <button id="hwmodesave" class="btn btn-secondary d-inline-block btn-sm">Save Configuration</button>&nbsp;&nbsp;
+                              </div>
 
-                  <div class="mb-3">
-                    <span>A discrete input channel can be configured as an emergency stop button. This will set all coils to OFF, all holding registers to 0, and will lock out the embedded controller from making any further decisions. It can be reset through a reboot.</span>
-                  </div>
+                              <div id="hwStatus" class="mt-3"></div>
+                            </div>
+                          </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                      <div class="mb-3 border-bottom pb-2">
+                                        <h6><i class="fas fa-stop-circle me-2 text-danger"></i>Emergency Stop</h6>
+                                      </div>
+                    
+                                      <div class="mb-3">
+                                        <small class="text-muted">Configures a discrete input as a hardware interrupt/stop.</small>
+                                      </div>
+                    
+                                      <div class="row g-2">
+                                        <div class="col-md-6 mb-3">
+                                          <label for="esChannel" class="form-label small">Input Address</label>
+                                          <input type="number" class="form-control form-control-sm" id="esChannel" placeholder="0" min="0" />
+                                        </div>
+                      
+                                        <div class="col-md-6 mb-3">
+                                          <label for="esInputMode" class="form-label small">Input Mode</label>
+                                          <select id="esInputMode" class="form-select form-select-sm">
+                                            <option>Normally Open (NO)</option>
+                                            <option>Normally Closed (NC)</option>
+                                          </select>
+                                        </div>
+                                      </div>
+                    
+                                      <div class="mb-3">
+                                        <button id="esSet" class="btn btn-primary d-inline-block btn-sm">Set E-Stop</button>
+                                      </div>
+                    
+                                      <div id="esStatus" class="mt-3"></div>
+                                    </div>
+                                  </div>
+                            </div>
 
-                  <div class="mb-3">
-                    <label for="esChannel" class="form-label">Discrete Input Address:</label>
-                    <input type="number" class="form-control" id="esChannel" placeholder="Enter a discrete input register address (e.g., 0)" min="0" />
-                  </div>
+                            <div class="col-12">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                      <div class="mb-3 border-bottom pb-2">
+                                        <h6><i class="fas fa-clock me-2 text-secondary"></i>Real Time Clock</h6>
+                                      </div>
+                                      <div class="d-flex align-items-end">
+                                        <div class="me-3 flex-grow-1">
+                                            <label for="rtctimezone" class="form-label small">Timezone</label>
+                                            <select id="rtctimezone" class="form-select form-select-sm"></select>
+                                        </div>
+                                        <div>
+                                            <button id="rtcset" class="btn btn-primary d-inline-block btn-sm">Sync RTC</button>
+                                        </div>
+                                      </div>
+                                      
+                                      <div id="rtcStatus" class="mt-3"></div>
+                                    </div>
+                                  </div>
+                            </div>
 
-                  <div class="mb-3">
-                    <label for="esInputMode" class="form-label">Input Mode:</label>
-                    <select id="esInputMode" class="form-select form-select-sm">
-                      <option>Normally Open (NO)</option>
-                      <option>Normally Closed (NC)</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
-                    <button id="esSet" class="btn btn-primary d-inline-block">Set</button>
-                  </div>
-
-                  <div id="esStatus" class="mt-3"></div>
+                            <div class="col-12">
+                                <div class="card mb-3 border-danger">
+                                    <div class="card-body">
+                                      <div class="mb-3 text-danger border-bottom border-danger pb-2">
+                                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Factory Reset</h6>
+                                      </div>
+                    
+                                        <small class="text-danger d-block mb-3">Warning: This cannot be undone. All rules and calibration data will be erased.</small>
+                                        
+                                        <button id="factoryResetBtn" class="btn btn-outline-danger btn-sm d-inline-block">Initiate Reset</button>
+                    
+                                      </div>
+                    
+                                      <div id="frStatus" class="mt-3"></div>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-
-              <div class="card m-3">
-                <div class="card-body">
-                  <div class="mb-3">
-                    <h6>Real Time Clock</h6>
-                  </div>
-                  <div class="mb-3">
-                    <label for="rtctimezone" class="form-label">Choose Timezone:</label>
-                    <select id="rtctimezone" class="form-select form-select-sm" style="width: 175px;"></select>
-                  </div>
-                  <div class="mb-3">
-                    <button id="rtcset" class="btn btn-primary d-inline-block">Set</button>
-                  </div>
-                  <div id="rtcStatus" class="mt-3"></div>
-                </div>
-              </div>
-
-              <div class="card m-3">
-                <div class="card-body">
-                  <div class="mb-3">
-                    <h6>Factory Reset</h6>
-
-                    <span style="color: red;">Warning: This cannot be undone!</span><br>
-                    <span>A factory reset will clear all automation rules, virtual registers, analogue IO mode configurations, emergency stop button configuration, and possibly more depending on the firmware revision!</span>
-                    <br><br>
-                    <button id="factoryResetBtn" class="btn btn-primary d-inline-block">Confirm</button>
-
-                  </div>
-
-                  <div id="frStatus" class="mt-3"></div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+
+<footer class="footer py-3 text-center mt-auto">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-4 text-lg-start">
+          <small>&copy; 2025-2026 Darcy Johnson</small>
+        </div>
+        <div class="col-lg-4 my-2 my-lg-0">
+            <i id ="ftStatusIcon" class="fas fa-circle text-danger small me-1"></i> <small id ="ftStatusText">System Disconnected</small>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <small class="text-muted">UI Version 2</small>
+        </div>
+      </div>
+    </div>
+  </footer>
 
 <!-- Java Script -->
 <script src="./js/utils.js"></script>
@@ -840,6 +951,7 @@
 <script src="./js/rtc_config.js"></script>
 <script src="./js/factory_reset.js"></script>
 <script src="./js/estop_config.js"></script>
+<script src="./js/analogue_config.js"></script>
 <script src="./js/main.js"></script>
 
 </body>

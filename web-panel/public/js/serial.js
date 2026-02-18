@@ -2,9 +2,12 @@
 const portSelect = document.getElementById("portSelect");
 const baudSelect = document.getElementById("baudSelect");
 const slaveSelect = document.getElementById("slaveAddress");
-const connectionStatus = document.getElementById("connectionStatus");
+const connectionStatusDOM = document.getElementById("connectionStatus"); 
 const connectBtn = document.getElementById("connectBtn");
 const refreshPortsBtn = document.getElementById("refreshPortsBtn");
+
+const ftStatusIcon = document.getElementById("ftStatusIcon");
+const ftStatusText = document.getElementById("ftStatusText");
 
 const connectionStatusDefaultText = 'Select a port and click connect.';
 const noPortsText = "No ports found";
@@ -18,70 +21,105 @@ const connectionStatusTimerInterval = 1000;
 
 async function getStatus() {
     try {
-    const res = await fetch('/status');
-    const connected = await res.json();
-    isConnected = connected.status;
-    currentPort = connected.port;
-    currentSlave = connected.slave;
+        const res = await fetch('/status');
+        const connected = await res.json();
+        isConnected = connected.status;
+        currentPort = connected.port;
+        currentSlave = connected.slave;
     } catch (exception) {
-    isConnected = false; // assume
+        isConnected = false; // assume
     }
 }
 
 async function fetchPorts() {
     try {
-    const res = await fetch('/ports');
-    const ports = await res.json();
+        const res = await fetch('/ports');
+        const ports = await res.json();
 
-    portSelect.innerHTML = '';
-    
-    if (ports.length == 0) {
-        const option = document.createElement('option');
-        option.value = noPortsText;
-        option.textContent = noPortsText;
-        portSelect.appendChild(option);
-    } else {
-        ports.forEach(port => {
-        const option = document.createElement('option');
-        option.value = port;
-        option.textContent = port;
-        portSelect.appendChild(option);
-        });
-    }
-    
-    
-    connectionStatus.textContent = connectionStatusDefaultText;
+        portSelect.innerHTML = '';
+        
+        if (ports.length == 0) {
+            const option = document.createElement('option');
+            option.value = noPortsText;
+            option.textContent = noPortsText;
+            portSelect.appendChild(option);
+        } else {
+            ports.forEach(port => {
+                const option = document.createElement('option');
+                option.value = port;
+                option.textContent = port;
+                portSelect.appendChild(option);
+            });
+        }
+        
+        connectionStatusDOM.textContent = connectionStatusDefaultText;
     } catch (exception) {
-    portSelect.innerHTML = '<option>Error loading ports</option>';
-    connectionStatus.textContent = 'Failed to fetch ports.';
+        portSelect.innerHTML = '<option>Error loading ports</option>';
+        connectionStatusDOM.textContent = 'Failed to fetch ports.';
     }
 }
 
 refreshPortsBtn.addEventListener('click', () => {
     if (!isConnected) {
-    fetchPorts();
+        fetchPorts();
     }
 });
 
 function updateUI(connected, port, slave) {
-    connectionStatus.classList.remove("text-muted", "text-danger", "text-success");
+    connectionStatusDOM.classList.remove("text-muted", "text-danger", "text-success");
+    
     if (connected) {
-    connectionStatus.textContent = `Connected to ${port}`;
-    connectionStatus.classList.add("text-success");
-    connectBtn.classList.remove("btn-success");
-    connectBtn.classList.add("btn-danger");
-    connectBtn.innerText = "Disconnect";
+        connectionStatusDOM.textContent = `Connected to ${port}`;
+        connectionStatusDOM.classList.add("text-success");
+        connectBtn.classList.remove("btn-success");
+        connectBtn.classList.add("btn-danger");
+        connectBtn.innerText = "Disconnect";
+
+        if (ftStatusIcon) {
+            ftStatusIcon.classList.remove("text-danger");
+            ftStatusIcon.classList.add("text-success");
+            ftStatusText.innerHTML = "System Connected";
+        }
     } else {
-    connectionStatus.textContent = `Disconnected from ${port}`;
-    connectionStatus.classList.add("text-muted");
-    connectBtn.classList.remove("btn-danger");
-    connectBtn.classList.add("btn-success");
-    connectBtn.innerText = "Connect";
+        connectionStatusDOM.textContent = `Disconnected from ${port}`;
+        connectionStatusDOM.classList.add("text-muted");
+        connectBtn.classList.remove("btn-danger");
+        connectBtn.classList.add("btn-success");
+        connectBtn.innerText = "Connect";
+
+        if (ftStatusIcon) {
+            ftStatusIcon.classList.remove("text-success");
+            ftStatusIcon.classList.add("text-danger");
+            ftStatusText.innerHTML = "System Disconnected";
+        }
     }
 
     if (slave !== undefined) {
-    slaveSelect.value = slave;
+        slaveSelect.value = slave;
     } 
+
+    if (port && portSelect.options.length > 0) {
+        portSelect.value = port;
+    }
+}
+
+// Helper function to monitor connection (Moved outside click listener for clarity)
+async function monitorConnectionLoop() {
+    const isConnectedBuffer = isConnected;
+    const portBuffer = currentPort;
+    await getStatus();
+    
+    // If state changed (e.g. cable unplugged)
+    if (isConnectedBuffer != isConnected) {
+        currentPort = portBuffer; // keep old port name for the 'Disconnected from X' message
+        updateUI(isConnected, currentPort, currentSlave);
+        statusPolling(isConnected);
+        
+        // Stop monitoring if disconnected
+        if (!isConnected) {
+            clearInterval(connectionStatusTimer);
+        }
+    }
 }
 
 connectBtn.addEventListener('click', async () => {
@@ -91,64 +129,58 @@ connectBtn.addEventListener('click', async () => {
     const selectedSlave = slaveSelect.value;  
 
     if (selectedPort == noPortsText) {
-    connectionStatus.textContent = `No valid port was selected.`;
-    connectionStatus.classList.remove("text-muted", "text-success");
-    connectionStatus.classList.add("text-danger");
-    return;
+        connectionStatusDOM.textContent = `No valid port was selected.`;
+        connectionStatusDOM.classList.remove("text-muted", "text-success");
+        connectionStatusDOM.classList.add("text-danger");
+        return;
     }
 
     if (!isConnected) {
-    // Connect
-    const res = await fetch(`/connect?port=${encodeURIComponent(selectedPort)}&baud=${encodeURIComponent(selectedBaud)}&slave=${encodeURIComponent(selectedSlave)}`);
-    const data = await res.json();
+        // Connect
+        const res = await fetch(`/connect?port=${encodeURIComponent(selectedPort)}&baud=${encodeURIComponent(selectedBaud)}&slave=${encodeURIComponent(selectedSlave)}`);
+        const data = await res.json();
 
-    
-    if (data.success) {
-        isConnected = true;
-        updateUI(true, selectedPort);
-        statusPolling(true);
-        await ruleListUpdate();
-        await vrListUpdate();
-        await hwGetModes();
-        connectionStatusTimer = setInterval(connectionStatus, connectionStatusTimerInterval);
+        if (data.success) {
+            isConnected = true;
+            updateUI(true, selectedPort);
+            statusPolling(true);
+            await ruleListUpdate();
+            await vrListUpdate();
+            await hwGetModes();
+            
+            // Start monitoring loop
+            connectionStatusTimer = setInterval(monitorConnectionLoop, connectionStatusTimerInterval);
+        } else {
+            statusPolling(false);
+            connectionStatusDOM.textContent = `Failed: ${data.error}`;
+            connectionStatusDOM.classList.remove("text-muted", "text-danger");
+            connectionStatusDOM.classList.add("text-danger");
+            
+            connectBtn.classList.remove("btn-danger");
+            connectBtn.classList.add("btn-success");
+            connectBtn.innerText = "Connect";
+
+            if (ftStatusIcon) {
+                ftStatusIcon.classList.remove("text-success");
+                ftStatusIcon.classList.add("text-danger");
+                ftStatusText.innerHTML = "System Disconnected";
+            }
+        }        
     } else {
+        // Disconnect
+        const res = await fetch(`/disconnect`);
+        const data = await res.json();
+
         statusPolling(false);
-        connectionStatus.textContent = `Failed: ${data.error}`;
-        connectionStatus.classList.remove("text-muted", "text-danger");
-        connectionStatus.classList.add("text-danger");
-        
-        connectBtn.classList.remove("btn-danger");
-        connectBtn.classList.add("btn-success");
-        connectBtn.innerText = "Connect";
-    }        
-    } else {
-    // Disconnect
-    const res = await fetch(`/disconnect`);
-    const data = await res.json();
 
-    statusPolling(false);
-
-    if (data.success) {
-        updateUI(false, selectedPort);
-        ruleListUpdate();
-        connectionStatusTimer = clearInterval();
-    } else {
-        connectionStatus.textContent = `Failed to disconnect: ${data.error}`;
-        connectionStatus.classList.remove("text-success");
-        connectionStatus.classList.add("text-danger");
+        if (data.success) {
+            updateUI(false, selectedPort);
+            ruleListUpdate();
+            clearInterval(connectionStatusTimer);
+        } else {
+            connectionStatusDOM.textContent = `Failed to disconnect: ${data.error}`;
+            connectionStatusDOM.classList.remove("text-success");
+            connectionStatusDOM.classList.add("text-danger");
+        }
     }
-    }
-
-    // Status polling regularly to check for serial port disconnect
-    async function connectionStatus() {
-    const isConnectedBuffer = isConnected;
-    const portBuffer = currentPort;
-    await getStatus();
-    if (isConnectedBuffer != isConnected) {
-        currentPort = portBuffer; // for disconnect text to be correct
-        updateUI(isConnected, currentPort, currentSlave);
-        statusPolling(isConnected);
-    }
-    }
-
 });
