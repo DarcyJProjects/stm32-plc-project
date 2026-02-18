@@ -29,8 +29,12 @@ async function populateTimezones() {
 rtcset.addEventListener("click", async () => {
   const tz = rtctimezone.value;
 
-  const url = `/setrtc?tz=${tz}`;
-  const response = await fetch(url);
+  const response = await fetch('/setrtc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tz: tz })
+  });
+  
   const data = await response.json();
   
   if (data.success == true) {

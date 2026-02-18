@@ -9,10 +9,18 @@ esSet.addEventListener("click", async () => {
 
   if (isNaN(channel) || channel > 0xFFFF || channel < 0 ) {
     frStatus.innerHTML = newStatus("alert-danger", `Error: The Discrete Input Address must be a valid.`);
+    return;
   }
 
-  const url = `/setemergencystop?channel=${channel}&inputMode=${inputMode}`;
-  const response = await fetch(url);
+  const response = await fetch('/setemergencystop', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+          channel: parseInt(channel), // Ensure number
+          inputMode: inputMode
+      })
+  });
+
   const data = await response.json();
   
   if (data.success == true) {

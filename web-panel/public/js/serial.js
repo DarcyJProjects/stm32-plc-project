@@ -137,7 +137,15 @@ connectBtn.addEventListener('click', async () => {
 
     if (!isConnected) {
         // Connect
-        const res = await fetch(`/connect?port=${encodeURIComponent(selectedPort)}&baud=${encodeURIComponent(selectedBaud)}&slave=${encodeURIComponent(selectedSlave)}`);
+        const res = await fetch('/connect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                port: selectedPort,
+                baud: parseInt(selectedBaud),
+                slave: parseInt(selectedSlave)
+            })
+        });
         const data = await res.json();
 
         if (data.success) {
@@ -168,7 +176,7 @@ connectBtn.addEventListener('click', async () => {
         }        
     } else {
         // Disconnect
-        const res = await fetch(`/disconnect`);
+        const res = await fetch('/disconnect', { method: 'POST' });
         const data = await res.json();
 
         statusPolling(false);

@@ -24,9 +24,17 @@ async function writeCoil(address, value) {
   try {
     coilStatusW.textContent = 'Sending request...';
     const valInt = value ? 1 : 0;
-    const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valInt}`;
     
-    const response = await fetch(url);
+    const response = await fetch('/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: 'coil',
+            address: parseInt(address),
+            value: valInt
+        })
+    });
+
     const data = await response.json();
 
     if (response.ok) {
@@ -44,9 +52,16 @@ async function writeMultipleCoils(address, valueArray) {
   try {
     coilStatusWM.textContent = 'Sending request...';
     
-    const url = `/write?type=coil&address=${encodeURIComponent(address)}&value=${valueArray}`;
+    const response = await fetch('/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: 'coil',
+            address: parseInt(address),
+            value: valueArray.join(',') // Join array to string for safe CSV handling
+        })
+    });
 
-    const response = await fetch(url);
     const data = await response.json();
 
     if (response.ok) {

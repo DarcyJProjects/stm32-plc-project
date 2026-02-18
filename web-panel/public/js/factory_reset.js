@@ -9,8 +9,12 @@ factoryResetBtn.addEventListener("click", () => frModal.show());
 confirmFactoryResetButton.addEventListener("click", async () => {
   frModal.hide();
 
-  const url = `/factoryreset?confirmation=true`;
-  const response = await fetch(url);
+  const response = await fetch('/factoryreset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ confirmation: true })
+  });
+
   const data = await response.json();
   
   if (data.success == true) {

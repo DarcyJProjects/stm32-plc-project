@@ -53,9 +53,14 @@ vrNewSubmit.addEventListener('click', async () => {
 
 async function vrNewRequest(registerType) {
   try {
-    const url = `/addvr?type=${encodeURIComponent(registerType)}`;
-    
-    const response = await fetch(url);
+    const response = await fetch('/addvr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: parseInt(registerType) })
+    });
+
+    const data = await response.json();
+
     vrNewStatus.innerHTML = "";
     if (response.ok) {
       const data = await response.json();
@@ -170,8 +175,16 @@ vrListViewAreaBtnWrite.addEventListener('click', async () => {
     return;
   }
 
-  const url = `/writevr?type=${selectedvrtype}&address=${selectedvr}&value=${value}`;
-  const response = await fetch(url);
+  const response = await fetch('/writevr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+          type: parseInt(selectedvrtype),
+          address: parseInt(selectedvr),
+          value: value
+      })
+  });
+  
   const data = await response.json();
 
   if (data.success == true) {

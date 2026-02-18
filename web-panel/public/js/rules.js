@@ -117,7 +117,7 @@ ruleAddJoin.addEventListener('click', () => {
     newRuleProcessInput();
 
     ruleAddJoin.innerText = "Remove Join";
-    ruleAddJoin.classList.remove("btn-primary");
+    ruleAddJoin.classList.remove("btn-outline-primary");
     ruleAddJoin.classList.add("btn-danger");
   } else {
     ruleJoinDiv.classList.add("d-none");
@@ -126,7 +126,7 @@ ruleAddJoin.addEventListener('click', () => {
     newRuleProcessInput();
 
     ruleAddJoin.innerText = "Add Join";
-    ruleAddJoin.classList.add("btn-primary");
+    ruleAddJoin.classList.add("btn-outline-primary");
     ruleAddJoin.classList.remove("btn-danger");
   }
 });
@@ -199,14 +199,30 @@ ruleSubmit.addEventListener('click', async () => {
   try {
     ruleStatus.textContent = 'Sending request...';
 
-    let url;
+    const payload = {
+      input_type1: getTypeIndex(inputType1.value),
+      input_reg1: parseInt(inputRegister1.value),
+      op1: getOperationIndex(op1.value),
+      compare_value1: parseInt(compareValue1.value),
+      join: joinActive ? getJoinIndex(ruleJoin.value) : 1, // 1 = NONE
+      output_type: getTypeIndex(outputType.value),
+      output_reg: parseInt(outputRegister.value),
+      output_value: parseInt(outputValue.value)
+    };
+
     if (joinActive) {
-      url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=${getTypeIndex(inputType2.value)}&input_reg2=${inputRegister2.value}&op2=${getOperationIndex(op2.value)}&compare_value2=${compareValue2.value}&join=${getJoinIndex(ruleJoin.value)}&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
-    } else {
-      url = `/addrule?input_type1=${getTypeIndex(inputType1.value)}&input_reg1=${inputRegister1.value}&op1=${getOperationIndex(op1.value)}&compare_value1=${compareValue1.value}&input_type2=0&input_reg2=0&op2=0&compare_value2=0&join=1&output_type=${getTypeIndex(outputType.value)}&output_reg=${outputRegister.value}&output_value=${outputValue.value}`;
+      payload.input_type2 = getTypeIndex(inputType2.value);
+      payload.input_reg2 = parseInt(inputRegister2.value);
+      payload.op2 = getOperationIndex(op2.value);
+      payload.compare_value2 = parseInt(compareValue2.value);
     }
     
-    const response = await fetch(url);
+    const response = await fetch('/addrule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    
     const data = await response.json();
 
     if (response.ok) {
@@ -251,7 +267,7 @@ function ruleCleanup() {
   
   joinActive = false;
   ruleAddJoin.innerText = "Add Join";
-  ruleAddJoin.classList.add("btn-primary");
+  ruleAddJoin.classList.add("btn-outline-primary");
   ruleAddJoin.classList.remove("btn-danger");
 
   ruleJoinDiv.classList.add("d-none");
@@ -367,8 +383,12 @@ confirmDeleteRuleButton.addEventListener('click', () => {
 async function deleteRule(index) {
   try{
     if (isConnected) {
-      let url = `/deleterule?index=${index}`;
-      const response = await fetch(url);
+      const response = await fetch('/deleterule', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ index: index })
+      });
+      
       const data = await response.json();
 
       if (response.ok) {

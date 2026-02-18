@@ -16,9 +16,17 @@ const holdingStatusWM = document.getElementById('holdingStatusWM');
 async function writeHolding(address, value) {
   try {
     holdingStatusW.textContent = 'Sending request...';
-    const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${encodeURIComponent(value)}`;
     
-    const response = await fetch(url);
+    const response = await fetch('/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: 'holding',
+            address: parseInt(address),
+            value: parseInt(value)
+        })
+    });
+
     const data = await response.json();
 
     if (response.ok) {
@@ -36,9 +44,16 @@ async function writeMultipleHolding(address, valueArray) {
   try {
     holdingStatusWM.textContent = 'Sending request...';
     
-    const url = `/write?type=holding&address=${encodeURIComponent(address)}&value=${valueArray}`;
+    const response = await fetch('/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: 'holding',
+            address: parseInt(address),
+            value: valueArray.join(',') // Join to CSV string
+        })
+    });
 
-    const response = await fetch(url);
     const data = await response.json();
 
     if (response.ok) {

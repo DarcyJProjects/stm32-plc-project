@@ -8,332 +8,322 @@ app.use(express.json());
 app.use(express.static('public'));
 
 const modbus = new ModbusRTU();
-const timeoutMs = 1000; // timeout for all functions sent over modbus in milliseconds
-const timeoutRetry = 3; // number of times to try when querying over modbus
 
+const FUNC_CODES = {
+    SET_MODE_HOLDING: 0x6F,
+    SET_MODE_INPUT: 0x70,
+    GET_MODE: 0x71,
+    ADD_RULE: 0x65,
+    GET_RULE_COUNT: 0x66,
+    GET_RULE: 0x67,
+    DELETE_RULE: 0x68,
+    ADD_VR: 0x69,
+    READ_VR: 0x6A,
+    WRITE_VR: 0x6B,
+    COUNT_VR: 0x6C,
+    CLEAR_VR: 0x6D,
+    SET_RTC: 0x6E,
+    SET_ESTOP: 0x72,
+    FACTORY_RESET: 0x73
+};
 
-let isConnected = false;
-let currentPort;
-let currentSlave;
+let connectionState = {
+    isConnected: false,
+    port: null,
+    slave: null
+};
+
+// ----- MIDDLEWARE -----
+
+// Connection Guard - to block requests if not connected
+const requireConnection = (req, res, next) => {
+    if (!connectionState.isConnected) {
+        return res.status(400).json({ error: "Not connected to any port" });
+    }
+    next();
+};
+
+// Validation
+const validate = (schema) => (req, res, next) => {
+    try {
+        const source = req.method === 'GET' ? req.query : req.body;
+        const cleanData = {};
+
+        for (const [field, rules] of Object.entries(schema)) {
+            let value = source[field];
+
+            // Check required
+            if (value === undefined || value === null || value === '') {
+                if (rules.required) throw new Error(`Field '${field}' is required.`);
+                continue;
+            }
+
+            // Check number
+            if (rules.type === 'number') {
+                const parsed = parseInt(value);
+                if (isNaN(parsed)) throw new Error(`Field '${field}' must be a number.`);
+                if (rules.min !== undefined && parsed < rules.min) throw new Error(`Field '${field}' too small (min ${rules.min}).`);
+                if (rules.max !== undefined && parsed > rules.max) throw new Error(`Field '${field}' too large (max ${rules.max}).`);
+                value = parsed;
+            }
+
+            // Check bool
+            if (rules.type === 'boolean') {
+                value = (value === 'true' || value === '1' || value === true || value === 1);
+            }
+
+            // Check enum
+            if (rules.enum && !rules.enum.includes(value)) {
+                throw new Error(`Field '${field}' must be one of: ${rules.enum.join(', ')}`);
+            }
+
+            cleanData[field] = value;
+        }
+
+        req.cleanData = cleanData;
+        next();
+    } catch (err) {
+        return res.status(400).json({ error: err.message });
+    }
+};
 
 // Timeout function
-async function withTimeout(awaiting, ms) {
-    for (let attempt = 1; attempt <= timeoutRetry; attempt++) {
+async function withTimeout(promiseOp) {
+    let lastError;
+
+    for (let attempt = 1; attempt <= CONFIG.retries; attempt++) {
         try {
+            // Create a timeout promise
             const timeout = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Timeout')), ms)
+                setTimeout(() => reject(new Error('Timeout')), CONFIG.timeoutMs)
             );
 
-            const result = await Promise.race([awaiting, timeout]);
-            return result;
+            // Race the actual operation against the timeout
+            return await Promise.race([promiseOp, timeout]);
         } catch (err) {
-            if (attempt === timeoutRetry || err.message !== 'Timeout') {
-                throw err;
-            }
-            console.warn(`Attempt ${attempt} timed out, retrying...`);
+            lastError = err;
+            if (err.message !== 'Timeout') throw err; // Only retry timeout errors
+            console.warn(`Attempt ${attempt} timed out...`);
         }
     }
-
-    const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout')), ms)
-    );
-    return Promise.race([awaiting, timeout]);
+    throw lastError || new Error('Operation timed out after retries');
 }
 
-// Read (single or multiple)
-app.get("/read", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+// ----- ROUTES -----
 
-    const { type, address, quantity } = req.query;
-
+// List serial ports (does not require a connection)
+app.get("/ports", async (req, res) => {
     try {
-        const addr = parseInt(address);
-        const count = parseInt(quantity || 1); // default to 1
+        const portNames = await ModbusRTU.listPorts();
+        res.json(portNames);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to list ports" });
+    }
+});
 
-        let resultAwait;
-        switch (type) {
-            case "coil":
-                resultAwait = modbus.readCoils(addr, count);
-                break;
-            case "discrete":
-                resultAwait = modbus.readDiscreteInputs(addr, count);
-                break;
-            case "holding":
-                resultAwait = modbus.readHoldingRegisters(addr, count);
-                break;
-            case "input":
-                resultAwait = modbus.readInputRegisters(addr, count);
-                break;
-            default:
-                return res.status(400).json({ error: "Invalid register type" });
-        }
+// Connect to a selected port
+const connectSchema = {
+    port: { required: true },
+    baud: { type: 'number', min: 300, max: 115200, required: true },
+    slave: { type: 'number', min: 1, max: 247, required: true }
+};
+app.post("/connect", validate(connectSchema), async (req, res) => {
+    try {
+        const { port, baud, slave } = req.cleanData;
+        await modbus.connect(slave, port, baud, "none");
+        
+        connectionState = { isConnected: true, port, slave };
+        console.log(`Connected to ${port}`);
+        res.json({ success: true });
+    } catch (err) {
+        connectionState = { isConnected: false, port: null, slave: null };
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
-        // timeout
-        const result = await withTimeout(resultAwait, timeoutMs);
+// Get connection status
+app.get("/status", async (req, res) => {
+    res.json({ status: connectionState.isConnected, ...connectionState });
+});
 
+// Disconnect
+app.post("/disconnect", async (req, res) => {
+    try {
+        await modbus.disconnect();
+        connectionState.isConnected = false;
+        res.json({ success: true });
+    } catch (err) {
+        res.json({ success: false, error: err.message });
+    }
+});
+
+// PROTECTED ROUTES (Require Connection)
+
+// Read (single or multiple)
+const readSchema = {
+    type: { enum: ['coil', 'discrete', 'holding', 'input'], required: true },
+    address: { type: 'number', min: 0, max: 65535, required: true },
+    quantity: { type: 'number', min: 1, max: 125, required: false } // optional
+};
+app.get("/read", requireConnection, validate(readSchema), async (req, res) => {
+    try {
+        const { type, address, quantity } = req.cleanData;
+        const count = quantity || 1;
+        let op;
+        
+        if (type === 'coil') op = modbus.readCoils(address, count);
+        else if (type === 'discrete') op = modbus.readDiscreteInputs(address, count);
+        else if (type === 'holding') op = modbus.readHoldingRegisters(address, count);
+        else if (type === 'input') op = modbus.readInputRegisters(address, count);
+
+        const result = await op;
         res.json({ data: result || [] });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
-// Write (single and multiple)
-app.get("/write", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const { type, address, value } = req.query;
-
+// Write (single or multiple)
+const writeSchema = {
+    type: { enum: ['coil', 'holding'], required: true },
+    address: { type: 'number', min: 0, max: 65535, required: true },
+    value: { required: true } // Validated manually below for CSV support
+};
+app.post("/write", requireConnection, validate(writeSchema), async (req, res) => {
     try {
-        const vals = value.split(',').map(v => parseInt(v)); // separate value(s) by comma, and convert to integers
+        const { type, address, value } = req.cleanData;
+        
+        // Handle CSV values
+        const valString = String(value);
+        const vals = valString.split(',').map(v => {
+            const parsed = parseInt(v);
+            if (isNaN(parsed)) throw new Error("Invalid value in CSV");
+            return parsed;
+        });
 
-        const addr = parseInt(address);
+        let op;
+        if (type === 'coil') op = modbus.writeCoils(address, vals);
+        else if (type === 'holding') op = modbus.writeRegisters(address, vals);
 
-        let resultAwait;
-        switch (type) {
-            case "coil":
-                resultAwait = modbus.writeCoils(addr, vals);
-                break;
-            case "holding":
-                resultAwait = modbus.writeRegisters(addr, vals);
-                break;
-            default:
-                return res.status(400).json({ error: "Invalid register type" });
-        }
-
-        // timeout
-        const result = await withTimeout(resultAwait, timeoutMs);
-
-        res.json({ status: "written", address: addr, value: vals });
+        await op;
+        res.json({ status: "written", address, value: vals });
     } catch (err) {
-        console.error("Write error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // Set mode (current or voltage for holding regs, input regs)
-app.get("/setmode", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const type = req.query.type;
-    const address = parseInt(req.query.address);
-    const mode = parseInt(req.query.mode) + 1;
-
-    if (isNaN(address) || address < 0 || address > 0xFFFF) {
-        return res.status(400).json({ error: "Invalid or missing register address" });
-    }
-
-    if (isNaN(mode) || mode < 1 || mode > 2) { // add one to checks
-        return res.status(400).json({ error: "Invalid or missing mode. 0 is voltage mode, 1 is current mode" });
-    }
-
-    if (!type || (type != "holding" && type != "input")) {
-        return res.status(400).json({ error: "Invalid or missing type. Type must be 'holding' or 'input'." });
-    }
-
-    let func;
-    switch (type) {
-        case "holding":
-            func = 0x6F;
-            break;
-        case "input":
-            func = 0x70;
-            break;
-    }
-
-    const request = Buffer.alloc(3);
-    request.writeUInt16BE(address, 0);
-    request.writeUInt8(mode, 2);
-
+const setModeSchema = {
+    type: { enum: ['holding', 'input'], required: true },
+    address: { type: 'number', min: 0, max: 65535, required: true },
+    mode: { type: 'number', min: 0, max: 1, required: true }
+};
+app.post("/setmode", requireConnection, validate(setModeSchema), async (req, res) => {
     try {
+        const { type, address, mode } = req.cleanData;
+        const func = (type === 'holding') ? FUNC_CODES.SET_MODE_HOLDING : FUNC_CODES.SET_MODE_INPUT;
+        
+        const request = Buffer.alloc(3);
+        request.writeUInt16BE(address, 0);
+        request.writeUInt8(mode + 1, 2); // 0->1, 1->2
+
         const result = await modbus.sendRequest(func, request);
-
-        // Check response
-        if (result.length < 3) throw new Error("Invalid response length");
-        if (result[2] !== 0x01) throw new Error("Invalid status byte");
-
-        res.json({
-            success: true,
-            raw: result.toString("hex") 
-        });
+        if (result.length < 3 || result[2] !== 0x01) throw new Error("Device reported failure");
+        res.json({ success: true, raw: result.toString("hex") });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // Get mode (current or voltage for holding regs, input regs)
-app.get("/getmode", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const func = 0x71;
-
-    const type = req.query.type;
-    const address = parseInt(req.query.address);
-
-    if (isNaN(address) || address < 0 || address > 0xFFFF) {
-        return res.status(400).json({ error: "Invalid or missing register address" });
-    }
-
-    if (!type || (type != "holding" && type != "input")) {
-        return res.status(400).json({ error: "Invalid or missing type. Type must be 'holding' or 'input'." });
-    }
-
-    let typeInt;
-    switch (type) {
-        case "holding": {
-            typeInt = 3;
-            break;
-        }
-        case "input": {
-            typeInt = 4;
-            break;
-        }
-    }
-
-    const request = Buffer.alloc(3);
-    request.writeUInt16BE(address, 0);
-    request.writeUInt8(typeInt, 2);
-
+app.get("/getmode", requireConnection, validate({
+    type: { enum: ['holding', 'input'], required: true },
+    address: { type: 'number', min: 0, max: 65535, required: true }
+}), async (req, res) => {
     try {
-        const result = await modbus.sendRequest(func, request);
+        const { type, address } = req.cleanData;
+        const typeInt = (type === 'holding') ? 3 : 4;
+        const request = Buffer.alloc(3);
+        request.writeUInt16BE(address, 0);
+        request.writeUInt8(typeInt, 2);
 
-        // Check response
-        if (result.length < 3) throw new Error("Invalid response length");
-        
-        mode = result[2] - 1;
-
-        res.json({
-            success: true,
-            mode: mode,
-            raw: result.toString("hex") 
-        });
+        const result = await modbus.sendRequest(FUNC_CODES.GET_MODE, request);
+        const mode = result[2] - 1; 
+        res.json({ success: true, mode, raw: result.toString("hex") });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
-// -----
-async function sendRule(slave, rule) {
-    // Custom function
-    const func = 0x65; // Function code 101
-
-    const b = Buffer.alloc(18); // 18 bytes for the rule data (no index)
-
-    b.writeUInt8(rule.input_type1, 0);
-    b.writeUInt16BE(rule.input_reg1, 1);
-    b.writeUInt8(rule.op1, 3);
-    b.writeUInt16BE(rule.compare_value1, 4);
-
-    b.writeUInt8(rule.input_type2, 6);
-    b.writeUInt16BE(rule.input_reg2, 7);
-    b.writeUInt8(rule.op2, 9);
-    b.writeUInt16BE(rule.compare_value2, 10);
-
-    b.writeUInt8(rule.join, 12);
-    b.writeUInt8(rule.output_type, 13);
-    b.writeUInt16BE(rule.output_reg, 14);
-    b.writeUInt16BE(rule.output_value, 16);
-
-    try {
-        const response = await modbus.sendRequest(func, b);
-        return response;
-    } catch (err) {
-        console.error("Failed to send rule", err);
-        throw err;
-    }
-}
-
 // Add a rule
-app.get("/addrule", async (req, res) => {
+const addRuleSchema = {
+    input_type1: { type: 'number', min: 1, max: 6, required: true },
+    input_reg1: { type: 'number', min: 0, max: 65535, required: true },
+    op1: { type: 'number', min: 1, max: 6, required: true },
+    compare_value1: { type: 'number', min: 0, max: 65535, required: true },
+    join: { type: 'number', min: 1, max: 3, required: true },
+    output_type: { type: 'number', min: 1, max: 255, required: true },
+    output_reg: { type: 'number', min: 0, max: 65535, required: true },
+    output_value: { type: 'number', min: 0, max: 65535, required: true },
+    // Optional second rule parts
+    input_type2: { type: 'number', min: 1, max: 6, required: false },
+    input_reg2: { type: 'number', min: 0, max: 65535, required: false },
+    op2: { type: 'number', min: 1, max: 6, required: false },
+    compare_value2: { type: 'number', min: 0, max: 65535, required: false }
+};
+
+app.post("/addrule", requireConnection, validate(addRuleSchema), async (req, res) => {
     try {
-        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
+        const d = req.cleanData; // d for data (short alias)
+        
+        const request = Buffer.alloc(18);
+        request.writeUInt8(d.input_type1, 0);
+        request.writeUInt16BE(d.input_reg1, 1);
+        request.writeUInt8(d.op1, 3);
+        request.writeUInt16BE(d.compare_value1, 4);
 
-        const rule = {
-            input_type1: parseInt(req.query.input_type1),
-            input_reg1: parseInt(req.query.input_reg1),
-            op1: parseInt(req.query.op1),
-            compare_value1: parseInt(req.query.compare_value1),
-            
-            input_type2: parseInt(req.query.input_type2),
-            input_reg2: parseInt(req.query.input_reg2),
-            op2: parseInt(req.query.op2),
-            compare_value2: parseInt(req.query.compare_value2),
+        // Handle optional second part (default to 0 if missing)
+        request.writeUInt8(d.input_type2 || 0, 6);
+        request.writeUInt16BE(d.input_reg2 || 0, 7);
+        request.writeUInt8(d.op2 || 0, 9);
+        request.writeUInt16BE(d.compare_value2 || 0, 10);
 
-            join: parseInt(req.query.join),
-            output_type: parseInt(req.query.output_type),
-            output_reg: parseInt(req.query.output_reg),
-            output_value: parseInt(req.query.output_value),
-        };
+        request.writeUInt8(d.join, 12);
+        request.writeUInt8(d.output_type, 13);
+        request.writeUInt16BE(d.output_reg, 14);
+        request.writeUInt16BE(d.output_value, 16);
 
-        const sendRes = await sendRule(currentSlave, rule);
+        const result = await modbus.sendRequest(FUNC_CODES.ADD_RULE, request);
 
-        // Get status byte to discern success
-        const statusByte = sendRes[2]; // index 2 = 3rd byte
-
-        if (statusByte === 1) { // true if 0x01 (success)
-            res.json({
-                success: true,
-                raw: sendRes.toString("hex") 
-            });
-        } else { // false if 0x00 (failure due to max rules reached)
-            res.status(409).json({
-                error: "Rule not added - maximum number of rules already reached.",
-                statusByte
-            });
-        }
+        if (result[2] === 0x01) res.json({ success: true });
+        else res.status(409).json({ error: "Max rules reached" });
     } catch (err) {
-        console.error("Failed to add rule:", err);
         res.status(500).json({ error: err.message });
     }
 });
 
 
 // Get rule count
-app.get("/getrulecount", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const func = 0x66;
-
-    const request = Buffer.alloc(2); // empty, but 2 bytes as the minimum modbus request length on the controller is 6 bytes
-
+app.get("/getrulecount", requireConnection, async (req, res) => {
     try {
-        const result = await modbus.sendRequest(func, request);
-
-        // Decode response
-        if (result.length < 5) throw new Error("Invalid response length");
-        if (result[2] !== 0x02) throw new Error("Unexpected byte count");
-
+        const result = await modbus.sendRequest(FUNC_CODES.GET_RULE_COUNT, Buffer.alloc(2));
         const ruleCount = (result[3] << 8) | result[4];
-
-        res.json({ data: ruleCount });
+        res.json({ success: true, data: ruleCount });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // Get Rule
-app.get("/getrule", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const func = 0x67;
-    const index = parseInt(req.query.index);
-
-    if (isNaN(index) || index < 0 || index > 0xFFFF) {
-        return res.status(400).json({ error: "Invalid or missing rule index" });
-    }
-
-    const request = Buffer.alloc(2);
-    request.writeUInt16BE(index, 0);
-
+app.get("/getrule", requireConnection, validate({
+    index: { type: 'number', min: 0, max: 65535, required: true }
+}), async (req, res) => {
     try {
-        const result = await modbus.sendRequest(func, request);
-
-        if (result.length < 20) {
-            throw new Error(`Response too short: expected 20+, got ${result.length}`);
-        }
+        const request = Buffer.alloc(2);
+        request.writeUInt16BE(req.cleanData.index, 0);
+        const result = await modbus.sendRequest(FUNC_CODES.GET_RULE, request);
+        
+        if (result.length < 20) throw new Error("Response too short");
 
         // Decode result
         const input_type1Raw = result[2];
@@ -373,311 +363,163 @@ app.get("/getrule", async (req, res) => {
 });
 
 // Delete Rule
-app.get("/deleterule", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const func = 0x68;
-
-    const index = parseInt(req.query.index);
-
-    if (isNaN(index) || index < 0 || index > 0xFFFF) {
-        return res.status(400).json({ error: "Invalid or missing rule index" });
-    }
-
-    const request = Buffer.alloc(2);
-    request.writeUInt16BE(index, 0);
-
+app.delete("/deleterule", requireConnection, validate({
+    index: { type: 'number', min: 0, max: 65535, required: true }
+}), async (req, res) => {
     try {
-        const result = await modbus.sendRequest(func, request);
-
-        // Check response
-        if (result.length < 3) throw new Error("Invalid response length");
-        if (result[2] !== 0x01) throw new Error("Invalid status byte");
-
-        res.json({
-            success: true,
-            raw: result.toString("hex") 
-        });
+        const request = Buffer.alloc(2);
+        request.writeUInt16BE(req.cleanData.index, 0);
+        const result = await modbus.sendRequest(FUNC_CODES.DELETE_RULE, request);
+        if (result[2] !== 0x01) throw new Error("Delete failed");
+        res.json({ success: true });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // ------
 // Add a virtual register
-app.get("/addvr", async (req, res) => { 
+app.post("/addvr", requireConnection, validate({
+    type: { type: 'number', min: 0, max: 65535, required: true }
+}), async (req, res) => {
     try {
-        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-        const func = 0x69;
-        const type = parseInt(req.query.type);
-
-        if (isNaN(type) || type < 0 || type > 0xFFFF) {
-            return res.status(400).json({ error: "Invalid or missing register type" });
-        }
-
         const request = Buffer.alloc(2);
-        request.writeUInt8(type, 0);
+        request.writeUInt8(req.cleanData.type, 0);
         request.writeUInt8(0, 1);
-
-        const result = await modbus.sendRequest(func, request);
-
-        if (result.length != 5 || result[2] != 1) {
-            throw new Error(`Invalid response.`);
-        }
-
-        // Send parsed data
-        res.json({
-            success: true,
-            raw: result.toString("hex") 
-        });
+        const result = await modbus.sendRequest(FUNC_CODES.ADD_VR, request);
+        if (result[2] !== 1) throw new Error("Failed");
+        res.json({ success: true });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // Read a virtual register
-app.get("/readvr", async (req, res) => { 
+app.get("/readvr", requireConnection, validate({
+    type: { type: 'number', min: 1, max: 2, required: true },
+    address: { type: 'number', min: 0, max: 65535, required: true }
+}), async (req, res) => {
     try {
-        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-        const func = 0x6A;
-        const type = parseInt(req.query.type);
-        const address = parseInt(req.query.address);
-
-        if (![1, 2].includes(type)) {
-            return res.status(400).json({ error: "Invalid register type (must be 1 or 2)" });
-        }
-        if (isNaN(address) || address < 0 || address > 0xFFFF) {
-            return res.status(400).json({ error: "Invalid or missing register address" });
-        }
-
+        const { type, address } = req.cleanData;
         const request = Buffer.alloc(3);
         request.writeUInt8(type, 0);
         request.writeUInt16BE(address, 1);
-
-        const result = await modbus.sendRequest(func, request);
-
-        if ((type == 1 && result.length < 4) || (type == 2 && result.length < 5)) { // type 1 = VIR_COIL, type 2 = VIR_HOLDING
-            throw new Error(`Response too short: expected ${(type == 2) ? "5" : "4"}, got ${result.length}`);
-        }
-
-        // Decode result
+        const result = await modbus.sendRequest(FUNC_CODES.READ_VR, request);
+        
         let value;
-        if (type == 1) {
-            value = result[3]; // 1 byte
-            if (![0,1].includes(value)) {
-                throw new Error(`Invalid response value: expected 0 or 1, got ${value}`);
-            }
-        } else {
-            value = (result[3] << 8) | result[4]; // 2 bytes
-        }
-
-        // Send parsed data
-        res.json({
-            success: true,
-            value,
-            raw: result.toString("hex") 
-        });
+        if (type == 1) value = result[3];
+        else value = (result[3] << 8) | result[4];
+        
+        res.json({ success: true, value });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // Write a virtual register
-app.get("/writevr", async (req, res) => { 
+app.post("/writevr", requireConnection, validate({
+    type: { type: 'number', min: 1, max: 2, required: true },
+    address: { type: 'number', min: 0, max: 65535, required: true },
+    value: { type: 'number', min: 0, max: 65535, required: true }
+}), async (req, res) => {
     try {
-        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-        const func = 0x6B;
-        const type = parseInt(req.query.type);
-        const address = parseInt(req.query.address);
-        const value = parseInt(req.query.value);
-
-        if (![1, 2].includes(type)) {
-            return res.status(400).json({ error: "Invalid register type (must be 1 or 2)" });
-        }
-        if (isNaN(address) || address < 0 || address > 0xFFFF) {
-            return res.status(400).json({ error: "Invalid or missing register address" });
-        }
-        if (isNaN(value) || value < 0 || value > 0xFFFF) {
-            return res.status(400).json({ error: "Invalid or missing write value" });
-        }
-
+        const { type, address, value } = req.cleanData;
         const request = Buffer.alloc(5);
         request.writeUInt8(type, 0);
         request.writeUInt16BE(address, 1);
         request.writeUInt16BE(value, 3);
-
-        const result = await modbus.sendRequest(func, request);
-
-        if (result.length != 5 || result[2] != 1) {
-            throw new Error(`Invalid response.`);
-        }
-
-        // Send parsed data
-        res.json({
-            success: true,
-            raw: result.toString("hex") 
-        });
+        
+        const result = await modbus.sendRequest(FUNC_CODES.WRITE_VR, request);
+        if (result[2] !== 1) throw new Error("Failed");
+        res.json({ success: true });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // Get virtual register count
-app.get("/countvr", async (req, res) => {
+app.get("/countvr", requireConnection, validate({
+    type: { type: 'number', min: 1, max: 2, required: true }
+}), async (req, res) => {
     try {
-        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-        const func = 0x6C;
-        const type = parseInt(req.query.type);
-
-        if (![1, 2].includes(type)) {
-            return res.status(400).json({ error: "Invalid register type (must be 1 or 2)" });
-        }
-
+        const { type } = req.cleanData;
         const request = Buffer.alloc(2);
         request.writeUInt8(type, 0);
         request.writeUInt8(0, 1);
 
-        const result = await modbus.sendRequest(func, request);
-
-        const count = (result[3] << 8) | result[4];
-
-        if (result.length != 7 || result[2] != 2) { // if length is wrong or byte count != 2
-            throw new Error(`Invalid response.`);
+        const result = await modbus.sendRequest(FUNC_CODES.COUNT_VR, request);
+        
+        if (result.length < 5 || result[2] !== 0x02) { 
+             throw new Error("Invalid response from device");
         }
 
-        // Send parsed data
-        res.json({
-            success: true,
-            count,
-            raw: result.toString("hex") 
-        });
+        const count = (result[3] << 8) | result[4];
+        res.json({ success: true, count, raw: result.toString("hex") });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // Delete a virtual register [BackEnd only at the moment]
-app.get("/clearvr", async (req, res) => { 
+app.post("/clearvr", requireConnection, validate({
+    confirmation: { type: 'boolean', required: true }
+}), async (req, res) => {
     try {
-        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-        const func = 0x6D;
-        const confirm = req.query.confirmation; // boolean
-        if (confirm !== '1' && confirm !== 'true') return res.status(400).json({ error: "Confirmation is required." }); 
-
-        const request = Buffer.alloc(2);
-        request.writeUInt8(1, 0); // confirm byte 1
-        request.writeUInt8(1, 1); // confirm byte 2
-
-        const result = await modbus.sendRequest(func, request);
-
-        if (result.length != 5 || result[2] != 1) {
-            throw new Error(`Invalid response.`);
-        }
-
-        // Send parsed data
-        res.json({
-            success: true,
-            raw: result.toString("hex") 
-        });
+        if (!req.cleanData.confirmation) throw new Error("Not confirmed");
+        const result = await modbus.sendRequest(FUNC_CODES.CLEAR_VR, Buffer.from([1, 1]));
+        if (result[2] !== 1) throw new Error("Failed");
+        res.json({ success: true });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 // ------
 // Set RTC time
-app.get("/setrtc", async (req, res) => { 
+app.post("/setrtc", requireConnection, validate({
+    tz: { required: true }
+}), async (req, res) => {
     try {
-        if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-        const timezone = req.query.tz;
-        if (!timezone) {
-            return res.status(400).json({ error: "Missing timezone (tz) query parameter" });
-        }
-
-        // Use luxon to get the time in the specified timezone
         const { DateTime } = require("luxon");
-        const now = DateTime.now().setZone(timezone);
-
-        if (!now.isValid) {
-            return res.status(400).json({ error: "Invalid timezone" });
-        }
-
-        const func = 0x6E;
+        const now = DateTime.now().setZone(req.cleanData.tz);
+        
+        if (!now.isValid) throw new Error("Invalid timezone");
 
         const request = Buffer.from([
-            now.second,
-            now.minute,
-            now.hour,
-            now.weekday % 7 + 1, // 1 = monday, 7 = sunday
-            now.day,
-            now.month,
-            now.year % 100 // last two digits
+            now.second, now.minute, now.hour,
+            now.weekday % 7 + 1, now.day, now.month, now.year % 100
         ]);
 
-        const result = await modbus.sendRequest(func, request);
-
-        if (!result || result.length < 3 || result[2] !== 0x01) {
-            throw new Error("Failed to set RTC on device");
-        }
-
-        res.json({
-            success: true,
-            timeSent: now.toFormat("yyyy-LL-dd HH:mm:ss"),
-            rawResponse: result.toString("hex")
-        });
+        const result = await modbus.sendRequest(FUNC_CODES.SET_RTC, request);
+        if (result[2] !== 0x01) throw new Error("Failed");
+        res.json({ success: true, timeSent: now.toFormat("yyyy-LL-dd HH:mm:ss") });
     } catch (err) {
-        console.error("RTC Set error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
 
 // Set emergency stop configuration
-app.get("/setemergencystop", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const func = 0x72;
-
-    const channel = parseInt(req.query.channel);
-    const inputMode = parseInt(req.query.inputMode) + 1;
-
-    if (isNaN(channel) || channel < 0 || channel > 0xFFFF) {
-        return res.status(400).json({ error: "Invalid or missing discrete input channel" });
-    }
-
-    if (isNaN(inputMode) || inputMode < 1 || inputMode > 2) { // add one to checks
-        return res.status(400).json({ error: "Invalid or missing inputMode. 0 is NO, 1 is NC" });
-    }
-
-    const request = Buffer.alloc(3);
-    request.writeUInt16BE(channel, 0);
-    request.writeUInt8(inputMode, 2);
-
+app.post("/setemergencystop", requireConnection, validate({
+    channel: { type: 'number', min: 0, max: 65535, required: true },
+    inputMode: { type: 'number', min: 0, max: 1, required: true } // 0 or 1
+}), async (req, res) => {
     try {
-        const result = await modbus.sendRequest(func, request);
+        const { channel, inputMode } = req.cleanData;
+        
+        const request = Buffer.alloc(3);
+        request.writeUInt16BE(channel, 0);
+        request.writeUInt8(inputMode + 1, 2); // Convert 0->1 (NO), 1->2 (NC)
 
-        // Check response
-        if (result.length < 3) throw new Error("Invalid response length");
-        if (result[2] !== 0x01) throw new Error("Invalid status byte");
+        const result = await modbus.sendRequest(FUNC_CODES.SET_ESTOP, request);
 
-        res.json({
-            success: true,
-            raw: result.toString("hex") 
-        });
+        // Validation: Expect Status byte 0x01
+        if (result.length < 3 || result[2] !== 0x01) {
+            throw new Error("Device reported failure");
+        }
+
+        res.json({ success: true, raw: result.toString("hex") });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -685,97 +527,20 @@ app.get("/setemergencystop", async (req, res) => {
 
 
 // Factory Reset
-app.get("/factoryreset", async (req, res) => {
-    if (!isConnected) return res.status(400).json({ error: "Not connected to any port" });
-
-    const func = 0x73;
-
-    const confirmation = req.query.confirmation;
-
-    if (confirmation != "true") {
-        return res.status(400).json({ error: "Must confirm with confirmation = true" });
-    }
-
-    const request = Buffer.alloc(2);
-    request.writeUInt8(1, 0); // confirmation
-    request.writeUInt8(0, 1); // padding
-
+app.post("/factoryreset", requireConnection, validate({
+    confirmation: { type: 'boolean', required: true }
+}), async (req, res) => {
     try {
-        const result = await modbus.sendRequest(func, request);
-
-        // Check response
-        if (result.length < 3) throw new Error("Invalid response length");
-        if (result[2] !== 0x01) throw new Error("Invalid status byte");
-
-        res.json({
-            success: true,
-            raw: result.toString("hex") 
-        });
+        if (!req.cleanData.confirmation) throw new Error("Not confirmed");
+        const result = await modbus.sendRequest(FUNC_CODES.FACTORY_RESET, Buffer.from([1, 0]));
+        if (result[2] !== 0x01) throw new Error("Failed");
+        res.json({ success: true });
     } catch (err) {
-        console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
-// ------
-// List serial ports
-app.get("/ports", async (req, res) => {
-    try {
-        const portNames = await ModbusRTU.listPorts();
-        res.json(portNames);
-    } catch (err) {
-        console.error("Error listing ports:", err);
-        res.status(500).json({ error: "Failed to list ports" });
-    }
-});
-
-// Get connection status
-app.get("/status", async (req, res) => {
-    try {
-        res.json({ status: isConnected, port: currentPort , slave: currentSlave });
-    } catch (err) {
-        console.error("Response error:", err);
-    }
-});
-
-// Connect to a selected port UPDATED
-app.get("/connect", async (req, res) => {
-    const { port, baud, slave } = req.query;
-
-    try {
-        const baudRate = parseInt(baud);
-
-        if (!port) return res.status(400).json({ success: false, error: "No port specified" });
-        if (!baudRate) return res.status(400).json({ success: false, error: "No baud rate specified" });
-        if (!slave) return res.status(400).json({ success: false, error: "No slave address specified" });
-
-        await modbus.connect(slave, port, baudRate, "none");
-        isConnected = true;
-        currentPort = port;
-        currentSlave = slave;
-        console.log(`Connected to ${port}`);
-        res.json({ success: true });
-    } catch (err) {
-        console.error("Connection error:", err);
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// Disconnect UPDATED
-app.get("/disconnect", async (req, res) => {
-    try {
-        await modbus.disconnect();
-        console.log("Disconnected.");
-        isConnected = false;
-        currentPort = null;
-        currentSlave = null;
-        res.json({ success: true });
-    } catch (err) {
-        console.log("Disconnection error:", err);
-        res.json({ success: false, error: err.message });
-    }
-});
-
+// ----- SHUTDOWN -----
 
 app.listen(5000, () => {
     console.log("Server running on http://localhost:5000");
@@ -783,7 +548,7 @@ app.listen(5000, () => {
 
 // Handle application shutdown cleanly
 process.on("SIGINT", async () => {
-    if (isConnected) {
+    if (connectionState.isConnected) {
         await modbus.disconnect();
     }
     process.exit();
@@ -792,7 +557,5 @@ process.on("SIGINT", async () => {
 // Listen for serial disconnects
 modbus.on("disconnect", () => {
     console.warn("Modbus device disconnected!");
-    isConnected = false;
-    currentPort = null;
-    currentSlave = null;
+    connectionState = { isConnected: false, port: null, slave: null };
 });

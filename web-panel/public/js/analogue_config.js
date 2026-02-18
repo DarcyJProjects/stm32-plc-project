@@ -103,11 +103,18 @@ async function hwModeSet() {
     }
 
     var mode = item.selectedIndex;
-
     var index = hwGetItemAddress(item);
 
-    const url = `/setmode?type=${type}&address=${index}&mode=${mode}`;
-    const response = await fetch(url);
+    const response = await fetch('/setmode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: type,
+        address: index,
+        mode: mode
+      })
+    });
+
     const data = await response.json();
     
     if (data.success == true) {
