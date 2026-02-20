@@ -371,13 +371,15 @@ Virtual Registers can be created dynamically to serve as intermediate variables 
 
 Since Virtual Registers are defined with specific Modbus data types, they can be fully accessed (Read/Write) using standard Modbus function codes.
 
+\clearpage
+
 \subsection{External Expansion ($I^2C$)}
 The isolated 5V $I^2C$ header allows external peripherals to be mapped to MODBUS registers. On-board field side 5V\_ISO pull-up resistors (4.7 k$\Omega$) are installed on SCL and SDA, so 5V tolerant $I^2C$ devices can only be used without an external level shifter (see Texas Instruments PCA9306). The user must provide their own power supply for the devices, and reference this to the GND pin in the header.
 \vspace{1em} \\
 \textit{\textbf{Note:} Unlike the Rule Engine, adding new $I^2C$ devices requires custom read/write drivers and a \textbf{firmware update}. Reference implementations for common sensors can be found in the project source code.}
 
 
-\clearpage
+
 \subsection{Vendor Defined Function Codes}
 These proprietary function codes provide access to specialized device capabilities, including the internal logic engine and virtual register management, that are not covered by standard MODBUS definitions.
 \textbf{Range:} 0x65--0x73 (Firmware Defined)
@@ -495,12 +497,9 @@ The isolated RS485 interface features a 6-pin jumper header (JP\_RS485) to enabl
 
 \begin{figure}[h]
     \centering
-    % REPLACE with your Mechanical Drawing (PCB Outline + Hole Dimensions)
-    % \includegraphics[width=0.7\linewidth]{mechanical_drawing} 
-    \begin{center}
-        \fbox{\parbox{10cm}{\centering \vspace{3cm} [PLACEHOLDER: PCB DIMENSIONS \& MOUNTING HOLES] \vspace{3cm}}}
-    \end{center}
-    \caption{Mechanical Dimensions (Units: mm). Mounting Holes are M3 standard.}
+    % width=1.0\linewidth ensures it fills the column width while maintaining aspect ratio
+    \includegraphics[width=1.0\linewidth]{../mounting_holes.pdf} 
+    \caption{Mechanical Dimensions (Units: mm).}
 \end{figure}
 
 \section{Connection Diagram}
