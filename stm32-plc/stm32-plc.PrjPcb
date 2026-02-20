@@ -560,7 +560,7 @@ GenerateClassCluster=0
 DocumentUniqueId=DUHDCCCF
 
 [Document31]
-DocumentPath=mountingcase.PCBDwf
+DocumentPath=..\Documentation\mounting_holes.PCBDwf
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -574,87 +574,178 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=NXIOBBLF
-
-[Document32]
-DocumentPath=dinrail.PCBDwf
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=-1
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=0
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=XKUNKLTV
+DocumentUniqueId=HIAXFYQR
 
 [GeneratedDocument1]
-DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles-NonPlated.TXT
+DocumentPath=Project Outputs for stm32-plc\Design Rule Check - Main.html
 DItemRevisionGUID=
 
 [GeneratedDocument2]
-DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles-Plated.TXT
+DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles-NonPlated.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument3]
-DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles.TXT
+DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles-Plated.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument4]
-DocumentPath=Project Outputs for stm32-plc\Main-SlotHoles-Plated.TXT
+DocumentPath=Project Outputs for stm32-plc\Main-RoundHoles.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument5]
-DocumentPath=Project Outputs for stm32-plc\Main-SlotHoles.TXT
+DocumentPath=Project Outputs for stm32-plc\Main-SlotHoles-Plated.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument6]
-DocumentPath=Project Outputs for stm32-plc\Main.DRR
+DocumentPath=Project Outputs for stm32-plc\Main-SlotHoles.TXT
 DItemRevisionGUID=
 
 [GeneratedDocument7]
-DocumentPath=Project Outputs for stm32-plc\Main.LDP
+DocumentPath=Project Outputs for stm32-plc\Main.DRR
 DItemRevisionGUID=
 
 [GeneratedDocument8]
-DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.G1
 DItemRevisionGUID=
 
 [GeneratedDocument9]
-DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Top.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.GBL
 DItemRevisionGUID=
 
 [GeneratedDocument10]
-DocumentPath=Project Outputs for stm32-plc\Main_Legend_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.GBO
 DItemRevisionGUID=
 
 [GeneratedDocument11]
-DocumentPath=Project Outputs for stm32-plc\Main_Legend_Top.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.GBP
 DItemRevisionGUID=
 
 [GeneratedDocument12]
-DocumentPath=Project Outputs for stm32-plc\Main_Paste_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.GBS
 DItemRevisionGUID=
 
 [GeneratedDocument13]
-DocumentPath=Project Outputs for stm32-plc\Main_Paste_Top.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.GD1
 DItemRevisionGUID=
 
 [GeneratedDocument14]
-DocumentPath=Project Outputs for stm32-plc\Main_Profile.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.GG1
 DItemRevisionGUID=
 
 [GeneratedDocument15]
-DocumentPath=Project Outputs for stm32-plc\Main_Soldermask_Bot.gbr
+DocumentPath=Project Outputs for stm32-plc\Main.GKO
 DItemRevisionGUID=
 
 [GeneratedDocument16]
+DocumentPath=Project Outputs for stm32-plc\Main.GM
+DItemRevisionGUID=
+
+[GeneratedDocument17]
+DocumentPath=Project Outputs for stm32-plc\Main.GM1
+DItemRevisionGUID=
+
+[GeneratedDocument18]
+DocumentPath=Project Outputs for stm32-plc\Main.GM2
+DItemRevisionGUID=
+
+[GeneratedDocument19]
+DocumentPath=Project Outputs for stm32-plc\Main.GM5
+DItemRevisionGUID=
+
+[GeneratedDocument20]
+DocumentPath=Project Outputs for stm32-plc\Main.GM11
+DItemRevisionGUID=
+
+[GeneratedDocument21]
+DocumentPath=Project Outputs for stm32-plc\Main.GM13
+DItemRevisionGUID=
+
+[GeneratedDocument22]
+DocumentPath=Project Outputs for stm32-plc\Main.GM15
+DItemRevisionGUID=
+
+[GeneratedDocument23]
+DocumentPath=Project Outputs for stm32-plc\Main.GM16
+DItemRevisionGUID=
+
+[GeneratedDocument24]
+DocumentPath=Project Outputs for stm32-plc\Main.GM19
+DItemRevisionGUID=
+
+[GeneratedDocument25]
+DocumentPath=Project Outputs for stm32-plc\Main.GM20
+DItemRevisionGUID=
+
+[GeneratedDocument26]
+DocumentPath=Project Outputs for stm32-plc\Main.GP1
+DItemRevisionGUID=
+
+[GeneratedDocument27]
+DocumentPath=Project Outputs for stm32-plc\Main.GPB
+DItemRevisionGUID=
+
+[GeneratedDocument28]
+DocumentPath=Project Outputs for stm32-plc\Main.GPT
+DItemRevisionGUID=
+
+[GeneratedDocument29]
+DocumentPath=Project Outputs for stm32-plc\Main.GTL
+DItemRevisionGUID=
+
+[GeneratedDocument30]
+DocumentPath=Project Outputs for stm32-plc\Main.GTO
+DItemRevisionGUID=
+
+[GeneratedDocument31]
+DocumentPath=Project Outputs for stm32-plc\Main.GTP
+DItemRevisionGUID=
+
+[GeneratedDocument32]
+DocumentPath=Project Outputs for stm32-plc\Main.GTS
+DItemRevisionGUID=
+
+[GeneratedDocument33]
+DocumentPath=Project Outputs for stm32-plc\Main.LDP
+DItemRevisionGUID=
+
+[GeneratedDocument34]
+DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument35]
+DocumentPath=Project Outputs for stm32-plc\Main_Copper_Signal_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument36]
+DocumentPath=Project Outputs for stm32-plc\Main_Legend_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument37]
+DocumentPath=Project Outputs for stm32-plc\Main_Legend_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument38]
+DocumentPath=Project Outputs for stm32-plc\Main_Paste_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument39]
+DocumentPath=Project Outputs for stm32-plc\Main_Paste_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument40]
+DocumentPath=Project Outputs for stm32-plc\Main_Profile.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument41]
+DocumentPath=Project Outputs for stm32-plc\Main_Soldermask_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument42]
 DocumentPath=Project Outputs for stm32-plc\Main_Soldermask_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument43]
+DocumentPath=Project Outputs for stm32-plc\Net Status - Main.html
 DItemRevisionGUID=
 
 [Configuration1]
@@ -953,7 +1044,7 @@ OutputDefault8=0
 Configuration8_Name1=ForceUpdateSettings
 Configuration8_Item1=False
 Configuration8_Name2=OutputConfigurationParameter1
-Configuration8_Item2=BoardEdgeRoutToolDia=2000000|GenerateBoardEdgeRout=False|GenerateDrilledSlotsG85=False|GenerateEIADrillFile=False|GenerateSeparatePlatedNonPlatedFiles=True|GenerateSeparateViaTypeFiles=False|GenerateToolsByDrillSymbols=False|NumberOfDecimals=3|NumberOfUnits=4|OptimizeChangeLocationCommands=True|OriginPosition=Absolute|Record=DrillView|Units=Metric|ZeroesMode=SuppressTrailingZeroes|DocumentPath=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc
+Configuration8_Item2=BoardEdgeRoutToolDia=2000000|GenerateBoardEdgeRout=False|GenerateDrilledSlotsG85=True|GenerateEIADrillFile=False|GenerateSeparatePlatedNonPlatedFiles=True|GenerateSeparateViaTypeFiles=False|GenerateToolsByDrillSymbols=False|NumberOfDecimals=5|NumberOfUnits=2|OptimizeChangeLocationCommands=True|OriginPosition=Absolute|Record=DrillView|Units=Imperial|ZeroesMode=SuppressLeadingZeroes|DocumentPath=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc
 OutputType9=IPC2581
 OutputName9=IPC-2581 Files
 OutputDocumentPath9=
@@ -978,7 +1069,7 @@ OutputDefault12=0
 Configuration12_Name1=ForceUpdateSettings
 Configuration12_Item1=False
 Configuration12_Name2=OutputConfigurationParameter1
-Configuration12_Item2=AddToAllLayerClasses.Set= |AddToAllPlots.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray|BoardID=DXKMAQOP|CentrePlots=False|DrillDrawingSymbol=GraphicsSymbol|DrillDrawingSymbolSize=500000|EmbeddedApertures=True|FilmBorderSize=10000000|FilmXSize=200000000|FilmYSize=160000000|FlashAllFills=False|FlashPadShapes=True|G54OnApertureChange=False|GenerateDRCRulesFile=False|GenerateDRCRulesFile=False|GenerateReliefShapes=True|GenerateReports=False|GerberUnit=Metric|GerberUnit=Metric|IncludeUnconnectedMidLayerPads=True|LayerClassesMirror.Set= |LayerClassesPlot.Set= |LeadingAndTrailingZeroesMode=SuppressLeadingZeroes|MaxApertureSize=2500000|MergePadAndRegion=False|MinusApertureTolerance=50|MinusApertureTolerance=50|Mirror.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray|MirrorDrillDrawingPlots=False|MirrorDrillGuidePlots=False|NoRegularPolygons=False|NumberOfDecimals=3|NumberOfDecimals=3|OptimizeChangeLocationCommands=True|OptimizeChangeLocationCommands=True|OriginPosition=Relative|OutputFormat=Single|Panelize=False|Plot.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray,16777217~1,16842751~1,16973830~1,16973831~1,16973834~1,16973835~1,16973832~1,16973833~1|PlotBoardProfile=True|PlotBoardProfileFileName= |PlotPositivePlaneLayers=False|PlotUsedDrillDrawingLayerPairs=False|PlotUsedDrillGuideLayerPairs=False|PlusApertureTolerance=50|PlusApertureTolerance=50|Record=GerberView|SoftwareArcs=False|Sorted=False|Sorted=False|UncheckPlotDrillDrawingLayerPair0_Backdrill=False|UncheckPlotDrillDrawingLayerPair0_Checked=False|UncheckPlotDrillDrawingLayerPair0_DrillType=Regular|UncheckPlotDrillDrawingLayerPair0_FileName= |UncheckPlotDrillDrawingLayerPair0_HighLayer=Bottom Layer|UncheckPlotDrillDrawingLayerPair0_LowLayer=Top Layer|UncheckPlotDrillGuideLayerPair0_Backdrill=False|UncheckPlotDrillGuideLayerPair0_Checked=False|UncheckPlotDrillGuideLayerPair0_DrillType=Regular|UncheckPlotDrillGuideLayerPair0_FileName= |UncheckPlotDrillGuideLayerPair0_HighLayer=Bottom Layer|UncheckPlotDrillGuideLayerPair0_LowLayer=Top Layer|DocumentPath=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc
+Configuration12_Item2=AddToAllLayerClasses.Set= |AddToAllPlots.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray|BoardID=DXKMAQOP|CentrePlots=False|DrillDrawingSymbol=GraphicsSymbol|DrillDrawingSymbolSize=500000|EmbeddedApertures=True|FilmBorderSize=10000000|FilmXSize=200000000|FilmYSize=160000000|FlashAllFills=False|FlashPadShapes=True|G54OnApertureChange=False|GenerateDRCRulesFile=False|GenerateDRCRulesFile=False|GenerateReliefShapes=True|GenerateReports=False|GerberUnit=Imperial|GerberUnit=Imperial|IncludeUnconnectedMidLayerPads=True|LayerClassesMirror.Set= |LayerClassesPlot.Set= |LeadingAndTrailingZeroesMode=SuppressLeadingZeroes|MaxApertureSize=2500000|MergePadAndRegion=False|MinusApertureTolerance=50|MinusApertureTolerance=50|Mirror.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray|MirrorDrillDrawingPlots=False|MirrorDrillGuidePlots=False|NoRegularPolygons=False|NumberOfDecimals=5|NumberOfDecimals=5|OptimizeChangeLocationCommands=True|OptimizeChangeLocationCommands=True|OriginPosition=Relative|OutputFormat=Different|Panelize=False|Plot.Set=SerializeLayerHash.Version~2,ClassName~TPlotLayerStateArray,16777217~1,16842751~1,16973830~1,16973831~1,16973834~1,16973835~1,16973832~1,16973833~1,16777218~1,16842754~1,16908289~1,16908290~1,16908293~1,16908299~1,16908301~1,16908303~1,16908304~1,16908307~1,16908308~1,16973837~1,16973848~1,16973849~1|PlotBoardProfile=True|PlotBoardProfileFileName= |PlotDrillDrawingLayerPair0_Backdrill=False|PlotDrillDrawingLayerPair0_Checked=True|PlotDrillDrawingLayerPair0_DrillType=Regular|PlotDrillDrawingLayerPair0_FileName= |PlotDrillDrawingLayerPair0_HighLayer=Bottom Layer|PlotDrillDrawingLayerPair0_LowLayer=Top Layer|PlotDrillGuideLayerPair0_Backdrill=False|PlotDrillGuideLayerPair0_Checked=True|PlotDrillGuideLayerPair0_DrillType=Regular|PlotDrillGuideLayerPair0_FileName= |PlotDrillGuideLayerPair0_HighLayer=Bottom Layer|PlotDrillGuideLayerPair0_LowLayer=Top Layer|PlotPositivePlaneLayers=False|PlotUsedDrillDrawingLayerPairs=False|PlotUsedDrillGuideLayerPairs=False|PlusApertureTolerance=50|PlusApertureTolerance=50|Record=GerberView|SoftwareArcs=False|Sorted=False|Sorted=False|DocumentPath=C:\Users\darcy\OneDrive\Documents\GitHub\stm-32-plc-project CBU6\stm32-plc\Main.PcbDoc
 
 [OutputGroup6]
 Name=Report Outputs
