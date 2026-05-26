@@ -255,60 +255,77 @@ app.get("/getmode", requireConnection, validate({
     }
 });
 
-// Add a rule
+// Add a rule (Logic or Copy)
 const addRuleSchema = {
-    input_type1: { type: 'number', min: 1, max: 6, required: true },
-    input_reg1: { type: 'number', min: 0, max: 65535, required: true },
-    op1: { type: 'number', min: 1, max: 6, required: true },
-    compare_value1: { type: 'number', min: 0, max: 65535, required: true },
-    join: { type: 'number', min: 1, max: 3, required: true },
+    rule_type: { type: 'number', min: 1, max: 2, required: true },
+    // Logic rule fields
+    input_type1: { type: 'number', min: 1, max: 6, required: false },
+    input_reg1: { type: 'number', min: 0, max: 65535, required: false },
+    op1: { type: 'number', min: 1, max: 6, required: false },
+    compare_value1: { type: 'number', min: 0, max: 65535, required: false },
+    join: { type: 'number', min: 1, max: 3, required: false },
     output_type: { type: 'number', min: 1, max: 255, required: true },
     output_reg: { type: 'number', min: 0, max: 65535, required: true },
-    output_value: { type: 'number', min: 0, max: 65535, required: true },
-    // Optional second rule parts
+    output_value: { type: 'number', min: 0, max: 65535, required: false },
     input_type2: { type: 'number', min: 1, max: 6, required: false },
     input_reg2: { type: 'number', min: 0, max: 65535, required: false },
     op2: { type: 'number', min: 1, max: 6, required: false },
-    compare_value2: { type: 'number', min: 0, max: 65535, required: false }
+    compare_value2: { type: 'number', min: 0, max: 65535, required: false },
+    // Copy rule specific fields
+    input_type: { type: 'number', min: 1, max: 6, required: false },
+    input_reg: { type: 'number', min: 0, max: 65535, required: false }
 };
 
 app.post("/addrule", requireConnection, validate(addRuleSchema), async (req, res) => {
     try {
-        const d = req.cleanData; // d for data (short alias)
-        
-        const request = Buffer.alloc(18);
-        request.writeUInt8(d.input_type1, 0);
-        request.writeUInt16BE(d.input_reg1, 1);
-        request.writeUInt8(d.op1, 3);
-        request.writeUInt16BE(d.compare_value1, 4);
+        const d = req.cleanData; 
+        let request;
 
-        // Handle optional second part (default to 0 if missing)
-        request.writeUInt8(d.input_type2 || 0, 6);
-        request.writeUInt16BE(d.input_reg2 || 0, 7);
-        request.writeUInt8(d.op2 || 0, 9);
-        request.writeUInt16BE(d.compare_value2 || 0, 10);
-
-        request.writeUInt8(d.join, 12);
-        request.writeUInt8(d.output_type, 13);
-        request.writeUInt16BE(d.output_reg, 14);
-        request.writeUInt16BE(d.output_value, 16);
+        if (d.rule_type === 1) { // Logic Rule
+            request = Buffer.alloc(19);
+            request.writeUInt8(1, 0); // rule_type
+            request.writeUInt8(d.input_type1, 1);
+            request.writeUInt16BE(d.input_reg1, 2);
+            request.writeUInt8(d.op1, 4);
+            request.writeUInt16BE(d.compare_value1, 5);
+            request.writeUInt8(d.input_type2 || 0, 7);
+            request.writeUInt16BE(d.input_reg2 || 0, 8);
+            request.writeUInt8(d.op2 || 0, 10);
+            request.writeUInt16BE(d.compare_value2 || 0, 11);
+            request.writeUInt8(d.join, 13);
+            request.writeUInt8(d.output_type, 14);
+            request.writeUInt16BE(d.output_reg, 15);
+            request.writeUInt16BE(d.output_value, 17);
+        } else if (d.rule_type === 2) { // Copy Rule
+            request = Buffer.alloc(7);
+            request.writeUInt8(2, 0); // rule_type
+            request.writeUInt8(d.input_type, 1);
+            request.writeUInt16BE(d.input_reg, 2);
+            request.writeUInt8(d.output_type, 4);
+            request.writeUInt16BE(d.output_reg, 5);
+        }
 
         const result = await modbus.sendRequest(FUNC_CODES.ADD_RULE, request);
 
         if (result[2] === 0x01) res.json({ success: true });
-        else res.status(409).json({ error: "Max rules reached" });
+        else res.status(409).json({ error: "Max rules reached or error occurred" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-
 // Get rule count
-app.get("/getrulecount", requireConnection, async (req, res) => {
+app.get("/getrulecount", requireConnection, validate({
+    rule_type: { type: 'number', min: 1, max: 2, required: true }
+}), async (req, res) => {
     try {
-        const result = await modbus.sendRequest(FUNC_CODES.GET_RULE_COUNT, Buffer.alloc(2));
-        const ruleCount = (result[3] << 8) | result[4];
-        res.json({ success: true, data: ruleCount });
+        const request = Buffer.alloc(2);
+        request.writeUInt8(req.cleanData.rule_type, 0);
+        request.writeUInt8(0, 1); // Padding byte
+
+        const result = await modbus.sendRequest(FUNC_CODES.GET_RULE_COUNT, request);
+        const count = (result[3] << 8) | result[4];
+        res.json({ success: true, data: count });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -316,46 +333,44 @@ app.get("/getrulecount", requireConnection, async (req, res) => {
 
 // Get Rule
 app.get("/getrule", requireConnection, validate({
+    rule_type: { type: 'number', min: 1, max: 2, required: true },
     index: { type: 'number', min: 0, max: 65535, required: true }
 }), async (req, res) => {
     try {
-        const request = Buffer.alloc(2);
-        request.writeUInt16BE(req.cleanData.index, 0);
+        const request = Buffer.alloc(3);
+        request.writeUInt8(req.cleanData.rule_type, 0);
+        request.writeUInt16BE(req.cleanData.index, 1);
         const result = await modbus.sendRequest(FUNC_CODES.GET_RULE, request);
         
-        if (result.length < 20) throw new Error("Response too short");
-
-        // Decode result
-        const input_type1Raw = result[2];
-        const input_reg1 = (result[3] << 8) | result[4];
-        const op1Raw = result[5];
-        const compare_value1 = (result[6] << 8) | result[7];
-        const input_type2Raw = result[8];
-        const input_reg2 = (result[9] << 8) | result[10];
-        const op2Raw = result[11];
-        const compare_value2 = (result[12] << 8) | result[13];
-        const joinRaw = result[14];
-        const output_typeRaw = result[15];
-        const output_reg = (result[16] << 8) | result[17];
-        const output_value = (result[18] << 8) | result[19];
-
-        // Send parsed data
-        res.json({
-            data: {
-                input_type1Raw,
-                input_reg1,
-                op1Raw,
-                compare_value1,
-                input_type2Raw,
-                input_reg2,
-                op2Raw,
-                compare_value2,
-                joinRaw,
-                output_typeRaw,
-                output_reg,
-                output_value
-            }
-        });
+        if (req.cleanData.rule_type === 1) { // Logic Rule
+            if (result.length < 20) throw new Error("Response too short");
+            res.json({
+                data: {
+                    input_type1Raw: result[2],
+                    input_reg1: (result[3] << 8) | result[4],
+                    op1Raw: result[5],
+                    compare_value1: (result[6] << 8) | result[7],
+                    input_type2Raw: result[8],
+                    input_reg2: (result[9] << 8) | result[10],
+                    op2Raw: result[11],
+                    compare_value2: (result[12] << 8) | result[13],
+                    joinRaw: result[14],
+                    output_typeRaw: result[15],
+                    output_reg: (result[16] << 8) | result[17],
+                    output_value: (result[18] << 8) | result[19]
+                }
+            });
+        } else if (req.cleanData.rule_type === 2) { // Copy Rule
+            if (result.length < 8) throw new Error("Response too short");
+            res.json({
+                data: {
+                    input_typeRaw: result[2],
+                    input_reg: (result[3] << 8) | result[4],
+                    output_typeRaw: result[5],
+                    output_reg: (result[6] << 8) | result[7]
+                }
+            });
+        }
     } catch (err) {
         console.error("Read error:", err.message);
         res.status(500).json({ error: err.message });
@@ -364,11 +379,13 @@ app.get("/getrule", requireConnection, validate({
 
 // Delete Rule
 app.delete("/deleterule", requireConnection, validate({
+    rule_type: { type: 'number', min: 1, max: 2, required: true },
     index: { type: 'number', min: 0, max: 65535, required: true }
 }), async (req, res) => {
     try {
-        const request = Buffer.alloc(2);
-        request.writeUInt16BE(req.cleanData.index, 0);
+        const request = Buffer.alloc(3);
+        request.writeUInt8(req.cleanData.rule_type, 0);
+        request.writeUInt16BE(req.cleanData.index, 1);
         const result = await modbus.sendRequest(FUNC_CODES.DELETE_RULE, request);
         if (result[2] !== 0x01) throw new Error("Delete failed");
         res.json({ success: true });
