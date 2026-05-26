@@ -10,7 +10,7 @@ I've implemented several hardware features including an RTC with battery backup,
 
 The entire ecosystem - the custom PCB, schematics, firmware, and the web panel - is completely open-source right here, so feel free to look into it and see how it works!
 
-#### Datasheet: Read the full datasheet here
+#### Datasheet: Read the full datasheet [here](https://github.com/DarcyJProjects/embedded-controller/blob/main/Documentation/datasheet/datasheet.pdf).
 
 <img src="https://raw.githubusercontent.com/DarcyJProjects/embedded-controller/refs/heads/main/Media/1.png" title="" alt="IMG: Main" data-align="center">
 
