@@ -16,209 +16,263 @@ void modbus_vendor_handle_frame(uint8_t* frame, uint16_t len) {
 
 	switch (function) {
 		case MODBUS_VENDOR_FUNC_ADD_RULE: {
-
-			// Check if the frame length is correct: 18 + 4 (slave id (1), function (1), crc (2))
-			if (len != 22) {
+			// At least 4 bytes for overhead + 1 byte for rule_type
+			if (len < 5) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
-			// Extract fields from the 18-byte payload
-			uint8_t input_type1Raw = frame[2];
-			uint16_t input_reg1 = (frame[3] << 8) | frame[4];
-			uint8_t op1Raw = frame[5];
-			uint16_t compare_value1 = (frame[6] << 8) | frame[7];
-			uint8_t input_type2Raw = frame[8];
-			uint16_t input_reg2 = (frame[9] << 8) | frame[10];
-			uint8_t op2Raw = frame[11];
-			uint16_t compare_value2 = (frame[12] << 8) | frame[13];
-			uint8_t joinRaw = frame[14];
-			uint8_t output_typeRaw = frame[15];
-			uint16_t output_reg = (frame[16] << 8) | frame[17];
-			uint16_t output_value = (frame[18] << 8) | frame[19];
+			uint8_t rule_type = frame[2];
 
-			// Validate fields
-			// Ensure types are valid
-			if (input_type1Raw == 0 || input_type1Raw > AUTOMATION_TYPE_COUNT || output_typeRaw == 0 || output_typeRaw > AUTOMATION_TYPE_COUNT) {
+			if (rule_type == 1) { // Logic Rule
+				// Check if the frame length is correct: 19 + 4 (slave id (1), function (1), crc (2)) = 23
+				if (len != 23) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+
+				// Extract fields from the payload (shifted by +1 due to rule_type)
+				uint8_t input_type1Raw = frame[3];
+				uint16_t input_reg1 = (frame[4] << 8) | frame[5];
+				uint8_t op1Raw = frame[6];
+				uint16_t compare_value1 = (frame[7] << 8) | frame[8];
+				uint8_t input_type2Raw = frame[9];
+				uint16_t input_reg2 = (frame[10] << 8) | frame[11];
+				uint8_t op2Raw = frame[12];
+				uint16_t compare_value2 = (frame[13] << 8) | frame[14];
+				uint8_t joinRaw = frame[15];
+				uint8_t output_typeRaw = frame[16];
+				uint16_t output_reg = (frame[17] << 8) | frame[18];
+				uint16_t output_value = (frame[19] << 8) | frame[20];
+
+				// Validate fields
+				if (input_type1Raw == 0 || input_type1Raw > AUTOMATION_TYPE_COUNT || output_typeRaw == 0 || output_typeRaw > AUTOMATION_TYPE_COUNT) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+				if ((joinRaw != 1) && (input_type2Raw == 0 || input_type2Raw > AUTOMATION_TYPE_COUNT)) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+				if (op1Raw == 0 || op1Raw > AUTOMATION_OPERATION_COUNT) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+				if ((joinRaw != 1) && (op2Raw == 0 || op2Raw > AUTOMATION_OPERATION_COUNT)) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+				if (joinRaw < 1 || joinRaw > AUTOMATION_JOIN_COUNT) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+
+				RegisterType input_type1 = input_type1Raw - 1;
+				RegisterType output_type = output_typeRaw - 1;
+				ComparisonOp op1 = op1Raw - 1;
+				LogicJoin join = joinRaw - 1;
+
+				RegisterType input_type2 = 0;
+				ComparisonOp op2 = 0;
+				if (joinRaw != 1) {
+					input_type2 = input_type2Raw - 1;
+					op2 = op2Raw - 1;
+				}
+
+				LogicRule newRule = {
+					.input_type1 = input_type1,
+					.input_reg1 = input_reg1,
+					.op1 = op1,
+					.compare_value1 = compare_value1,
+					.input_type2 = input_type2,
+					.input_reg2 = input_reg2,
+					.op2 = op2,
+					.compare_value2 = compare_value2,
+					.join = join,
+					.output_type = output_type,
+					.output_reg = output_reg,
+					.output_value = output_value
+				};
+
+				uint8_t statusByte = 0x01; // Successful
+				if (!automation_add_rule(newRule)) {
+					statusByte = 0x00; // Unsuccessful
+				}
+
+				// Create the response frame
+				uint8_t responseData[3];
+				responseData[0] = slave_address;
+				responseData[1] = MODBUS_VENDOR_FUNC_ADD_RULE;
+				responseData[2] = statusByte;
+				modbus_send_response(responseData, 3);
+
+			} else if (rule_type == 2) { // Copy Rule
+				// Length: 7 payload + 4 overhead = 11
+				if (len != 11) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+
+				uint8_t input_typeRaw = frame[3];
+				uint16_t input_reg = (frame[4] << 8) | frame[5];
+				uint8_t output_typeRaw = frame[6];
+				uint16_t output_reg = (frame[7] << 8) | frame[8];
+
+				// Validate types
+				if (input_typeRaw == 0 || input_typeRaw > AUTOMATION_TYPE_COUNT || output_typeRaw == 0 || output_typeRaw > AUTOMATION_TYPE_COUNT) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+					return;
+				}
+
+				CopyRule newRule = {
+					.input_type = input_typeRaw - 1,
+					.input_reg = input_reg,
+					.output_type = output_typeRaw - 1,
+					.output_reg = output_reg
+				};
+
+				uint8_t statusByte = 0x01;
+				if (!automation_add_copyRule(newRule)) {
+					statusByte = 0x00;
+				}
+
+				uint8_t responseData[3];
+				responseData[0] = slave_address;
+				responseData[1] = MODBUS_VENDOR_FUNC_ADD_RULE;
+				responseData[2] = statusByte;
+				modbus_send_response(responseData, 3);
+
+			} else {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
-				return;
 			}
-			if ((joinRaw != 1) && (input_type2Raw == 0 || input_type2Raw > AUTOMATION_TYPE_COUNT)) {
-				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
-				return;
-			}
-
-			// Ensure operations are valid
-			if (op1Raw == 0 || op1Raw > AUTOMATION_OPERATION_COUNT) {
-				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
-				return;
-			}
-			if ((joinRaw != 1) && (op2Raw == 0 || op2Raw > AUTOMATION_OPERATION_COUNT)) {
-				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
-				return;
-			}
-
-			// Ensure join is valid
-			if (joinRaw < 1 || joinRaw > AUTOMATION_JOIN_COUNT) {
-				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
-				return;
-			}
-
-
-			// Construct the rule (note enums start at 0, but over modbus i start a 1 so that null errors are easier to catch (i.e., they are 0 only if an error has occured))
-			RegisterType input_type1 = input_type1Raw - 1;
-			RegisterType output_type = output_typeRaw - 1;
-			ComparisonOp op1 = op1Raw - 1;
-			LogicJoin join = joinRaw - 1;
-
-			RegisterType input_type2 = 0;
-			ComparisonOp op2 = 0;
-			if (joinRaw != 1) {
-				input_type2 = input_type2Raw - 1;
-				op2 = op2Raw - 1;
-			}
-
-
-			LogicRule newRule = {
-				.input_type1 = input_type1,
-				.input_reg1 = input_reg1,
-				.op1 = op1,
-				.compare_value1 = compare_value1,
-
-				.input_type2 = input_type2,
-				.input_reg2 = input_reg2,
-				.op2 = op2,
-				.compare_value2 = compare_value2,
-
-				.join = join,
-
-				.output_type = output_type,
-				.output_reg = output_reg,
-				.output_value = output_value
-			};
-
-
-			uint8_t statusByte = 0x01; // Successful
-
-			bool status = automation_add_rule(newRule);
-			if (status == false) {
-				statusByte = 0x00; // Unsuccessful -> no more rules allowable.
-			}
-
-			// Create the response frame
-			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
-
-			responseData[0] = slave_address; // the address of us
-			responseData[1] = MODBUS_VENDOR_FUNC_ADD_RULE;
-			responseData[2] = statusByte; // 1 byte to indicate success/failure
-
-			uint16_t responseLen = 3;
-
-			modbus_send_response(responseData, responseLen);
 			break;
 		}
 		case MODBUS_VENDOR_FUNC_GET_RULE_COUNT: {
+			// Check request length (Slave, Func, Type, Padding, CRC Low, CRC High) = 6
+			if (len != 6) {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
+			uint8_t rule_type = frame[2];
+			uint16_t count = 0;
+
+			if (rule_type == 1) {
+				count = automation_get_rule_count();
+			} else if (rule_type == 2) {
+				count = automation_get_copyRule_count();
+			} else {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
 			// Create the response frame
-			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
+			uint8_t responseData[5];
 
-			uint16_t ruleCount = automation_get_rule_count();
+			responseData[0] = slave_address;
+			responseData[1] = MODBUS_VENDOR_FUNC_GET_RULE_COUNT; // Fixed: originally was ADD_RULE
+			responseData[2] = 0x02; // byte count, 2 bytes follow
+			responseData[3] = count >> 8;
+			responseData[4] = count & 0x00FF;
 
-			responseData[0] = slave_address; // the address of us
-			responseData[1] = MODBUS_VENDOR_FUNC_ADD_RULE;
-			responseData[2] = 0x02; // byte count, 2 bytes follow (16 bits -> uint16_t)
-			responseData[3] = ruleCount >> 8; // high byte
-			responseData[4] = ruleCount & 0x00FF; // low byte
-
-			uint16_t responseLen = 5;
-			modbus_send_response(responseData, responseLen);
+			modbus_send_response(responseData, 5);
 			break;
 		}
 		case MODBUS_VENDOR_FUNC_GET_RULE: {
-			// Check request length (Slave Address, Function Code, Index High, Index Low, CRC Low, CRC High)
-			if (len != 6) {
+			// Check request length (Slave, Func, RuleType, Index High, Index Low, CRC Low, CRC High) = 7
+			if (len != 7) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
-			uint16_t ruleIndex = (frame[2] << 8) | frame[3];
-
-			LogicRule rule;
-
-			bool status = automation_get_rule(ruleIndex, &rule);
-			if (status == false) {
-				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
-				return;
-			}
-
-			// Extract fields from the rule struct
-			// Enumerations have + 1 as to make first index 1 (easier to detect 0 errors).
-			uint8_t input_type1Raw = (uint8_t)rule.input_type1 + 1;
-			uint16_t input_reg1 = (uint16_t)rule.input_reg1;
-			uint8_t op1Raw = (uint8_t)rule.op1 + 1;
-			uint16_t compare_value1 = (uint16_t)rule.compare_value1;
-			uint8_t input_type2Raw = (uint8_t)rule.input_type2 + 1;
-			uint16_t input_reg2 = (uint16_t)rule.input_reg2;
-			uint8_t op2Raw = (uint8_t)rule.op2 + 1;
-			uint16_t compare_value2 = (uint16_t)rule.compare_value2;
-			uint8_t joinRaw = (uint8_t)rule.join + 1;
-			uint8_t output_typeRaw = (uint8_t)rule.output_type + 1;
-			uint16_t output_reg = (uint16_t)rule.output_reg;
-			uint16_t output_value = (uint16_t)rule.output_value;
-
+			uint8_t rule_type = frame[2];
+			uint16_t ruleIndex = (frame[3] << 8) | frame[4];
 			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
 
-			// Create the response frame
-			responseData[0] = slave_address; // the address of us
+			responseData[0] = slave_address;
 			responseData[1] = MODBUS_VENDOR_FUNC_GET_RULE;
 
-			responseData[2] = input_type1Raw;
-			responseData[3] = input_reg1 >> 8; // high bit
-			responseData[4] = input_reg1 & 0xFF; // low bit
-			responseData[5] = op1Raw;
-			responseData[6] = compare_value1 >> 8;
-			responseData[7] = compare_value1 & 0xFF;
-			responseData[8] = input_type2Raw;
-			responseData[9] = input_reg2 >> 8;
-			responseData[10] = input_reg2 & 0xFF;
-			responseData[11] = op2Raw;
-			responseData[12] = compare_value2 >> 8;
-			responseData[13] = compare_value2 & 0xFF;
-			responseData[14] = joinRaw;
-			responseData[15] = output_typeRaw;
-			responseData[16] = output_reg >> 8;
-			responseData[17] = output_reg & 0xFF;
-			responseData[18] = output_value >> 8;
-			responseData[19] = output_value & 0xFF;
+			if (rule_type == 1) { // Logic Rule
+				LogicRule rule;
+				if (!automation_get_rule(ruleIndex, &rule)) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+					return;
+				}
 
-			uint16_t responseLen = 20;
-			modbus_send_response(responseData, responseLen);
+				responseData[2] = (uint8_t)rule.input_type1 + 1;
+				responseData[3] = (uint16_t)rule.input_reg1 >> 8;
+				responseData[4] = (uint16_t)rule.input_reg1 & 0xFF;
+				responseData[5] = (uint8_t)rule.op1 + 1;
+				responseData[6] = (uint16_t)rule.compare_value1 >> 8;
+				responseData[7] = (uint16_t)rule.compare_value1 & 0xFF;
+				responseData[8] = (uint8_t)rule.input_type2 + 1;
+				responseData[9] = (uint16_t)rule.input_reg2 >> 8;
+				responseData[10] = (uint16_t)rule.input_reg2 & 0xFF;
+				responseData[11] = (uint8_t)rule.op2 + 1;
+				responseData[12] = (uint16_t)rule.compare_value2 >> 8;
+				responseData[13] = (uint16_t)rule.compare_value2 & 0xFF;
+				responseData[14] = (uint8_t)rule.join + 1;
+				responseData[15] = (uint8_t)rule.output_type + 1;
+				responseData[16] = (uint16_t)rule.output_reg >> 8;
+				responseData[17] = (uint16_t)rule.output_reg & 0xFF;
+				responseData[18] = (uint16_t)rule.output_value >> 8;
+				responseData[19] = (uint16_t)rule.output_value & 0xFF;
+
+				modbus_send_response(responseData, 20);
+
+			} else if (rule_type == 2) { // Copy Rule
+				CopyRule rule;
+				if (!automation_get_copyRule(ruleIndex, &rule)) {
+					modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
+					return;
+				}
+
+				responseData[2] = (uint8_t)rule.input_type + 1;
+				responseData[3] = (uint16_t)rule.input_reg >> 8;
+				responseData[4] = (uint16_t)rule.input_reg & 0xFF;
+				responseData[5] = (uint8_t)rule.output_type + 1;
+				responseData[6] = (uint16_t)rule.output_reg >> 8;
+				responseData[7] = (uint16_t)rule.output_reg & 0xFF;
+
+				modbus_send_response(responseData, 8);
+			} else {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
 			break;
 		}
 		case MODBUS_VENDOR_FUNC_DEL_RULE: {
-			// Check request length (Slave Address, Function Code, Index High, Index Low, CRC Low, CRC High)
-			if (len != 6) {
+			// Check request length (Slave, Func, RuleType, Index High, Index Low, CRC Low, CRC High) = 7
+			if (len != 7) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
 				return;
 			}
 
-			uint16_t ruleIndex = (frame[2] << 8) | frame[3];
+			uint8_t rule_type = frame[2];
+			uint16_t ruleIndex = (frame[3] << 8) | frame[4];
+			bool status = false;
 
-			bool status = automation_delete_rule(ruleIndex);
+			if (rule_type == 1) {
+				status = automation_delete_rule(ruleIndex);
+			} else if (rule_type == 2) {
+				status = automation_delete_copyRule(ruleIndex);
+			} else {
+				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE);
+				return;
+			}
+
 			if (status == false) {
 				modbus_send_exception(slave_address, function, MODBUS_EXCEPTION_SLAVE_DEVICE_FAILURE);
 				return;
 			}
 
 			// Create the response frame
-			uint8_t responseData[MODBUS_MAX_FRAME_SIZE];
-
-			responseData[0] = slave_address; // the address of us
+			uint8_t responseData[3];
+			responseData[0] = slave_address;
 			responseData[1] = MODBUS_VENDOR_FUNC_DEL_RULE;
-			responseData[2] = 0x01; // 1 byte to indicate success --> no failure byte at this point
+			responseData[2] = 0x01; // Success
 
-			uint16_t responseLen = 3;
-
-			modbus_send_response(responseData, responseLen);
+			modbus_send_response(responseData, 3);
 			break;
 		}
 		case MODBUS_VENDOR_FUNC_ADD_VIRTUAL_REG: {

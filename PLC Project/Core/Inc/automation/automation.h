@@ -62,16 +62,32 @@ typedef struct {
 	uint16_t output_value;
 } LogicRule;
 
+typedef struct {
+	RegisterType input_type;
+	uint16_t input_reg;
+
+	RegisterType output_type;
+	uint16_t output_reg;
+} CopyRule;
+
 void automation_Init(void);
 void automation_Tick(void);
 
 bool automation_add_rule(LogicRule newRule);
 
+bool automation_add_copyRule(CopyRule newCopyRule);
+
 uint16_t automation_get_rule_count(void);
+
+uint16_t automation_get_copyRule_count(void);
 
 bool automation_get_rule(uint16_t index, LogicRule* rule);
 
+bool automation_get_copyRule(uint16_t index, CopyRule* copyRule);
+
 bool automation_delete_rule(uint16_t index);
+
+bool automation_delete_copyRule(uint16_t index);
 
 bool automation_save_rules(void);
 
