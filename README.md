@@ -35,7 +35,7 @@ The editable hardware source files are provided so that the design can be studie
 
 * 🧠 [Why I Built This](#-why-i-built-this)
 
-* 🛠️ [Getting Started](#-getting-started)
+* 🛠️ [Getting Started](#%EF%B8%8F-getting-started)
 
 * 📂 [Repo Structure](#-repo-structure)
 
@@ -258,7 +258,7 @@ stm32-plc-project/
 
 ---
 
-#### 📜 Licence
+## 📜 Licence
 
 This repository contains both hardware design files and software.
 
