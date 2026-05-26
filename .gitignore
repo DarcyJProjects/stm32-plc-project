@@ -67,26 +67,26 @@ yarn-error.log*
 # OS junk files
 .DS_Store
 Thumbs.db
-PLC Project/.metadata/.log4j2.xml
-PLC Project/.metadata/.plugins/com.st.stm32cube.ide.mcu.informationcenter/2.3.100.202501301211
-PLC Project/.metadata/.plugins/org.eclipse.cdt.make.core/specs.c
-PLC Project/.metadata/.plugins/org.eclipse.cdt.make.core/specs.cpp
-PLC Project/.metadata/.plugins/org.eclipse.cdt.make.ui/dialog_settings.xml
-PLC Project/.metadata/.plugins/org.eclipse.core.resources/.root/.indexes/history.version
-PLC Project/.metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.version
-PLC Project/.metadata/.plugins/org.eclipse.core.resources/.root/1.tree
-PLC Project/.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.core.resources
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/com.st.stm32cube.ide.mcu.ide.oss.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.cdt.debug.core.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.cdt.ui.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.core.resources.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.debug.core.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.debug.ui.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.ide.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.navigator.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.prefs
-PLC Project/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.workbench.prefs
-PLC Project/.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
-PLC Project/.metadata/.plugins/org.eclipse.ui.ide/dialog_settings.xml
-PLC Project/.metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
-PLC Project/.metadata/version.ini
+Firmware/.metadata/.log4j2.xml
+Firmware/.metadata/.plugins/com.st.stm32cube.ide.mcu.informationcenter/2.3.100.202501301211
+Firmware/.metadata/.plugins/org.eclipse.cdt.make.core/specs.c
+Firmware/.metadata/.plugins/org.eclipse.cdt.make.core/specs.cpp
+Firmware/.metadata/.plugins/org.eclipse.cdt.make.ui/dialog_settings.xml
+Firmware/.metadata/.plugins/org.eclipse.core.resources/.root/.indexes/history.version
+Firmware/.metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.version
+Firmware/.metadata/.plugins/org.eclipse.core.resources/.root/1.tree
+Firmware/.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.core.resources
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/com.st.stm32cube.ide.mcu.ide.oss.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.cdt.debug.core.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.cdt.ui.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.core.resources.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.debug.core.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.debug.ui.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.ide.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.navigator.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.prefs
+Firmware/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.workbench.prefs
+Firmware/.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
+Firmware/.metadata/.plugins/org.eclipse.ui.ide/dialog_settings.xml
+Firmware/.metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
+Firmware/.metadata/version.ini
