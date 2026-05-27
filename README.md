@@ -119,9 +119,13 @@ I tried to pack a wide range of industrial-style hardware and firmware features 
 - Status LEDs for power, isolated power, communication, relay state, and general status
 - Hardware mode switches for analogue current/voltage configuration
 
-### Block Diagram:
+### Overall Block Diagram:
 
 <img src="https://raw.githubusercontent.com/DarcyJProjects/embedded-controller/refs/heads/main/Documentation/datasheet/general_block_diagram.png" title="" alt="IMG: Block diagram" data-align="center">
+
+### Power Supply Block Diagram:
+
+<img src="https://raw.githubusercontent.com/DarcyJProjects/embedded-controller/refs/heads/main/Documentation/datasheet/power-supply-block-diagram.png" title="" alt="IMG: Power Supply Block Diagram" data-align="center">
 
 ---
 
