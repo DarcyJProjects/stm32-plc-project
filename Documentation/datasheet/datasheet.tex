@@ -35,7 +35,7 @@
 \begin{textblock*}{5cm}(15cm, 2.5cm) 
     \raggedleft % Align text to the right
     \small 
-    \textbf{Hardware Ver:} v1.XXX
+    \textbf{Hardware Ver:} v1.194
 \end{textblock*}
 
 \maketitle
@@ -43,7 +43,7 @@
 \section{Features}
 \begin{itemize}[leftmargin=*, itemsep=2pt, topsep=0pt]
     \item \textbf{Core:} STM32G431 Cortex-M4 MCU @ 170MHz
-    \item \textbf{Power:} 7V-28V DC (Rev. Polarity, OCP, TVS)
+    \item \textbf{Power:} 12V-28V DC (Rev. Polarity, OCP, TVS)
     \item \textbf{Isolation \& Protection:} 1 kV Galvanic Isolation, ESD Protection up to 30 kV
     
     % CONDENSING STRATEGY: Use a paragraph style for the big lists.
@@ -53,16 +53,16 @@
     2x Analog Outputs (12-bit, 4-20mA/0-5V),
     4x Digital Inputs (24V),
     2x Digital Outputs (24V),
-    2x Relays (10A / 30VDC, 50VAC),
+    2x Relays (10A / 30VDC, ELV 50VAC),
     Isolated $I^2$C Header.
 
     \item \textbf{On-Board HMI:} 
     0.96" OLED Display, 
     4x Tactile Buttons, 
     5x Status LEDs, 
-    6x Hardware Mode Switches (Analog Current/Voltage Mode Config).
+    6x Hardware Mode Switches (Analog Current/Voltage Mode Configuration).
 
-    \item \textbf{Memory:} 4KB EEPROM with CRC (Stores Config \& Automation Rules)
+    \item \textbf{Memory:} 4KB EEPROM with CRC (Stores Configuration \& Automation Rules)
 
     \item \textbf{Connectivity:}
     Isolated RS485 (MODBUS RTU Master/Slave);
@@ -78,9 +78,9 @@
 
 
 
-\section{Intended Applications}
+\section{Example Demonstration Use Cases}
 \begin{itemize}[leftmargin=*, itemsep=2pt, topsep=0pt]
-    \item \textbf{Industrial Sensor Node:} Aggregation of 4-20mA process signals (pressure, flow, level) to MODBUS RTU.
+    \item \textbf{Industrial Sensor Node:} Aggregation of voltage or 4-20mA process signals (pressure, flow, level) to MODBUS RTU.
     \item \textbf{Distributed I/O Expansion:} Cost-effective relay control and status monitoring for existing SCADA networks.
     \item \textbf{Hybrid Edge Controller:} Autonomous control of downstream MODBUS slaves (e.g., VFDs, remote sensors) while simultaneously reporting status to an upstream SCADA system.
     \item \textbf{Embedded Logic Prototyping:} Development platform for custom control loops and automation logic using the STM32G4.
@@ -109,7 +109,7 @@
 
 % --- SECTION 2: DESCRIPTION ---
 \section{General Description}
-The \textbf{DJP-G431-EIC} is a robust embedded controller designed for industrial environments, bridging the gap between low-level microcontroller flexibility and PLC reliability. Built around the high-performance STM32G4 series, it features a high-efficiency 24V buck converter and \textbf{full galvanic isolation} on all field interfaces, ensuring system stability in noisy environments.
+The \textbf{DJP-G431-EIC} is an educational embedded controller inspired by industrial I/O and PLC-style design practices. Built around the high-performance STM32G4 series, it features a high-efficiency 24V buck converter and \textbf{full galvanic isolation} on all field interfaces, ensuring system stability in noisy environments.
 
 Unique to this controller is a \textbf{Hybrid Master-Slave} configuration handled by a custom \textbf{DMA-driven MODBUS RTU stack}. This allows the board to autonomously control downstream devices while simultaneously reporting to an upstream SCADA system or Web Panel. An on-board OLED display with burn-in protection provides local feedback on system status and configuration.
 
@@ -192,8 +192,8 @@ Conditions: $V_{IN} = 24V$, $T_A = 25^{\circ}C$ unless otherwise noted.
     \thickhline
     \textbf{Protected Rail} & \textbf{Hold} ($I_{HOLD}$) & \textbf{Trip} ($I_{TRIP}$) & \textbf{Max V} & \textbf{Notes} \\
     \hline
-    Main Power Input ($V_{IN}$) & XX mA & $\sim$2x the hold mA  & 30 V & Protects entire board \\
-    5V\_ISO & XX mA & $\sim$2x the hold mA & 6 V & Protects B0505S isolated DC/DC \\
+    Main Power Input ($V_{IN}$) & 2 A & $\sim$2x the hold  & 30 V & Protects entire board \\
+    5V\_ISO & 750 mA & $\sim$2x the hold & 6 V & Protects B0505S isolated DC/DC \\
     \thickhline
 \end{tabularx}
 \begin{tablenotes}
@@ -211,13 +211,13 @@ Conditions: $V_{IN} = 24V$, $T_A = 25^{\circ}C$ unless otherwise noted.
     \hline
     \multicolumn{7}{l}{\textbf{Power Supply}} \\
     \hline
-    Supply Voltage      & $V_{IN}$   & 7  & 24  & 28  & V  & Operating Range \\
-    Supply Current      & $I_{IN}$   & -   & XX  & XX & mA & Idle vs. All Relays Active \\
+    Supply Voltage      & $V_{IN}$   & 12  & 24  & 28  & V  & Operating Range \\
+    Supply Current      & $I_{IN}$   & -   & 90  & 150 & mA & Idle vs. Relays Active @ $V_{IN}$=24 V \\
     \hline
     \multicolumn{7}{l}{\textbf{Digital Inputs}} \\
     \hline
-    Input Voltage High  & $V_{IH}$   & XX  & 24  & 28  & V  & Logic "1" Threshold \\
-    Input Voltage Low   & $V_{IL}$   & XX  & 0   & XX   & V  & Logic "0" Threshold \\
+    Input Voltage High  & $V_{IH}$   & 1.5  & 24  & 28  & V  & Logic "1" Threshold \\
+    Input Voltage Low   & $V_{IL}$   & 0  & 0   & 1.3  & V  & Logic "0" Threshold \\
     Input Current       & $I_{DIN}$  & -   & 11.4   & 14.9  & mA & @ 24V (Typ) / 28V (Max) \\
     \hline
     \multicolumn{7}{l}{\textbf{Digital Outputs}} \\
@@ -240,9 +240,9 @@ Conditions: $V_{IN} = 24V$, $T_A = 25^{\circ}C$ unless otherwise noted.
     \multicolumn{7}{l}{\textbf{Analog Outputs (12-Bit)}} \\
     \hline
     Output Voltage      & $V_{OUT}$  & 0   & -   & 5   & V  & 0-5V Mode -- \textbf{Sourcing} (Active) \\
-    Source Current      & $I_{SRC}$  & -   & -   & XX  & mA & 0-5V Mode -- Max drive \\
+    % Source Current      & $I_{SRC}$  & -   & -   & XX  & mA & 0-5V Mode -- Max drive \\
     \hline
-    Current Sink Range\tnote{1}  & $I_{SNK}$  & X   & -   & XX  & mA & 4-20mA Mode -- \textbf{Sinking} (Passive) \\
+    % Current Sink Range\tnote{1}  & $I_{SNK}$  & X   & -   & XX  & mA & 4-20mA Mode -- \textbf{Sinking} (Passive) \\
     Max Loop Voltage\tnote{3}    & $V_{LOOP}$ & 12  & 24  & 30  & V  & 4-20mA Mode -- Ext. Loop Supply \\
     Max Loop Resistance & $R_{LOOP}$ & 300 & 900 & 1075 & $\Omega$ & @ 12V / 24V / 30V Loop Voltage \\
     \hline
@@ -272,22 +272,22 @@ Conditions: $V_{IN} = 24V$, $T_A = 25^{\circ}C$ unless otherwise noted.
 
 \section{Absolute Maximum Ratings}
 \begin{table}[H]
-\caption{Stress Ratings CALC CONFIRMED}
+\caption{Stress Ratings}
 \begin{tabularx}{\textwidth}{l | c | c c | c | X}
     \thickhline
     \textbf{Parameter} & \textbf{Symbol} & \textbf{Min.} & \textbf{Max.} & \textbf{Unit} & \textbf{Comments} \\
     \hline
     \multicolumn{6}{l}{\textbf{Power}} \\
     \hline
-    Input Voltage       & $V_{IN\_MAX}$  & - & 30 & V & Continuous (Limited by Input PPTC \& TVS) \\
-    Max Total Current   & $I_{IN\_MAX}$  & - & XX & A & Limited by Input PPTC \\
+    Input Voltage       & $V_{IN\_MAX}$  & 7 & 30 & V & Continuous (Limited by Input PPTC \& TVS) \\
+    Max Total Current   & $I_{IN\_MAX}$  & - & 2 & A & Limited by Input PPTC \\
     \hline
     \multicolumn{6}{l}{\textbf{Digital I/O}} \\
     \hline
     DIN Voltage         & $V_{DIN\_MAX}$ & - & 30 & V & Continuous (Thermal Limit of Series Resistors)\\
     \hline
     DOUT Sink Current   & $I_{DOUT\_MAX}$ & - & 3 & A & Continuous (Per Channel) @ $T_A = 85^{\circ}C$\\
-    Relay Voltage       & $V_{SW\_MAX(DC)}$ & - & 110 & V & Max DC Contact Switching Voltage \\
+    Relay Voltage       & $V_{SW\_MAX(DC)}$ & - & 30 & V & Max DC Contact Switching Voltage \\
     Relay Voltage       & $V_{SW\_MAX(AC)}$ & -  & 50 & VAC & Max AC Contact Switching Voltage \\
     Relay Current       & $I_{REL\_MAX}$ & - & 10 & A & Resistive Load \\
     \hline
@@ -305,11 +305,11 @@ Conditions: $V_{IN} = 24V$, $T_A = 25^{\circ}C$ unless otherwise noted.
     RS485 Bus Voltage Out   & $V_{485\_OUT\_ABS}$ & -8 & +12.5 & V & Max voltage from driver to A/B pins \\
     I2C Pin Voltage     & $V_{I2C\_ABS}$ & -0.5 & 5.5 & V & Max voltages on SDA/SCL \\
     \hline
-    \multicolumn{6}{l}{\textbf{Environmental}} \\
-    \hline
-    Storage Temp.       & $T_{STG}$      & -XX & +XX & $^{\circ}$C & Estimation\\
-    Operating Temp.     & $T_{OP}$       & -XX & +XX & $^{\circ}$C & Estimation \\
-    \thickhline
+    %\multicolumn{6}{l}{\textbf{Environmental}} \\
+    %\hline
+    %Storage Temp.       & $T_{STG}$      & -XX & +XX & $^{\circ}$C & Estimation\\
+    %Operating Temp.     & $T_{OP}$       & -XX & +XX & $^{\circ}$C & Estimation \\
+    %\thickhline
 \end{tabularx}
 \end{table}
 
@@ -374,7 +374,7 @@ Since Virtual Registers are defined with specific Modbus data types, they can be
 \clearpage
 
 \subsection{External Expansion ($I^2C$)}
-The isolated 5V $I^2C$ header allows external peripherals to be mapped to MODBUS registers. On-board field side 5V\_ISO pull-up resistors (4.7 k$\Omega$) are installed on SCL and SDA, so 5V tolerant $I^2C$ devices can only be used without an external level shifter (see Texas Instruments PCA9306). The user must provide their own power supply for the devices, and reference this to the GND pin in the header.
+The isolated 5V $I^2C$ header allows external peripherals to be mapped to MODBUS registers. On-board field side 5V\_ISO pull-up resistors (4.7 k$\Omega$) are installed on SCL and SDA so only 5 V-tolerant $I^2C$ devices should be connected directly. Lower-voltage devices may require an external level shifter, such as a PCA9306.
 \vspace{1em} \\
 \textit{\textbf{Note:} Unlike the Rule Engine, adding new $I^2C$ devices requires custom read/write drivers and a \textbf{firmware update}. Reference implementations for common sensors can be found in the project source code.}
 
@@ -396,9 +396,9 @@ These proprietary function codes provide access to specialized device capabiliti
     0x6A & READ\_VIRTUAL\_REG & Returns the value of the requested virtual register \\
     0x6B & WRITE\_VIRTUAL\_REG & Write the specified value to the requested virtual register \\
     0x6C & GET\_VIRTUAL\_REG\_COUNT & Returns the number of virtual registers \\
-    0x6D & CLEAR\_VIRTUAL\_REG & Deletes all virtual registers. Warning: Do no execute if there are \textbf{any} rules that reference \textbf{any} virtual registers. \\
+    0x6D & CLEAR\_VIRTUAL\_REG & Deletes all virtual registers. Warning: Do not execute if there are \textbf{any} rules that reference \textbf{any} virtual registers. \\
     0x6E & SET\_RTC & Sets the RTC date and time \\
-    0x6F & SET\_HOLDING\_REG\_MODE & Sets the requested virtual register to the specified mode (current/voltage) \\
+    0x6F & SET\_HOLDING\_REG\_MODE & Sets the requested holding register to the specified mode (current/voltage) \\
     0x70 & SET\_INPUT\_REG\_MODE & Sets the requested input register to the specified mode (current/voltage) \\
     0x71 & GET\_REG\_MODE & Returns the mode (current/voltage) of the requested register (holding/input) \\
     0x72 & SET\_EMERGENCY\_STOP & Sets the E-STOP button configuration \\
@@ -407,18 +407,8 @@ These proprietary function codes provide access to specialized device capabiliti
 \end{tabularx}
 \end{table}
 
-\textbf{Note:} Function codes 0x6F--0x73 extend into the Public Function Code range. 
-While functionally valid for this device, they are non-standard. Future firmware revisions 
-may migrate all vendor-defined functions into a Sub-Function Encapsulation architecture (e.g. Function Code 0x64).
+\textbf{Note:} These function codes are firmware-specific and should not be considered MODBUS-standard or interoperable with other devices.
 
-\section{Software Ecosystem}
-The DJP-G431-EIC is supported by a comprehensive software suite:
-\begin{itemize}
-    \item \textbf{Web Configuration Panel:} A Node.js-based dashboard connecting via the USB-Serial bridge. Allows for real-time monitoring of all registers, hardware configuration, and "No-Code" logic automation; all over MODBUS RTU.
-    \item \textbf{Automation Engine:} Custom logic engine supporting drop-down based "If-This-Then-That" rules, executed locally on the STM32, programmed over MODBUS vendor functions.
-\end{itemize}
-
-\clearpage
 
 \section{User Interface}
 
@@ -447,9 +437,10 @@ The board features 4 tactile buttons for menu interaction, system recovery, and 
     \textbf{Name} & \textbf{Color} & \textbf{Indication} \\
     \hline
     \textbf{PWR} & Green & 3.3V Logic Domain Power Active \\
+    \textbf{STATUS} & Red & General Status Indicator \\
     \textbf{ISO\_PWR} & Green & 5V Isolated Field Domain Power Active \\
     \textbf{RX/TX} & Blue & Modbus RS485 Data Traffic \\
-    \textbf{REL1 / REL2} & Yellow & Relay Coil Energized (Output Active) \\
+    \textbf{REL1 / REL2} & Red & Relay Coil Energized (Output Active) \\
     \thickhline
 \end{tabularx}
 \end{table}
@@ -493,6 +484,16 @@ The isolated RS485 interface features a 6-pin jumper header (JP\_RS485) to enabl
 
 
 \clearpage
+
+
+\section{Software Ecosystem}
+The DJP-G431-EIC is supported by a comprehensive software suite:
+\begin{itemize}
+    \item \textbf{Web Configuration Panel:} A Node.js-based dashboard connecting via the USB-Serial bridge. Allows for real-time monitoring of all registers, hardware configuration, and "No-Code" logic automation; all over MODBUS RTU.
+    \item \textbf{Automation Engine:} Custom logic engine supporting drop-down based "If-This-Then-That" rules, executed locally on the STM32, programmed over MODBUS vendor functions. A single rule can include up to two conditions, with virtual registers provided as memory to link several rules (\textgreater 2) together.
+\end{itemize}
+
+
 \section{Mechanical \& Installation}
 
 \begin{figure}[h]
@@ -502,30 +503,34 @@ The isolated RS485 interface features a 6-pin jumper header (JP\_RS485) to enabl
     \caption{Mechanical Dimensions (Units: mm).}
 \end{figure}
 
-\section{Connection Diagram}
-\begin{figure}[H]
-    \centering
-    % REPLACE with your "Coloured Wires" diagram
-    % \includegraphics[width=0.9\linewidth]{wiring_diagram}
-    \begin{center}
-        \fbox{\parbox{12cm}{\centering \vspace{4cm} [PLACEHOLDER: SENSOR \& ACTUATOR WIRING DIAGRAM] \vspace{4cm}}}
-    \end{center}
-    \caption{Typical Connection Example. Note: Analog I/O must be configured via slide switches before powering on, and via the web panel or vendor-defined functions post-boot. }
-\end{figure}
+\clearpage
+\section{Safety Disclaimer}
 
+This hardware is a personal engineering project created solely for educational purposes, experimentation, and skill development.
 
+Although it uses industrial-style design techniques, it has \textbf{not} been tested, approved, certified, or validated against industrial, safety, EMC, electrical, environmental, functional safety, or regulatory standards, including IEC, UL, CE, RCM, or any similar certification scheme.
 
-%\vfill % Pushes this to the bottom of the page
+\vspace{1em}
 
-%\begin{center}
-%\fbox{\parbox{0.9\textwidth}{
-%    \centering
-%    \scriptsize
-%    \textit{\textbf{DISCLAIMER:} This hardware is a personal engineering project created solely for \textbf{educational purposes and %skill development}. While it explores industrial design techniques, it has \textbf{not} been tested against or certified for any specific %industrial standards (e.g., IEC, UL, CE). It is provided "AS IS" without warranty.}
-%    
-%    \vspace{0.3em} % Tiny gap
-%    \textit{For full licence details, design files, and terms of use, please refer to the project repository at \textbf{github.com/%DarcyJProjects}.}
-%}}
-%\end{center}
+\noindent\textbf{LIMITATION OF LIABILITY:}
+
+\vspace{0.5em}
+
+\noindent\textbf{THIS PROJECT IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER ACCEPTS NO LIABILITY FOR ANY DAMAGE, INJURY, DEATH, LOSS, NON-COMPLIANCE, EQUIPMENT FAILURE, DATA LOSS, BUSINESS INTERRUPTION, OR ANY OTHER ISSUE RESULTING FROM THE USE, MODIFICATION, MANUFACTURE, ASSEMBLY, DISTRIBUTION, OR ATTEMPTED DEPLOYMENT OF THIS DESIGN.}
+
+\vspace{1em}
+
+\noindent Do \textbf{not} use this project in:
+
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=4pt]
+    \item real industrial installations
+    \item safety-critical systems
+    \item mains-voltage systems
+    \item life-support, medical, automotive, aviation, mining, or hazardous environments
+    \item commercial products without proper engineering review, testing, certification, and regulatory approval
+    \item any system where failure could cause injury, property damage, environmental harm, financial loss, or unsafe operation
+\end{itemize}
+
+Anyone using, modifying, manufacturing, or testing this design does so entirely at their own risk and is responsible for ensuring compliance with all applicable laws, standards, and safety requirements.
 
 \end{document}
